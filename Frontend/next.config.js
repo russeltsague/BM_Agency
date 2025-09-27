@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['framer-motion'],
+  // Optimize for Vercel deployment
+  output: 'standalone',
+  // Disable static optimization for better Vercel compatibility
+  generateBuildId: async () => {
+    return 'build-cache-' + Date.now()
+  },
+  // Enable hybrid rendering
   experimental: {
     esmExternals: 'loose',
   },
@@ -12,6 +18,13 @@ const nextConfig = {
     })
     return config
   },
+  // Optimize images for Vercel
+  images: {
+    unoptimized: true,
+    domains: ['localhost'],
+  },
+  // Enable SWC minifier for better performance
+  swcMinify: true,
 }
 
 module.exports = nextConfig

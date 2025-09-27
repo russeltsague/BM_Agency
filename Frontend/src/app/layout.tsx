@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BM Agency - Agence de Communication Digitale 360°',
-  description: 'BM Agency est votre partenaire de confiance pour la communication digitale, le marketing, les objets publicitaires et la création de contenu.',
+  title: 'Camer Digital Agency - Agence de Communication Digitale 360°',
+  description: 'Camer Digital Agency est votre partenaire de confiance pour la communication digitale, le marketing, les objets publicitaires et la création de contenu au Cameroun.',
 }
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           defaultTheme="light"
-          storageKey="bm-agency-theme"
+          storageKey="camer-digital-agency-theme"
         >
           {children}
         </ThemeProvider>
