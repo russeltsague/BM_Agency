@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  mongodb-test:
+    image: mongo:6.0
+    container_name: mongodb-test
+    environment:
+      MONGO_INITDB_DATABASE: bm-agency-test
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_test_data:/data/db
+
+volumes:
+  mongodb_test_data:
