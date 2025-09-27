@@ -99,7 +99,7 @@ export default function ContactPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-primary-50 to-white">
+      <section className="pt-24 pb-16 bg-gradient-to-br from-primary-50 to-white dark:from-slate-800 dark:to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -107,10 +107,10 @@ export default function ContactPage() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Contactez <span className="text-primary-600">BM Agency</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
+              Contactez <span className="text-primary-600 dark:text-blue-400">Camer Digital Agency</span>
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
               Prêt à donner un coup d'accélérateur à votre présence digitale ?
               Nos experts vous accompagnent pour transformer vos idées en succès.
             </p>
@@ -119,7 +119,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-20">
+      <section className="py-20 bg-slate-900 dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {contactInfo.map((info, index) => (
@@ -129,35 +129,35 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center"
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 text-center border border-gray-100 dark:border-slate-700"
               >
                 <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  info.color === 'blue' ? 'bg-blue-100' :
-                  info.color === 'green' ? 'bg-green-100' :
-                  info.color === 'purple' ? 'bg-purple-100' :
-                  'bg-orange-100'
+                  info.color === 'blue' ? 'bg-blue-100 dark:bg-blue-900/30' :
+                  info.color === 'green' ? 'bg-green-100 dark:bg-green-900/30' :
+                  info.color === 'purple' ? 'bg-purple-100 dark:bg-purple-900/30' :
+                  'bg-orange-100 dark:bg-orange-900/30'
                 }`}>
                   <info.icon className={`w-8 h-8 ${
-                    info.color === 'blue' ? 'text-blue-600' :
-                    info.color === 'green' ? 'text-green-600' :
-                    info.color === 'purple' ? 'text-purple-600' :
-                    'text-orange-600'
+                    info.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                    info.color === 'green' ? 'text-green-600 dark:text-green-400' :
+                    info.color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
+                    'text-orange-600 dark:text-orange-400'
                   }`} />
                 </div>
 
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-3">
                   {info.title}
                 </h3>
 
                 <div className="space-y-1 mb-3">
                   {info.details.map((detail, detailIndex) => (
-                    <p key={detailIndex} className="text-gray-700 font-medium">
+                    <p key={detailIndex} className="text-gray-700 dark:text-slate-300 font-medium">
                       {detail}
                     </p>
                   ))}
                 </div>
 
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-slate-400">
                   {info.description}
                 </p>
               </motion.div>

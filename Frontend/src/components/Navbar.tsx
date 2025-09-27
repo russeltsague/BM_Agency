@@ -29,7 +29,7 @@ export const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               className="text-2xl font-bold text-primary-600 dark:text-blue-400"
             >
-              Camer Digital Agency
+              BM Agency
             </MotionDiv>
           </Link>
 
@@ -59,7 +59,7 @@ export const Navbar = () => {
             <ThemeToggle />
             <Button variant="outline" size="sm">
               <Phone className="w-4 h-4 mr-2" />
-              01 23 45 67 89
+              +237 222 123 456
             </Button>
             <Button size="sm">
               <Mail className="w-4 h-4 mr-2" />
@@ -103,7 +103,7 @@ export const Navbar = () => {
               <div className="flex flex-col space-y-2">
                 <Button variant="outline" className="w-full justify-center">
                   <Phone className="w-4 h-4 mr-2" />
-                  01 23 45 67 89
+                  +237 222 123 456
                 </Button>
                 <Button className="w-full justify-center">
                   <Mail className="w-4 h-4 mr-2" />

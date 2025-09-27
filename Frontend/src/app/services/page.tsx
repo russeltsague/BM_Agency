@@ -201,10 +201,10 @@ export default function ServicesPage() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Nos <span className="text-primary-600">Services</span>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
+              Nos <span className="text-primary-600 dark:text-blue-400">Services</span>
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
               Découvrez notre gamme complète de services digitaux conçus pour propulser
               votre entreprise vers le succès. Chaque solution est personnalisée selon vos
               objectifs et votre secteur d'activité.
