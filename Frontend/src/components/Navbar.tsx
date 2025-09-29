@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { MotionDiv } from '@/components/MotionComponents'
-import { Menu, X, Phone, Mail } from 'lucide-react'
+import { Phone, Mail, Menu, X, User, Settings } from 'lucide-react'
 import { Button } from './Button'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -65,6 +65,12 @@ export const Navbar = () => {
               <Mail className="w-4 h-4 mr-2" />
               Devis gratuit
             </Button>
+            <Link href="/admin/login">
+              <Button size="sm" variant="outline">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -109,6 +115,12 @@ export const Navbar = () => {
                   <Mail className="w-4 h-4 mr-2" />
                   Devis gratuit
                 </Button>
+                <Link href="/admin/login">
+                  <Button variant="outline" className="w-full justify-center">
+                    <Settings className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

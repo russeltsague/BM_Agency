@@ -28,11 +28,29 @@ export function ThemeProvider({
   storageKey = 'camer-digital-agency-ui-theme',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage?.getItem(storageKey) as Theme) || defaultTheme
-  )
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') return
+
+    try {
+      const storedTheme = localStorage.getItem(storageKey) as Theme
+      if (storedTheme && ['light', 'dark', 'system'].includes(storedTheme)) {
+        setTheme(storedTheme)
+      }
+    } catch (error) {
+      // If localStorage is not available, keep default theme
+      console.warn('localStorage not available:', error)
+    }
+  }, [storageKey])
+
+  useEffect(() => {
+    if (!mounted) return
+
     const root = window.document.documentElement
 
     root.classList.remove('light', 'dark')
@@ -48,14 +66,25 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme)
-  }, [theme])
+  }, [theme, mounted])
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage?.setItem(storageKey, theme)
+      try {
+        if (typeof window !== 'undefined' && localStorage) {
+          localStorage.setItem(storageKey, theme)
+        }
+      } catch (error) {
+        console.warn('Failed to save theme to localStorage:', error)
+      }
       setTheme(theme)
     },
+  }
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return <>{children}</>
   }
 
   return (

@@ -1,72 +1,50 @@
 {
   "pages": {
-    "/_not-found/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/app/_not-found/page-800c57f7f124690e.js"
-    ],
     "/layout": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/css/39e26306c7e12af0.css",
-      "static/chunks/app/layout-adaf8613189ee896.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
     "/agence/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/905-52cd9ac6081ee7a3.js",
-      "static/chunks/app/agence/page-6c05df5c785be33d.js"
-    ],
-    "/blog/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/905-52cd9ac6081ee7a3.js",
-      "static/chunks/app/blog/page-c87130e72bf9f328.js"
-    ],
-    "/contact/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/905-52cd9ac6081ee7a3.js",
-      "static/chunks/app/contact/page-da56867d42025954.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/agence/page.js"
     ],
     "/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/app/page-f20b05044366fa0d.js"
-    ],
-    "/portfolio/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/905-52cd9ac6081ee7a3.js",
-      "static/chunks/app/portfolio/page-009b69064f02e98a.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
     ],
     "/services/page": [
-      "static/chunks/webpack-a785c941f80c2152.js",
-      "static/chunks/fd9d1056-4a917af64af6b262.js",
-      "static/chunks/23-4043f137acde0018.js",
-      "static/chunks/main-app-03e9fed2c9670f62.js",
-      "static/chunks/790-df95f1122c43d234.js",
-      "static/chunks/905-52cd9ac6081ee7a3.js",
-      "static/chunks/app/services/page-b2620115a5159be1.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/services/page.js"
+    ],
+    "/portfolio/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/portfolio/page.js"
+    ],
+    "/blog/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/blog/page.js"
+    ],
+    "/admin/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/login/page.js"
+    ],
+    "/admin/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/layout.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
