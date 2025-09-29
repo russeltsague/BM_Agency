@@ -73,11 +73,11 @@ export default function AgencyPage() {
 
   const milestones = [
     { year: '2018', event: 'Création de BM Agency' },
-    { year: '2019', event: 'Ouverture du bureau parisien' },
+    { year: '2019', event: 'Ouverture du bureau de douala ' },
     { year: '2020', event: 'Lancement de la division e-commerce' },
     { year: '2021', event: 'Plus de 100 clients satisfaits' },
     { year: '2022', event: 'Expansion équipe +50%' },
-    { year: '2023', event: 'Lancement service IA & Automation' },
+    { year: '2023', event: 'Lancement du project une entreprise un siteweb' },
     { year: '2024', event: 'Objectif 1000 projets réalisés' }
   ]
 

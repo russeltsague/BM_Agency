@@ -25,7 +25,7 @@ export const HeroSection = () => {
           >
             <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-200/50 shadow-sm mb-8 dark:bg-slate-800/80 dark:border-slate-600/50 dark:text-slate-300">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Agence digitale camerounaise</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Agence digitale </span>
             </div>
 
             <MotionH1

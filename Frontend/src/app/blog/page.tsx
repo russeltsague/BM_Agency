@@ -131,10 +131,10 @@ export default function BlogPage() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
               Actualités & <span className="text-primary-600 dark:text-blue-400">Blog</span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-slate-400 leading-relaxed max-w-3xl mx-auto">
               Restez à la pointe des dernières tendances du digital avec nos articles
               d'experts. Conseils pratiques, analyses et insights pour votre stratégie digitale.
             </p>
@@ -145,7 +145,7 @@ export default function BlogPage() {
       {/* Search & Filter Section */}
       <section className="py-8 border-b border-gray-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-slate-500 w-5 h-5" />
               <input
@@ -155,7 +155,7 @@ export default function BlogPage() {
               />
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
                   key={category}
@@ -173,7 +173,7 @@ export default function BlogPage() {
       </section>
 
       {/* Featured Post */}
-      <section className="py-12 bg-gray-50 dark:bg-slate-800">
+      <section className="py-8 lg:py-12 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -182,10 +182,10 @@ export default function BlogPage() {
             viewport={{ once: true }}
             className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-slate-700"
           >
-            <div className="md:flex">
-              <div className="md:w-1/2 h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30"></div>
-              <div className="md:w-1/2 p-8">
-                <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-slate-400 mb-3">
+            <div className="flex flex-col md:flex-row">
+              <div className="w-full md:w-1/2 h-48 md:h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30"></div>
+              <div className="w-full md:w-1/2 p-6 lg:p-8">
+                <div className="flex flex-wrap gap-2 mb-3">
                   <span className="bg-yellow-500 dark:bg-yellow-600 text-white px-2 py-1 rounded text-xs font-medium">
                     Article à la une
                   </span>
@@ -194,7 +194,7 @@ export default function BlogPage() {
                   </span>
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-slate-100 mb-4">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-slate-100 mb-4">
                   {blogPosts[0].title}
                 </h2>
 
@@ -202,8 +202,8 @@ export default function BlogPage() {
                   {blogPosts[0].excerpt}
                 </p>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-slate-400">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-slate-400">
                     <div className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
                       {blogPosts[0].author}
@@ -229,14 +229,14 @@ export default function BlogPage() {
       </section>
 
       {/* Blog Posts Grid */}
-      <section className="py-20 bg-slate-900 dark:bg-slate-900">
+      <section className="py-16 lg:py-20 bg-slate-900 dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           >
             {blogPosts.slice(1).map((post, index) => (
               <motion.article
@@ -301,7 +301,7 @@ export default function BlogPage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-20 bg-primary-600 dark:bg-blue-600 text-white">
+      <section className="py-16 lg:py-20 bg-primary-600 dark:bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -309,22 +309,24 @@ export default function BlogPage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6">
               Ne manquez aucun article
             </h2>
-            <p className="text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-lg lg:text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
               Recevez nos derniers articles directement dans votre boîte mail.
               Une newsletter hebdomadaire avec les tendances du digital.
             </p>
-            <div className="max-w-md mx-auto flex gap-4">
-              <input
-                type="email"
-                placeholder="Votre email"
-                className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-blue-400"
-              />
-              <Button variant="secondary" className="bg-white dark:bg-slate-800 text-primary-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700">
-                S'abonner
-              </Button>
+            <div className="max-w-lg mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="email"
+                  placeholder="Votre email"
+                  className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-blue-400"
+                />
+                <Button variant="secondary" className="bg-white dark:bg-slate-800 text-primary-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700">
+                  S'abonner
+                </Button>
+              </div>
             </div>
           </motion.div>
         </div>
