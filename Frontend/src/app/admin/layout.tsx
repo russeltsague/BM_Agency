@@ -58,10 +58,14 @@ const sidebarItems = [
 ]
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  const queryClient = new QueryClient()
+
   return (
-    <AuthProvider>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 
@@ -71,7 +75,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-900">
       {/* Mobile sidebar backdrop */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -89,13 +93,13 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       <motion.aside
         initial={{ x: -280 }}
         animate={{ x: sidebarOpen ? 0 : -280 }}
-        className="fixed left-0 top-0 z-50 h-full w-64 bg-white shadow-lg lg:translate-x-0"
+        className="fixed left-0 top-0 z-50 h-full w-64 bg-slate-800 shadow-lg lg:translate-x-0"
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-16 items-center justify-between px-6 border-b">
-            <h1 className="text-xl font-bold text-primary-600">
-              Camer Digital Agency
+          <div className="flex h-16 items-center justify-between px-6 border-b border-slate-700">
+            <h1 className="text-xl font-bold text-blue-400">
+              BM Agency
             </h1>
             <Button
               variant="ghost"
@@ -120,8 +124,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                       href={item.href}
                       className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                         isActive
-                          ? 'bg-primary-100 text-primary-700'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          ? 'bg-blue-900/50 text-blue-400'
+                          : 'text-slate-300 hover:bg-slate-700 hover:text-slate-100'
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
@@ -135,16 +139,16 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </nav>
 
           {/* User section */}
-          <div className="border-t p-4">
+          <div className="border-t border-slate-700 p-4">
             <div className="flex items-center space-x-3 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100">
-                <User className="h-4 w-4 text-primary-600" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-900/30">
+                <User className="h-4 w-4 text-blue-400" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-slate-100 truncate">
                   {user?.name || 'Admin User'}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-slate-400 truncate">
                   {user?.email}
                 </p>
               </div>
@@ -165,7 +169,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top navbar */}
-        <header className="sticky top-0 z-30 bg-white border-b shadow-sm">
+        <header className="sticky top-0 z-30 bg-slate-800 border-b border-slate-700 shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
               <Button
@@ -177,14 +181,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="hidden lg:block">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold text-slate-100">
                   {sidebarItems.find(item => item.href === pathname)?.title || 'Dashboard'}
                 </h2>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="hidden sm:block text-sm text-gray-700">
+              <div className="hidden sm:block text-sm text-slate-300">
                 Welcome back, {user?.name || 'Admin'}
               </div>
             </div>

@@ -100,8 +100,8 @@ const mockProducts: Product[] = [
   },
   {
     id: '2',
-    name: 'T-shirt coton bio Camer Digital',
-    description: 'T-shirt en coton biologique 100% avec impression du logo Camer Digital Agency, disponible en plusieurs tailles.',
+    name: 'T-shirt coton bio BM Agency',
+    description: 'T-shirt en coton biologique 100% avec impression du logo BM Agency, disponible en plusieurs tailles.',
     price: 15000,
     category: 'Vêtements',
     sku: 'TSHIRT-CD-002',

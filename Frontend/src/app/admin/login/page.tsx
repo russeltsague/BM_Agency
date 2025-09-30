@@ -50,7 +50,7 @@ export default function AdminLogin() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Camer Digital Agency
+            BM Agency
           </CardTitle>
           <CardDescription>
             Admin Dashboard Login

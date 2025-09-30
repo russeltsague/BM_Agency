@@ -3,8 +3,8 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Camer Digital Agency - Agence de Communication Digitale 360°',
-  description: 'Camer Digital Agency est votre partenaire de confiance pour la communication digitale, le marketing, les objets publicitaires et la création de contenu au Cameroun.',
+  title: 'BM Agency - Agence de Communication Digitale 360°',
+  description: 'BM Agency est votre partenaire de confiance pour la communication digitale, le marketing, les objets publicitaires et la création de contenu au Cameroun.',
 }
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider
           defaultTheme="light"
-          storageKey="camer-digital-agency-theme"
+          storageKey="bm-agency-theme"
         >
           {children}
         </ThemeProvider>

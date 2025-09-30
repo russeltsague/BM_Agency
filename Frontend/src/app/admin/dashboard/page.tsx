@@ -56,40 +56,40 @@ const statCards = [
     value: mockStats.services,
     icon: Settings,
     href: '/admin/services',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-900/30',
   },
   {
     title: 'Portfolio',
     value: mockStats.portfolio,
     icon: Image,
     href: '/admin/portfolio',
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
+    color: 'text-green-400',
+    bgColor: 'bg-green-900/30',
   },
   {
     title: 'Blog Articles',
     value: mockStats.blog,
     icon: FileText,
     href: '/admin/blog',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-900/30',
   },
   {
     title: 'Testimonials',
     value: mockStats.testimonials,
     icon: Users,
     href: '/admin/testimonials',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-100',
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-900/30',
   },
   {
     title: 'Products',
     value: mockStats.products,
     icon: Package,
     href: '/admin/products',
-    color: 'text-pink-600',
-    bgColor: 'bg-pink-100',
+    color: 'text-pink-400',
+    bgColor: 'bg-pink-900/30',
   },
 ]
 
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
   if (!mounted) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
       </div>
     )
   }
@@ -132,8 +132,8 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back! Here's an overview of your content.</p>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-slate-300">Welcome back! Here's an overview of your content.</p>
         </div>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -153,9 +153,9 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer bg-slate-800 border-slate-700">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-slate-300">
                     {stat.title}
                   </CardTitle>
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
@@ -163,10 +163,10 @@ export default function AdminDashboard() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-white">
                     {isLoading ? '...' : stat.value}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Total {stat.title.toLowerCase()}
                   </p>
                 </CardContent>
@@ -179,13 +179,13 @@ export default function AdminDashboard() {
       {/* Recent Activity & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Actions */}
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-white">
               <Clock className="mr-2 h-5 w-5" />
               Recent Actions
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-slate-400">
               Latest changes to your content
             </CardDescription>
           </CardHeader>
@@ -198,15 +198,15 @@ export default function AdminDashboard() {
                       action.type === 'service' ? 'bg-blue-500' :
                       action.type === 'blog' ? 'bg-purple-500' :
                       action.type === 'portfolio' ? 'bg-green-500' :
-                      'bg-gray-500'
+                      'bg-slate-500'
                     }`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900">
+                    <p className="text-sm text-white">
                       <span className="font-medium capitalize">{action.action}</span>{' '}
                       <span className="font-medium">{action.title}</span>
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-slate-400">
                       {formatTimestamp(action.timestamp)}
                     </p>
                   </div>
@@ -217,31 +217,31 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-white">
               <TrendingUp className="mr-2 h-5 w-5" />
               Quick Actions
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-slate-400">
               Common tasks and shortcuts
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="h-auto p-4 flex-col">
+              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
                 <Settings className="h-6 w-6 mb-2" />
                 <span className="text-sm">Add Service</span>
               </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col">
+              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
                 <FileText className="h-6 w-6 mb-2" />
                 <span className="text-sm">New Article</span>
               </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col">
+              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
                 <Image className="h-6 w-6 mb-2" />
                 <span className="text-sm">Add Project</span>
               </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col">
+              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
                 <Users className="h-6 w-6 mb-2" />
                 <span className="text-sm">Add Testimonial</span>
               </Button>
@@ -251,32 +251,32 @@ export default function AdminDashboard() {
       </div>
 
       {/* Content Overview */}
-      <Card>
+      <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
-          <CardTitle>Content Overview</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Content Overview</CardTitle>
+          <CardDescription className="text-slate-400">
             Summary of all your content across the platform
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">
+              <div className="text-3xl font-bold text-blue-400">
                 {mockStats.services + mockStats.portfolio}
               </div>
-              <p className="text-sm text-gray-600">Total Projects & Services</p>
+              <p className="text-sm text-slate-300">Total Projects & Services</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">
+              <div className="text-3xl font-bold text-green-400">
                 {mockStats.blog}
               </div>
-              <p className="text-sm text-gray-600">Published Articles</p>
+              <p className="text-sm text-slate-300">Published Articles</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">
+              <div className="text-3xl font-bold text-purple-400">
                 {mockStats.testimonials + mockStats.products}
               </div>
-              <p className="text-sm text-gray-600">Reviews & Products</p>
+              <p className="text-sm text-slate-300">Reviews & Products</p>
             </div>
           </div>
         </CardContent>

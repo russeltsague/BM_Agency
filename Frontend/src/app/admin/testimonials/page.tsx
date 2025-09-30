@@ -84,7 +84,7 @@ const mockTestimonials: Testimonial[] = [
     name: 'Jean-Pierre Ndiaye',
     company: 'Société Générale Cameroun',
     position: 'Directeur Marketing',
-    message: 'Camer Digital Agency nous a accompagnés dans notre transformation digitale avec un professionnalisme exemplaire. Leur expertise et leur réactivité ont dépassé nos attentes.',
+    message: 'BM Agency nous a accompagnés dans notre transformation digitale avec un professionnalisme exemplaire. Leur expertise et leur réactivité ont dépassé nos attentes.',
     rating: 5,
     featured: true,
     published: true,
@@ -97,7 +97,7 @@ const mockTestimonials: Testimonial[] = [
     name: 'Fatou Sow',
     company: 'MTN Cameroon',
     position: 'Chef de Projet Digital',
-    message: 'Excellente collaboration ! L\'équipe de Camer Digital Agency comprend parfaitement les enjeux du marché camerounais et propose des solutions adaptées.',
+    message: 'Excellente collaboration ! L\'équipe de BM Agency comprend parfaitement les enjeux du marché camerounais et propose des solutions adaptées.',
     rating: 5,
     featured: true,
     published: true,
@@ -267,7 +267,7 @@ export default function AdminTestimonials() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Testimonials Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Témoignages BM Agency</h1>
           <p className="text-gray-600">Manage customer testimonials and reviews.</p>
         </div>
         <Button onClick={() => setIsCreateModalOpen(true)}>

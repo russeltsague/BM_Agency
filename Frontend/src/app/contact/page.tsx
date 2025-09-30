@@ -108,7 +108,7 @@ export default function ContactPage() {
             className="text-center max-w-4xl mx-auto"
           >
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
-              Contactez <span className="text-primary-600 dark:text-blue-400">Camer Digital Agency</span>
+              Contactez <span className="text-primary-600 dark:text-blue-400"> BM Agency</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
               Prêt à donner un coup d'accélérateur à votre présence digitale ?
@@ -119,7 +119,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-20 bg-slate-900 dark:bg-slate-900">
+      <section className="py-20 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {contactInfo.map((info, index) => (

@@ -1,7 +1,7 @@
 {
   "/agence/page": "app/agence/page.js",
-  "/blog/page": "app/blog/page.js",
   "/contact/page": "app/contact/page.js",
   "/page": "app/page.js",
+  "/portfolio/page": "app/portfolio/page.js",
   "/admin/dashboard/page": "app/admin/dashboard/page.js"
 }
