@@ -59,11 +59,14 @@ export const articleValidation = {
 export const validate = (schema: z.ZodSchema) => {
   return (req: any, res: any, next: any) => {
     try {
-      schema.parse({
-        body: req.body,
-        query: req.query,
-        params: req.params,
-      });
+      // Create a plain object to avoid Express 5 getter issues
+      const validationData = {
+        body: req.body || {},
+        query: req.query ? { ...req.query } : {},
+        params: req.params ? { ...req.params } : {},
+      };
+      
+      schema.parse(validationData);
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {

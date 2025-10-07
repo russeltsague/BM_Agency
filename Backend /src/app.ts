@@ -40,7 +40,24 @@ const connectDB = async () => {
 export const app = express();
 
 // Middleware
-app.use(cors());
+// CORS configuration for frontend
+const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000'];
+
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -51,9 +68,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Security headers
-app.use(helmet.xssFilter());
-app.use(helmet.noSniff());
-app.use(helmet.hidePoweredBy());
+// Helmet v8 sets sensible defaults; the specific sub-middleware functions like
+// xssFilter/noSniff/hidePoweredBy were removed. The base helmet middleware
+// already provides these protections.
 
 // Rate limiting
 const limiter = rateLimit({
@@ -64,17 +81,19 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Temporarily disabled due to Express 5 compatibility issues
+// app.use(mongoSanitize());
 
 // Data sanitization against XSS
-app.use(xss());
+// app.use(xss());
 
 // Prevent parameter pollution
-app.use(hpp({
-  whitelist: [
-    'duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'
-  ]
-}));
+// Temporarily disabled due to Express 5 compatibility issues
+// app.use(hpp({
+//   whitelist: [
+//     'duration', 'ratingsQuantity', 'ratingsAverage', 'maxGroupSize', 'difficulty', 'price'
+//   ]
+// }));
 
 // Test middleware
 app.use((req: Request, res: Response, next: NextFunction) => {

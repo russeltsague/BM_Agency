@@ -1,26 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
-  Plus,
-  Edit,
-  Trash2,
   Search,
+  Plus,
+  Trash2,
   MoreHorizontal,
-  Image as ImageIcon,
   Calendar,
-  ExternalLink
+  Image as ImageIcon,
+  Edit,
 } from 'lucide-react'
+import { realisationsAPI } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -44,14 +45,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { toast } from 'react-hot-toast'
 
 // Portfolio form schema
 const portfolioSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   client: z.string().min(1, 'Client name is required'),
-  date: z.string().min(1, 'Date is required'),
+  category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
   link: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   featured: z.boolean(),
@@ -63,144 +63,127 @@ const portfolioSchema = z.object({
 type PortfolioForm = z.infer<typeof portfolioSchema>
 
 interface Portfolio {
-  id: string
+  _id: string
   title: string
   description: string
-  client: string
-  date: string
-  tags: string[]
+  client?: string
+  category?: string
+  tags?: string[]
   link?: string
-  featured: boolean
-  images: string[]
+  featured?: boolean
   createdAt: string
   updatedAt: string
 }
 
-// Mock data - replace with real API
-const mockPortfolio: Portfolio[] = [
-  {
-    id: '1',
-    title: 'Plateforme E-commerce Mode Africaine',
-    description: 'Refonte complète d\'une plateforme e-commerce spécialisée dans la mode africaine avec optimisation UX/UI et intégration de solutions de paiement locales.',
-    client: 'Maison de la Mode Africaine',
-    date: '2024-01-15',
-    tags: ['React', 'Node.js', 'MTN MoMo', 'SEO'],
-    link: 'https://maison-mode-africaine.cm',
-    featured: true,
-    images: ['/images/portfolio-1.jpg'],
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-  },
-  {
-    id: '2',
-    title: 'Application Mobile Bancaire',
-    description: 'Développement d\'une application mobile bancaire avec authentification biométrique et gestion des comptes en temps réel pour les clients camerounais.',
-    client: 'Banque Atlantique Cameroun',
-    date: '2024-01-10',
-    tags: ['React Native', 'Node.js', 'MongoDB', 'Biometric'],
-    featured: true,
-    images: ['/images/portfolio-2.jpg'],
-    createdAt: '2024-01-02T00:00:00Z',
-    updatedAt: '2024-01-02T00:00:00Z',
-  },
-]
-
 export default function AdminPortfolio() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null)
   const queryClient = useQueryClient()
 
   const {
     register,
     handleSubmit,
+    formState: { errors },
     reset,
     setValue,
-    watch,
-    formState: { errors },
   } = useForm<PortfolioForm>({
     resolver: zodResolver(portfolioSchema),
   })
 
-  // Fetch portfolio items
+  // Fetch portfolio
   const { data: portfolio = [], isLoading } = useQuery({
     queryKey: ['admin-portfolio'],
     queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-      return mockPortfolio
+      try {
+        const response = await realisationsAPI.getAll()
+        return Array.isArray(response.data) ? response.data : []
+      } catch (error) {
+        console.error('Failed to fetch portfolio:', error)
+        return []
+      }
     },
   })
 
+  // Ensure portfolio is always an array
+  const portfolioArray = Array.isArray(portfolio) ? portfolio : []
+
   // Filter portfolio based on search
-  const filteredPortfolio = portfolio.filter(item =>
+  const filteredPortfolio = portfolioArray.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchTerm.toLowerCase())
+    item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.client && item.client.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   // Create portfolio mutation
   const createMutation = useMutation({
     mutationFn: async (data: PortfolioForm) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const newPortfolio: Portfolio = {
-        id: Date.now().toString(),
-        ...data,
+      const portfolioData = {
+        title: data.title,
+        description: data.description,
+        client: data.client,
+        category: data.category,
         tags: data.tags.split(',').map(t => t.trim()),
-        images: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        link: data.link,
+        featured: data.featured,
       }
-      return newPortfolio
+      const response = await realisationsAPI.create(portfolioData)
+      return response.data.realisation
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-portfolio'] })
       setIsCreateModalOpen(false)
       reset()
-      toast.success('Portfolio item created successfully!')
+      toast.success('Project created successfully!')
     },
-    onError: () => {
-      toast.error('Failed to create portfolio item')
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create project')
     },
   })
 
   // Update portfolio mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: PortfolioForm }) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return { id, ...data, tags: data.tags.split(',').map(t => t.trim()) }
+      const portfolioData = {
+        title: data.title,
+        description: data.description,
+        client: data.client,
+        category: data.category,
+        tags: data.tags.split(',').map(t => t.trim()),
+        link: data.link,
+        featured: data.featured,
+      }
+      const response = await realisationsAPI.update(id, portfolioData)
+      return response.data.realisation
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-portfolio'] })
       setIsEditModalOpen(false)
       setSelectedPortfolio(null)
       reset()
-      toast.success('Portfolio item updated successfully!')
+      toast.success('Project updated successfully!')
     },
-    onError: () => {
-      toast.error('Failed to update portfolio item')
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to update project')
     },
   })
 
   // Delete portfolio mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await realisationsAPI.delete(id)
       return id
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-portfolio'] })
       setIsDeleteModalOpen(false)
       setSelectedPortfolio(null)
-      toast.success('Portfolio item deleted successfully!')
+      toast.success('Project deleted successfully!')
     },
-    onError: () => {
-      toast.error('Failed to delete portfolio item')
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete project')
     },
   })
 
@@ -212,23 +195,23 @@ export default function AdminPortfolio() {
     setSelectedPortfolio(portfolio)
     setValue('title', portfolio.title)
     setValue('description', portfolio.description)
-    setValue('client', portfolio.client)
-    setValue('date', portfolio.date)
-    setValue('tags', portfolio.tags.join(', '))
+    setValue('client', portfolio.client || '')
+    setValue('category', portfolio.category || '')
+    setValue('tags', portfolio.tags?.join(', ') || '')
     setValue('link', portfolio.link || '')
-    setValue('featured', portfolio.featured)
+    setValue('featured', portfolio.featured || false)
     setIsEditModalOpen(true)
   }
 
   const handleUpdate = (data: PortfolioForm) => {
     if (selectedPortfolio) {
-      updateMutation.mutate({ id: selectedPortfolio.id, data })
+      updateMutation.mutate({ id: selectedPortfolio._id, data })
     }
   }
 
   const handleDelete = () => {
     if (selectedPortfolio) {
-      deleteMutation.mutate(selectedPortfolio.id)
+      deleteMutation.mutate(selectedPortfolio._id)
     }
   }
 
@@ -239,131 +222,150 @@ export default function AdminPortfolio() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Portfolio Management</h1>
-          <p className="text-gray-600">Manage your projects and case studies.</p>
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-900 via-emerald-900 to-teal-900 p-8">
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        <div className="relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Portfolio Management</h1>
+              <p className="text-slate-300 text-lg">Présentez vos projets et études de cas</p>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                <ImageIcon className="h-5 w-5" />
+                <span>{filteredPortfolio.length} Projets</span>
+              </div>
+              <Button onClick={() => setIsCreateModalOpen(true)} size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                <Plus className="mr-2 h-5 w-5" />
+                Ajouter un Projet
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Project
-        </Button>
       </div>
 
-      {/* Search */}
-      <Card>
+      {/* Enhanced Search */}
+      <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
             <Input
-              placeholder="Search projects..."
+              placeholder="Rechercher des projets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-12 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Portfolio Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Portfolio Projects ({filteredPortfolio.length})</CardTitle>
-          <CardDescription>
-            Manage all your portfolio projects and case studies.
+      {/* Enhanced Portfolio Table */}
+      <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-white text-xl">Projets Portfolio ({filteredPortfolio.length})</CardTitle>
+          <CardDescription className="text-slate-400">
+            Gérez tous vos projets portfolio et études de cas
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Featured</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {filteredPortfolio.map((item) => (
-                    <motion.tr
-                      key={item.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      layout
-                    >
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="font-semibold">{item.title}</div>
-                          <div className="text-sm text-gray-500 line-clamp-2">
-                            {item.description}
+            <div className="rounded-md border border-slate-700 overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-700/50 border-slate-700">
+                    <TableHead className="text-slate-300 font-semibold">Titre</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Client</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Date</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Tags</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">En Vedette</TableHead>
+                    <TableHead className="text-slate-300 font-semibold w-[100px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <AnimatePresence>
+                    {filteredPortfolio.map((item) => (
+                      <motion.tr
+                        key={item._id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        layout
+                        className="border-slate-700 hover:bg-slate-700/30 transition-colors"
+                      >
+                        <TableCell className="font-medium text-white">
+                          <div>
+                            <div className="font-semibold text-lg">{item.title}</div>
+                            <div className="text-sm text-slate-400 line-clamp-2 mt-1">
+                              {item.description}
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{item.client}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Calendar className="mr-1 h-3 w-3 text-gray-400" />
-                          {new Date(item.date).toLocaleDateString()}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {item.tags.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {item.tags.length > 2 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{item.tags.length - 2}
-                            </Badge>
+                        </TableCell>
+                        <TableCell className="text-slate-300">{item.client}</TableCell>
+                        <TableCell className="text-slate-300">
+                          <div className="flex items-center">
+                            <Calendar className="mr-1 h-3 w-3 text-slate-400" />
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {item.tags?.slice(0, 2).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs bg-slate-700 text-slate-300">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {item.tags && item.tags.length > 2 && (
+                              <Badge variant="secondary" className="text-xs bg-slate-700 text-slate-300">
+                                +{item.tags.length - 2}
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {item.featured ? (
+                            <Badge className="bg-green-100 text-green-800">En Vedette</Badge>
+                          ) : (
+                            <Badge variant="outline" className="border-slate-600 text-slate-300">Standard</Badge>
                           )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {item.featured ? (
-                          <Badge className="bg-green-100 text-green-800">Featured</Badge>
-                        ) : (
-                          <Badge variant="outline">Standard</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(item)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openDeleteModal(item)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-700">
+                                <MoreHorizontal className="h-4 w-4 text-slate-400" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700">
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(item)}
+                                className="text-slate-300 hover:bg-slate-700"
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => openDeleteModal(item)}
+                                className="text-red-400 hover:bg-red-900/20"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -374,7 +376,7 @@ export default function AdminPortfolio() {
           <DialogHeader>
             <DialogTitle>Add New Project</DialogTitle>
             <DialogDescription>
-              Create a new portfolio project or case study.
+              Create a new portfolio project to showcase your work.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
@@ -417,14 +419,14 @@ export default function AdminPortfolio() {
               </div>
 
               <div>
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="category">Category</Label>
                 <Input
-                  id="date"
-                  type="date"
-                  {...register('date')}
+                  id="category"
+                  {...register('category')}
+                  placeholder="e.g., E-commerce, Application Mobile, Site Web"
                 />
-                {errors.date && (
-                  <p className="text-sm text-red-600 mt-1">{errors.date.message}</p>
+                {errors.category && (
+                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
                 )}
               </div>
             </div>
@@ -445,23 +447,12 @@ export default function AdminPortfolio() {
               <Label htmlFor="link">Project Link (optional)</Label>
               <Input
                 id="link"
-                type="url"
                 {...register('link')}
                 placeholder="https://example.com"
               />
               {errors.link && (
                 <p className="text-sm text-red-600 mt-1">{errors.link.message}</p>
               )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="featured"
-                {...register('featured')}
-                className="rounded border-gray-300"
-              />
-              <Label htmlFor="featured">Mark as featured project</Label>
             </div>
 
             <DialogFooter>
@@ -529,14 +520,14 @@ export default function AdminPortfolio() {
               </div>
 
               <div>
-                <Label htmlFor="edit-date">Date</Label>
+                <Label htmlFor="edit-category">Category</Label>
                 <Input
-                  id="edit-date"
-                  type="date"
-                  {...register('date')}
+                  id="edit-category"
+                  {...register('category')}
+                  placeholder="e.g., E-commerce, Application Mobile, Site Web"
                 />
-                {errors.date && (
-                  <p className="text-sm text-red-600 mt-1">{errors.date.message}</p>
+                {errors.category && (
+                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
                 )}
               </div>
             </div>
@@ -557,23 +548,12 @@ export default function AdminPortfolio() {
               <Label htmlFor="edit-link">Project Link (optional)</Label>
               <Input
                 id="edit-link"
-                type="url"
                 {...register('link')}
                 placeholder="https://example.com"
               />
               {errors.link && (
                 <p className="text-sm text-red-600 mt-1">{errors.link.message}</p>
               )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="edit-featured"
-                {...register('featured')}
-                className="rounded border-gray-300"
-              />
-              <Label htmlFor="edit-featured">Mark as featured project</Label>
             </div>
 
             <DialogFooter>

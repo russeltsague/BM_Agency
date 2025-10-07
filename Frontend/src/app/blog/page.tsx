@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
@@ -14,90 +15,44 @@ import {
   BookOpen,
   TrendingUp
 } from 'lucide-react'
+import { articlesAPI, type Article } from '@/lib/api'
 
 export default function BlogPage() {
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'Les tendances du marketing digital au Cameroun en 2024',
-      excerpt: 'Découvrez les principales tendances qui façonneront le marketing digital camerounais cette année et comment les intégrer dans votre stratégie d\'entreprise.',
-      content: 'Le marketing digital au Cameroun évolue à un rythme effréné. En 2024, plusieurs tendances majeures se démarquent et redéfinissent la façon dont les entreprises interagissent avec leur audience...',
-      image: '/images/blog-1.jpg',
-      author: 'Marie Dubois',
-      date: '15 Jan 2024',
-      readTime: '8 min',
-      category: 'Marketing Digital',
-      featured: true,
-      tags: ['Tendances', 'Marketing', 'Cameroun', '2024']
-    },
-    {
-      id: 2,
-      title: 'Comment optimiser son SEO pour les moteurs de recherche au Cameroun',
-      excerpt: 'Guide complet pour améliorer le référencement de votre site web et augmenter votre visibilité sur Google et autres moteurs de recherche locaux.',
-      content: 'Le SEO (Search Engine Optimization) reste un pilier fondamental du marketing digital camerounais. Dans cet article, nous vous dévoilons les meilleures pratiques...',
-      image: '/images/blog-2.jpg',
-      author: 'Thomas Martin',
-      date: '12 Jan 2024',
-      readTime: '12 min',
-      category: 'SEO',
-      featured: false,
-      tags: ['SEO', 'Référencement', 'Google', 'Cameroun']
-    },
-    {
-      id: 3,
-      title: 'L\'importance du design thinking en UX/UI',
-      excerpt: 'Pourquoi adopter une approche design thinking pour créer des expériences utilisateur exceptionnelles et mémorables.',
-      content: 'Le design thinking n\'est pas qu\'une méthodologie à la mode. C\'est une approche centrée sur l\'utilisateur qui révolutionne la création de produits digitaux...',
-      image: '/images/blog-3.jpg',
-      author: 'Sophie Chen',
-      date: '08 Jan 2024',
-      readTime: '6 min',
-      category: 'Design',
-      featured: false,
-      tags: ['Design Thinking', 'UX', 'UI', 'Expérience utilisateur']
-    },
-    {
-      id: 4,
-      title: 'IA et Marketing : Le futur de la personnalisation',
-      excerpt: 'Comment l\'intelligence artificielle transforme le marketing digital et permet une personnalisation à grande échelle.',
-      content: 'L\'intelligence artificielle n\'est plus de la science-fiction. Elle est devenue un outil indispensable pour les marketeurs modernes...',
-      image: '/images/blog-4.jpg',
-      author: 'Pierre Durand',
-      date: '05 Jan 2024',
-      readTime: '10 min',
-      category: 'IA & Tech',
-      featured: false,
-      tags: ['Intelligence Artificielle', 'Personnalisation', 'Marketing', 'Technologie']
-    },
-    {
-      id: 5,
-      title: 'Les secrets d\'une stratégie social media réussie',
-      excerpt: 'Conseils pratiques pour développer votre présence sur les réseaux sociaux et engager votre communauté efficacement.',
-      content: 'Les réseaux sociaux sont devenus incontournables pour toute stratégie digitale. Mais comment se démarquer dans ce paysage saturé ?...',
-      image: '/images/blog-5.jpg',
-      author: 'Amélie Moreau',
-      date: '02 Jan 2024',
-      readTime: '7 min',
-      category: 'Social Media',
-      featured: false,
-      tags: ['Réseaux sociaux', 'Community Management', 'Engagement', 'Stratégie']
-    },
-    {
-      id: 6,
-      title: 'E-commerce 2024 : Les clés du succès',
-      excerpt: 'Analyse des meilleures pratiques e-commerce et des innovations qui transforment le secteur du commerce en ligne.',
-      content: 'Le e-commerce continue sa croissance exponentielle. En 2024, de nouvelles tendances émergent et redéfinissent les règles du jeu...',
-      image: '/images/blog-6.jpg',
-      author: 'Jean-François Leroy',
-      date: '28 Déc 2023',
-      readTime: '9 min',
-      category: 'E-commerce',
-      featured: false,
-      tags: ['E-commerce', 'Vente en ligne', 'Conversion', 'UX']
-    }
-  ]
+  const [articles, setArticles] = useState<Article[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('Tous')
 
-  const categories = ['Tous', 'Marketing Digital', 'SEO', 'Design', 'IA & Tech', 'Social Media', 'E-commerce']
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setIsLoading(true)
+        const response = await articlesAPI.getAll()
+        const items = response?.data
+        setArticles(Array.isArray(items) ? items : [])
+      } catch (err: any) {
+        console.error('Failed to fetch articles:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchArticles()
+  }, [])
+
+  const categories = ['Tous', ...Array.from(new Set(articles.map(article => article.category).filter(Boolean)))]
+
+  const filteredArticles = articles.filter(article => {
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === 'Tous' || article.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
+
+  const featuredArticle = filteredArticles.find(article => article.featured) || filteredArticles[0]
+  const otherArticles = filteredArticles.filter(article => article !== featuredArticle)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -118,6 +73,37 @@ export default function BlogPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-slate-400">Chargement des articles...</p>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">Erreur: {error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Réessayer
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
   return (
     <main className="min-h-screen bg-white dark:bg-slate-900">
       <Navbar />
@@ -145,13 +131,15 @@ export default function BlogPage() {
       {/* Search & Filter Section */}
       <section className="py-8 border-b border-gray-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-x-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-slate-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Rechercher un article..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
@@ -159,9 +147,10 @@ export default function BlogPage() {
               {categories.map((category) => (
                 <Button
                   key={category}
-                  variant={category === 'Tous' ? 'primary' : 'outline'}
+                  variant={category === selectedCategory ? 'primary' : 'outline'}
                   size="sm"
                   className="border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500"
+                  onClick={() => setSelectedCategory(category || 'Tous')}
                 >
                   <Filter className="w-4 h-4 mr-1" />
                   {category}
@@ -171,7 +160,6 @@ export default function BlogPage() {
           </div>
         </div>
       </section>
-
       {/* Featured Post */}
       <section className="py-8 lg:py-12 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -190,31 +178,31 @@ export default function BlogPage() {
                     Article à la une
                   </span>
                   <span className="bg-primary-100 text-primary-600 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded text-xs">
-                    {blogPosts[0].category}
+                    {featuredArticle?.category}
                   </span>
                 </div>
 
                 <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-                  {blogPosts[0].title}
+                  {featuredArticle?.title}
                 </h2>
 
                 <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
-                  {blogPosts[0].excerpt}
+                  {featuredArticle?.excerpt}
                 </p>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-slate-400">
                     <div className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
-                      {blogPosts[0].author}
+                      Admin User
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {blogPosts[0].date}
+                      {featuredArticle?.createdAt ? new Date(featuredArticle.createdAt).toLocaleDateString('fr-FR') : 'Date inconnue'}
                     </div>
                     <div className="flex items-center">
                       <Clock className="w-4 h-4 mr-1" />
-                      {blogPosts[0].readTime}
+                      {featuredArticle?.readTime}
                     </div>
                   </div>
                   <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-blue-600 dark:hover:bg-blue-700">
@@ -238,9 +226,9 @@ export default function BlogPage() {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           >
-            {blogPosts.slice(1).map((post, index) => (
+            {otherArticles.map((post: Article, index: number) => (
               <motion.article
-                key={post.id}
+                key={post._id}
                 variants={itemVariants}
                 whileHover={{ y: -5 }}
                 className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700"
@@ -269,16 +257,16 @@ export default function BlogPage() {
                   <div className="flex items-center justify-between text-sm text-gray-500 dark:text-slate-400 mb-4">
                     <div className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
-                      {post.author}
+                      Admin User
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {post.date}
+                      {post.createdAt ? new Date(post.createdAt).toLocaleDateString('fr-FR') : 'Date inconnue'}
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mb-4">
-                    {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                    {post.tags?.slice(0, 3).map((tag: string, tagIndex: number) => (
                       <span
                         key={tagIndex}
                         className="text-xs bg-primary-100 text-primary-600 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded"

@@ -2,11 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { authAPI, type User as APIUser } from '@/lib/api'
 
 interface User {
   id: string
   email: string
   name: string
+  role: string
 }
 
 interface AuthContextType {
@@ -48,31 +50,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true)
 
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const response = await authAPI.login({ email, password })
 
-      if (!response.ok) {
-        const error = await response.json()
-        return { success: false, error: error.message || 'Login failed' }
+      // Extract user data from response
+      const userData = {
+        id: response.data.user._id,
+        email: response.data.user.email,
+        name: response.data.user.name,
+        role: response.data.user.role,
       }
 
-      const data = await response.json()
-
       // Store token and user data
-      localStorage.setItem('admin-token', data.token)
-      localStorage.setItem('admin-user', JSON.stringify(data.user))
+      localStorage.setItem('admin-token', response.token)
+      localStorage.setItem('admin-user', JSON.stringify(userData))
 
-      setToken(data.token)
-      setUser(data.user)
+      // Set cookie for server-side middleware
+      if (typeof window !== 'undefined') {
+        document.cookie = `admin-token=${response.token}; path=/; max-age=${7 * 24 * 60 * 60}` // 7 days
+      }
+
+      setToken(response.token)
+      setUser(userData)
 
       return { success: true }
-    } catch (error) {
-      return { success: false, error: 'Network error occurred' }
+    } catch (error: any) {
+      console.error('Login error:', error)
+      return { success: false, error: error.message || 'Network error occurred' }
     } finally {
       setIsLoading(false)
     }
@@ -81,6 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem('admin-token')
     localStorage.removeItem('admin-user')
+
+    // Clear cookie
+    if (typeof window !== 'undefined') {
+      document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+    }
+
     setToken(null)
     setUser(null)
     router.push('/admin/login')

@@ -27,10 +27,10 @@ export const Footer = () => {
   }
 
   const socialLinks = [
-    { href: '#', icon: Facebook, label: 'Facebook' },
-    { href: '#', icon: Twitter, label: 'Twitter' },
-    { href: '#', icon: Instagram, label: 'Instagram' },
-    { href: '#', icon: Linkedin, label: 'LinkedIn' },
+    { href: 'https://www.facebook.com/share/1BVBZarSbm/?mibextid=wwXIfr', icon: Facebook, label: 'Facebook' },
+    { href: 'https://twitter.com/votreentreprise', icon: Twitter, label: 'Twitter' },
+    { href: 'https://instagram.com/votreentreprise', icon: Instagram, label: 'Instagram' },
+    { href: 'https://www.linkedin.com/company/agency-bm/', icon: Linkedin, label: 'LinkedIn' },
   ]
 
   return (
@@ -53,16 +53,16 @@ export const Footer = () => {
               <div className="space-y-2">
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <MapPin className="w-4 h-4 mr-2" />
-                  123 Avenue Kennedy<br />
+                  11595 Yaoundé-Kondengui<br />
                   Yaoundé, Cameroun
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <Phone className="w-4 h-4 mr-2" />
-                  +237 222 123 456
+                  +237 675176974
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <Mail className="w-4 h-4 mr-2" />
-                  contact@bm_Agency.cm
+                  contact@bm-agency.net
                 </div>
               </div>
             </MotionDiv>

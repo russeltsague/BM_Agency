@@ -158,8 +158,11 @@ export default function AdminProducts() {
     },
   })
 
+  // Ensure products is always an array
+  const productsArray = Array.isArray(products) ? products : []
+
   // Filter products based on search
-  const filteredProducts = products.filter(product =>
+  const filteredProducts = productsArray.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.sku.toLowerCase().includes(searchTerm.toLowerCase())

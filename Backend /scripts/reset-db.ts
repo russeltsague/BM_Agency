@@ -1,8 +1,13 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables - check if we're in test mode
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: path.join(__dirname, '../.env.test') });
+} else {
+  dotenv.config();
+}
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -18,11 +23,13 @@ const resetDB = async () => {
     console.log('Connected to MongoDB');
 
     // Drop all collections
-    const collections = await mongoose.connection.db.collections();
-    
-    for (let collection of collections) {
-      await collection.drop();
-      console.log(`Dropped collection: ${collection.collectionName}`);
+    if (mongoose.connection.db) {
+      const collections = await mongoose.connection.db.collections();
+
+      for (let collection of collections) {
+        await collection.drop();
+        console.log(`Dropped collection: ${collection.collectionName}`);
+      }
     }
 
     console.log('Database reset completed successfully');

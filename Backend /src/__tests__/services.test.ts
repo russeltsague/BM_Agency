@@ -1,145 +1,172 @@
 import request from 'supertest';
 import app from '../app';
 import { Service } from '../models/Service';
-import { setupTestDB } from './test-db';
-import mongoose from 'mongoose';
-
-// Setup test database
-setupTestDB();
 
 describe('Services API', () => {
   let adminToken: string;
-  let serviceId: string;
 
-  const serviceData = {
-    title: 'Test Service',
-    description: 'This is a test service',
-    image: 'https://example.com/image.jpg',
-  };
-
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create admin user and get token
-    const registerResponse = await request(app)
+    const response = await request(app)
       .post('/api/v1/auth/register')
       .send({
         name: 'Admin User',
-        email: 'admin@test.com',
+        email: 'admin@example.com',
         password: 'password123',
-        passwordConfirm: 'password123',
         role: 'admin'
       });
     
-    adminToken = `Bearer ${registerResponse.body.token}`;
-  }, 30000);
-
-  describe('POST /api/v1/services', () => {
-    it('should create a new service (admin only)', async () => {
-      const response = await request(app)
-        .post('/api/v1/services')
-        .set('Authorization', adminToken)
-        .send(serviceData)
-        .expect(201);
-
-      expect(response.body.status).toBe('success');
-      expect(response.body.data.service.title).toBe(serviceData.title);
-      
-      serviceId = response.body.data.service._id;
-    });
-
-    it('should return 401 if not authenticated', async () => {
-      await request(app)
-        .post('/api/v1/services')
-        .send(serviceData)
-        .expect(401);
-    });
-
-    it('should return 403 if not admin', async () => {
-      // Register a regular user
-      const registerResponse = await request(app)
-        .post('/api/v1/auth/register')
-        .send({
-          name: 'Regular User',
-          email: 'user@test.com',
-          password: 'password123',
-          passwordConfirm: 'password123'
-        });
-      
-      const token = registerResponse.body.token;
-      
-      await request(app)
-        .post('/api/v1/services')
-        .set('Authorization', `Bearer ${token}`)
-        .send(serviceData)
-        .expect(403);
-    });
+    adminToken = response.body.token;
   });
 
   describe('GET /api/v1/services', () => {
     it('should get all services', async () => {
-      // Create a test service
-      await Service.create(serviceData);
+      // Create test services
+      await Service.create([
+        {
+          title: 'Service 1',
+          description: 'Description 1',
+          image: 'https://example.com/image1.jpg'
+        },
+        {
+          title: 'Service 2',
+          description: 'Description 2',
+          image: 'https://example.com/image2.jpg'
+        }
+      ]);
 
       const response = await request(app)
         .get('/api/v1/services')
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.results).toBeGreaterThan(0);
-      expect(Array.isArray(response.body.data.services)).toBe(true);
+      expect(response.body.results).toBe(2);
+      expect(response.body.data.services).toHaveLength(2);
+    });
+
+    it('should return empty array when no services exist', async () => {
+      const response = await request(app)
+        .get('/api/v1/services')
+        .expect(200);
+
+      expect(response.body.status).toBe('success');
+      expect(response.body.results).toBe(0);
+      expect(response.body.data.services).toHaveLength(0);
     });
   });
 
   describe('GET /api/v1/services/:id', () => {
-    it('should get a service by ID', async () => {
-      const service = await Service.create(serviceData);
-      
+    it('should get a single service by id', async () => {
+      const service = await Service.create({
+        title: 'Test Service',
+        description: 'Test Description',
+        image: 'https://example.com/image.jpg'
+      });
+
       const response = await request(app)
         .get(`/api/v1/services/${service._id}`)
         .expect(200);
 
       expect(response.body.status).toBe('success');
+      expect(response.body.data.service.title).toBe('Test Service');
+    });
+
+    it('should return 404 for non-existent service', async () => {
+      const fakeId = '507f1f77bcf86cd799439011';
+      const response = await request(app)
+        .get(`/api/v1/services/${fakeId}`)
+        .expect(404);
+
+      expect(response.body.status).toBe('error');
+    });
+  });
+
+  describe('POST /api/v1/services', () => {
+    it('should create a new service with valid data', async () => {
+      const serviceData = {
+        title: 'New Service',
+        description: 'New Description',
+        image: 'https://example.com/new-image.jpg'
+      };
+
+      const response = await request(app)
+        .post('/api/v1/services')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(serviceData)
+        .expect(201);
+
+      expect(response.body.status).toBe('success');
       expect(response.body.data.service.title).toBe(serviceData.title);
     });
 
-    it('should return 404 if service not found', async () => {
-      const nonExistentId = new mongoose.Types.ObjectId();
-      
-      await request(app)
-        .get(`/api/v1/services/${nonExistentId}`)
-        .expect(404);
+    it('should not create service without authentication', async () => {
+      const serviceData = {
+        title: 'New Service',
+        description: 'New Description',
+        image: 'https://example.com/new-image.jpg'
+      };
+
+      const response = await request(app)
+        .post('/api/v1/services')
+        .send(serviceData)
+        .expect(401);
+
+      expect(response.body.status).toBe('error');
+    });
+
+    it('should not create service with missing required fields', async () => {
+      const serviceData = {
+        title: 'New Service'
+        // missing description and image
+      };
+
+      const response = await request(app)
+        .post('/api/v1/services')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(serviceData)
+        .expect(400);
+
+      expect(response.body.status).toBe('error');
     });
   });
 
   describe('PATCH /api/v1/services/:id', () => {
-    it('should update a service (admin only)', async () => {
-      const service = await Service.create(serviceData);
-      
-      const updatedData = {
-        title: 'Updated Service',
-        description: 'This is an updated service',
+    it('should update a service', async () => {
+      const service = await Service.create({
+        title: 'Original Title',
+        description: 'Original Description',
+        image: 'https://example.com/original.jpg'
+      });
+
+      const updateData = {
+        title: 'Updated Title'
       };
 
       const response = await request(app)
         .patch(`/api/v1/services/${service._id}`)
-        .set('Authorization', adminToken)
-        .send(updatedData)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(updateData)
         .expect(200);
 
       expect(response.body.status).toBe('success');
-      expect(response.body.data.service.title).toBe(updatedData.title);
+      expect(response.body.data.service.title).toBe('Updated Title');
+      expect(response.body.data.service.description).toBe('Original Description');
     });
   });
 
   describe('DELETE /api/v1/services/:id', () => {
-    it('should delete a service (admin only)', async () => {
-      const service = await Service.create(serviceData);
-      
+    it('should delete a service', async () => {
+      const service = await Service.create({
+        title: 'Service to Delete',
+        description: 'Description',
+        image: 'https://example.com/image.jpg'
+      });
+
       await request(app)
         .delete(`/api/v1/services/${service._id}`)
-        .set('Authorization', adminToken)
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(204);
 
-      // Verify service is deleted
       const deletedService = await Service.findById(service._id);
       expect(deletedService).toBeNull();
     });

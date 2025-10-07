@@ -12,86 +12,16 @@ import {
   Package,
   TrendingUp,
   Clock,
-  Plus
+  Plus,
+  ChevronRight,
+  Activity,
+  BarChart3,
+  Database
 } from 'lucide-react'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-
-// Mock data - replace with real API calls
-const mockStats = {
-  services: 8,
-  portfolio: 24,
-  blog: 15,
-  testimonials: 12,
-  products: 6,
-}
-
-const mockRecentActions = [
-  {
-    id: 1,
-    type: 'service',
-    action: 'created',
-    title: 'Communication Digitale',
-    timestamp: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: 2,
-    type: 'blog',
-    action: 'published',
-    title: 'Les tendances du marketing digital au Cameroun en 2024',
-    timestamp: '2024-01-14T14:20:00Z',
-  },
-  {
-    id: 3,
-    type: 'portfolio',
-    action: 'updated',
-    title: 'Plateforme E-commerce Mode Africaine',
-    timestamp: '2024-01-13T09:15:00Z',
-  },
-]
-
-const statCards = [
-  {
-    title: 'Services',
-    value: mockStats.services,
-    icon: Settings,
-    href: '/admin/services',
-    color: 'text-blue-400',
-    bgColor: 'bg-blue-900/30',
-  },
-  {
-    title: 'Portfolio',
-    value: mockStats.portfolio,
-    icon: Image,
-    href: '/admin/portfolio',
-    color: 'text-green-400',
-    bgColor: 'bg-green-900/30',
-  },
-  {
-    title: 'Blog Articles',
-    value: mockStats.blog,
-    icon: FileText,
-    href: '/admin/blog',
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-900/30',
-  },
-  {
-    title: 'Testimonials',
-    value: mockStats.testimonials,
-    icon: Users,
-    href: '/admin/testimonials',
-    color: 'text-orange-400',
-    bgColor: 'bg-orange-900/30',
-  },
-  {
-    title: 'Products',
-    value: mockStats.products,
-    icon: Package,
-    href: '/admin/products',
-    color: 'text-pink-400',
-    bgColor: 'bg-pink-900/30',
-  },
-]
+import { Badge } from '@/components/ui/badge'
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false)
@@ -100,24 +30,115 @@ export default function AdminDashboard() {
     setMounted(true)
   }, [])
 
-  // Fetch dashboard data - replace with real API call
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['admin-stats'],
+  // Fetch dashboard data from real APIs
+  const { data: servicesData, isLoading: servicesLoading } = useQuery({
+    queryKey: ['admin-services'],
     queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return mockStats
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/services`)
+      if (!response.ok) throw new Error('Failed to fetch services')
+      return response.json()
     },
   })
 
-  const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+  const { data: realisationsData, isLoading: realisationsLoading } = useQuery({
+    queryKey: ['admin-realisations'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/realisations`)
+      if (!response.ok) throw new Error('Failed to fetch realisations')
+      return response.json()
+    },
+  })
+
+  const { data: articlesData, isLoading: articlesLoading } = useQuery({
+    queryKey: ['admin-articles'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/articles`)
+      if (!response.ok) throw new Error('Failed to fetch articles')
+      return response.json()
+    },
+  })
+
+  const { data: testimonialsData, isLoading: testimonialsLoading } = useQuery({
+    queryKey: ['admin-testimonials'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/testimonials`)
+      if (!response.ok) throw new Error('Failed to fetch testimonials')
+      return response.json()
+    },
+  })
+
+  const { data: productsData, isLoading: productsLoading } = useQuery({
+    queryKey: ['admin-products'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/products`)
+      if (!response.ok) throw new Error('Failed to fetch products')
+      return response.json()
+    },
+  })
+
+  const isLoading = servicesLoading || realisationsLoading || articlesLoading || testimonialsLoading || productsLoading
+
+  // Update stats with real data
+  const realStats = {
+    services: servicesData?.results || 0,
+    portfolio: realisationsData?.results || 0,
+    blog: articlesData?.results || 0,
+    testimonials: testimonialsData?.results || 0,
+    products: productsData?.results || 0,
   }
+
+  const statCards = [
+    {
+      title: 'Services',
+      value: realStats.services,
+      icon: Settings,
+      href: '/admin/services',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-900/30',
+      description: 'Manage your services',
+      gradient: 'from-blue-500/20 to-purple-500/20'
+    },
+    {
+      title: 'Portfolio',
+      value: realStats.portfolio,
+      icon: Image,
+      href: '/admin/portfolio',
+      color: 'text-green-400',
+      bgColor: 'bg-green-900/30',
+      description: 'Showcase your work',
+      gradient: 'from-green-500/20 to-teal-500/20'
+    },
+    {
+      title: 'Blog Articles',
+      value: realStats.blog,
+      icon: FileText,
+      href: '/admin/blog',
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-900/30',
+      description: 'Share your insights',
+      gradient: 'from-purple-500/20 to-pink-500/20'
+    },
+    {
+      title: 'Testimonials',
+      value: realStats.testimonials,
+      icon: Users,
+      href: '/admin/testimonials',
+      color: 'text-orange-400',
+      bgColor: 'bg-orange-900/30',
+      description: 'Client feedback',
+      gradient: 'from-orange-500/20 to-red-500/20'
+    },
+    {
+      title: 'Products',
+      value: realStats.products,
+      icon: Package,
+      href: '/admin/products',
+      color: 'text-pink-400',
+      bgColor: 'bg-pink-900/30',
+      description: 'Your product catalog',
+      gradient: 'from-pink-500/20 to-rose-500/20'
+    },
+  ]
 
   if (!mounted) {
     return (
@@ -129,154 +150,109 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-slate-300">Welcome back! Here's an overview of your content.</p>
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 p-8">
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        <div className="relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
+              <p className="text-slate-300 text-lg">Welcome back! Here's an overview of your content management system.</p>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-sm text-slate-400">
+                <Activity className="h-4 w-4" />
+                <span>System Status: Active</span>
+              </div>
+              <Badge variant="outline" className="border-green-400 text-green-400">
+                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                Online
+              </Badge>
+            </div>
+          </div>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Quick Actions
-        </Button>
       </div>
 
-      {/* Stats Grid */}
+      {/* Enhanced Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon
 
           return (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="hover:shadow-md transition-shadow cursor-pointer bg-slate-800 border-slate-700">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-300">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`h-4 w-4 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-white">
-                    {isLoading ? '...' : stat.value}
-                  </div>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Total {stat.title.toLowerCase()}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Link key={stat.title} href={stat.href}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group cursor-pointer"
+              >
+                <Card className="relative overflow-hidden hover:shadow-xl transition-all duration-300 bg-slate-800/50 border-slate-700 hover:border-slate-600 backdrop-blur-sm">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                  <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">
+                      {stat.title}
+                    </CardTitle>
+                    <div className={`p-3 rounded-xl ${stat.bgColor} group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className={`h-5 w-5 ${stat.color}`} />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <div className="text-3xl font-bold text-white mb-2">
+                      {isLoading ? (
+                        <div className="animate-pulse bg-slate-700 h-8 w-16 rounded"></div>
+                      ) : (
+                        stat.value
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">
+                      {stat.description}
+                    </p>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <ChevronRight className="h-4 w-4 text-slate-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </Link>
           )
         })}
       </div>
 
-      {/* Recent Activity & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Actions */}
-        <Card className="bg-slate-800 border-slate-700">
-          <CardHeader>
-            <CardTitle className="flex items-center text-white">
-              <Clock className="mr-2 h-5 w-5" />
-              Recent Actions
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Latest changes to your content
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {mockRecentActions.map((action) => (
-                <div key={action.id} className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      action.type === 'service' ? 'bg-blue-500' :
-                      action.type === 'blog' ? 'bg-purple-500' :
-                      action.type === 'portfolio' ? 'bg-green-500' :
-                      'bg-slate-500'
-                    }`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white">
-                      <span className="font-medium capitalize">{action.action}</span>{' '}
-                      <span className="font-medium">{action.title}</span>
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {formatTimestamp(action.timestamp)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="bg-slate-800 border-slate-700">
-          <CardHeader>
-            <CardTitle className="flex items-center text-white">
-              <TrendingUp className="mr-2 h-5 w-5" />
-              Quick Actions
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Common tasks and shortcuts
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
-                <Settings className="h-6 w-6 mb-2" />
-                <span className="text-sm">Add Service</span>
-              </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
-                <FileText className="h-6 w-6 mb-2" />
-                <span className="text-sm">New Article</span>
-              </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
-                <Image className="h-6 w-6 mb-2" />
-                <span className="text-sm">Add Project</span>
-              </Button>
-              <Button variant="outline" className="h-auto p-4 flex-col border-slate-600 hover:bg-slate-700">
-                <Users className="h-6 w-6 mb-2" />
-                <span className="text-sm">Add Testimonial</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Content Overview */}
-      <Card className="bg-slate-800 border-slate-700">
+      <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-white">Content Overview</CardTitle>
+          <CardTitle className="flex items-center text-white text-xl">
+            <Database className="mr-3 h-6 w-6 text-blue-400" />
+            Content Overview
+          </CardTitle>
           <CardDescription className="text-slate-400">
             Summary of all your content across the platform
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">
-                {mockStats.services + mockStats.portfolio}
+            <div className="text-center p-6 bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-xl border border-slate-700">
+              <div className="text-4xl font-bold text-blue-400 mb-2">
+                {realStats.services + realStats.portfolio}
               </div>
-              <p className="text-sm text-slate-300">Total Projects & Services</p>
+              <p className="text-sm text-slate-300 font-medium">Total Projects & Services</p>
+              <p className="text-xs text-slate-500 mt-1">Combined content items</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">
-                {mockStats.blog}
+            <div className="text-center p-6 bg-gradient-to-br from-green-900/20 to-teal-900/20 rounded-xl border border-slate-700">
+              <div className="text-4xl font-bold text-green-400 mb-2">
+                {realStats.blog}
               </div>
-              <p className="text-sm text-slate-300">Published Articles</p>
+              <p className="text-sm text-slate-300 font-medium">Published Articles</p>
+              <p className="text-xs text-slate-500 mt-1">Knowledge base content</p>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400">
-                {mockStats.testimonials + mockStats.products}
+            <div className="text-center p-6 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl border border-slate-700">
+              <div className="text-4xl font-bold text-purple-400 mb-2">
+                {realStats.testimonials + realStats.products}
               </div>
-              <p className="text-sm text-slate-300">Reviews & Products</p>
+              <p className="text-sm text-slate-300 font-medium">Reviews & Products</p>
+              <p className="text-xs text-slate-500 mt-1">Customer engagement</p>
             </div>
           </div>
         </CardContent>

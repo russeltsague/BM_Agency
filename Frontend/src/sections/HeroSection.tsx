@@ -1,7 +1,7 @@
 'use client'
 
 import { MotionDiv, MotionH1, MotionP, MotionSection } from '@/components/MotionComponents'
-import { Play, ArrowRight, CheckCircle } from 'lucide-react'
+import { Play, ArrowRight, CheckCircle, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 
 export const HeroSection = () => {
@@ -23,10 +23,13 @@ export const HeroSection = () => {
             transition={{ duration: 0.8 }}
             className="mb-8"
           >
-            <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-200/50 shadow-sm mb-8 dark:bg-slate-800/80 dark:border-slate-600/50 dark:text-slate-300">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Agence digitale </span>
-            </div>
+            <button
+              onClick={() => window.open('https://wa.me/237675176974', '_blank')}
+              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 mb-8"
+            >
+              <MessageCircle className="w-5 h-5" />
+              <span>WhatsApp</span>
+            </button>
 
             <MotionH1
               initial={{ opacity: 0, y: 30 }}

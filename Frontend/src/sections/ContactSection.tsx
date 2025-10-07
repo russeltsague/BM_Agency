@@ -9,19 +9,19 @@ export const ContactSection = () => {
     {
       icon: Phone,
       title: 'Téléphone',
-      details: ['01 23 45 67 89', '01 23 45 67 90'],
+      details: ['+237 675176974'],
       description: 'Nos conseillers sont disponibles du lundi au vendredi'
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['contact@bm-agency.fr', 'devis@bm-agency.fr'],
+      details: ['contact@bm-agency.net'],
       description: 'Réponse sous 24h garantie'
     },
     {
       icon: MapPin,
       title: 'Adresse',
-      details: ['123 Avenue de la Communication', '75001 Paris, France'],
+      details: ['11595 Yaoundé-Kondengui'],
       description: 'Métro ligne 1 - Station Concorde'
     },
     {

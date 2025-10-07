@@ -15,15 +15,14 @@ import {
   MoreHorizontal,
   FileText,
   Calendar,
-  Eye,
-  EyeOff,
   Clock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { articlesAPI } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -275,203 +274,229 @@ export default function AdminBlog() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
-          <p className="text-gray-600">Manage your blog articles and content.</p>
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-900 via-slate-800 to-pink-900 p-8">
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        <div className="relative">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Blog Management</h1>
+              <p className="text-slate-300 text-lg">Create and manage your blog content</p>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                <FileText className="h-5 w-5" />
+                <span>{filteredBlog.length} Articles</span>
+              </div>
+              <Button onClick={() => setIsCreateModalOpen(true)} size="lg" className="bg-purple-600 hover:bg-purple-700">
+                <Plus className="mr-2 h-5 w-5" />
+                New Article
+              </Button>
+            </div>
+          </div>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Article
-        </Button>
       </div>
 
-      {/* Search */}
-      <Card>
+      {/* Enhanced Search */}
+      <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardContent className="pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
             <Input
-              placeholder="Search articles..."
+              placeholder="Rechercher des articles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-12 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Blog Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Blog Articles ({filteredBlog.length})</CardTitle>
-          <CardDescription>
-            Manage all your blog articles and their content.
+      {/* Enhanced Blog Table */}
+      <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-white text-xl">Articles de Blog ({filteredBlog.length})</CardTitle>
+          <CardDescription className="text-slate-400">
+            Gérez tous vos articles de blog et leur contenu
           </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Read Time</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {filteredBlog.map((post) => (
-                    <motion.tr
-                      key={post.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      layout
-                    >
-                      <TableCell className="font-medium">
-                        <div>
-                          <div className="font-semibold">{post.title}</div>
-                          <div className="text-sm text-gray-500 line-clamp-2">
-                            {post.excerpt}
+            <div className="rounded-md border border-slate-700 overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-700/50 border-slate-700">
+                    <TableHead className="text-slate-300 font-semibold">Titre</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Auteur</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Catégorie</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Statut</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Temps de Lecture</TableHead>
+                    <TableHead className="text-slate-300 font-semibold w-[100px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <AnimatePresence>
+                    {filteredBlog.map((post) => (
+                      <motion.tr
+                        key={post.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        layout
+                        className="border-slate-700 hover:bg-slate-700/30 transition-colors"
+                      >
+                        <TableCell className="font-medium text-white">
+                          <div>
+                            <div className="font-semibold text-lg">{post.title}</div>
+                            <div className="text-sm text-slate-400 line-clamp-2">
+                              {post.excerpt}
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{post.author}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{post.category}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${
-                            post.published ? 'bg-green-500' : 'bg-yellow-500'
-                          }`} />
-                          <span className="text-sm">
-                            {post.published ? 'Published' : 'Draft'}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Clock className="mr-1 h-3 w-3 text-gray-400" />
-                          {post.readTime}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(post)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openDeleteModal(post)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell className="text-slate-300">{post.author}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="border-slate-600 text-slate-300">
+                            {post.category}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-2 h-2 rounded-full ${
+                              post.published ? 'bg-green-500' : 'bg-yellow-500'
+                            }`} />
+                            <span className="text-sm text-slate-300">
+                              {post.published ? 'Publié' : 'Brouillon'}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Clock className="mr-1 h-3 w-3 text-slate-400" />
+                            <span className="text-sm text-slate-300">{post.readTime}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-700">
+                                <MoreHorizontal className="h-4 w-4 text-slate-400" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-slate-800 border-slate-700">
+                              <DropdownMenuItem
+                                onClick={() => handleEdit(post)}
+                                className="text-slate-300 hover:bg-slate-700"
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => openDeleteModal(post)}
+                                className="text-red-400 hover:bg-red-900/20"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Create Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Add New Article</DialogTitle>
-            <DialogDescription>
-              Create a new blog article with rich text content.
+            <DialogTitle className="text-white">Créer un Nouvel Article</DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Créez un nouvel article de blog avec du contenu riche.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="title">Article Title</Label>
+                <Label htmlFor="title" className="text-slate-300">Titre de l'Article</Label>
                 <Input
                   id="title"
                   {...register('title')}
-                  placeholder="e.g., Les tendances du marketing digital au Cameroun en 2024"
+                  placeholder="ex: Les tendances du marketing digital au Cameroun en 2024"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.title && (
-                  <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="author">Author</Label>
+                <Label htmlFor="author" className="text-slate-300">Auteur</Label>
                 <Input
                   id="author"
                   {...register('author')}
-                  placeholder="e.g., Marie Dubois"
+                  placeholder="ex: Marie Dubois"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.author && (
-                  <p className="text-sm text-red-600 mt-1">{errors.author.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.author.message}</p>
                 )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="text-slate-300">Catégorie</Label>
                 <Input
                   id="category"
                   {...register('category')}
-                  placeholder="e.g., Marketing Digital"
+                  placeholder="ex: Marketing Digital"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.category && (
-                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
+                <Label htmlFor="tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
                 <Input
                   id="tags"
                   {...register('tags')}
-                  placeholder="e.g., Tendances, Marketing, Cameroun, 2024"
+                  placeholder="ex: Tendances, Marketing, Cameroun, 2024"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.tags && (
-                  <p className="text-sm text-red-600 mt-1">{errors.tags.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
                 )}
               </div>
             </div>
 
             <div>
-              <Label htmlFor="excerpt">Excerpt</Label>
+              <Label htmlFor="excerpt" className="text-slate-300">Extrait</Label>
               <Input
                 id="excerpt"
                 {...register('excerpt')}
-                placeholder="Brief description of the article..."
+                placeholder="Brève description de l'article..."
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
               />
               {errors.excerpt && (
-                <p className="text-sm text-red-600 mt-1">{errors.excerpt.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.excerpt.message}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content" className="text-slate-300">Contenu</Label>
               <div className="mt-1">
                 <ReactQuill
                   theme="snow"
@@ -479,24 +504,24 @@ export default function AdminBlog() {
                   onChange={(value) => setValue('content', value)}
                   modules={modules}
                   formats={formats}
-                  placeholder="Write your article content here..."
-                  className="h-64"
+                  placeholder="Écrivez le contenu de votre article ici..."
+                  className="h-64 [&_.ql-toolbar]:bg-slate-700 [&_.ql-toolbar]:border-slate-600 [&_.ql-container]:bg-slate-700 [&_.ql-container]:border-slate-600 [&_.ql-editor]:text-white"
                 />
               </div>
               {errors.content && (
-                <p className="text-sm text-red-600 mt-1">{errors.content.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.content.message}</p>
               )}
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6 p-4 bg-slate-700/50 rounded-lg">
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="featured"
                   {...register('featured')}
-                  className="rounded border-gray-300"
+                  className="rounded border-slate-600 text-purple-500 focus:ring-purple-500"
                 />
-                <Label htmlFor="featured">Mark as featured article</Label>
+                <Label htmlFor="featured" className="text-slate-300">Marquer comme article en vedette</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -504,9 +529,9 @@ export default function AdminBlog() {
                   type="checkbox"
                   id="published"
                   {...register('published')}
-                  className="rounded border-gray-300"
+                  className="rounded border-slate-600 text-purple-500 focus:ring-purple-500"
                 />
-                <Label htmlFor="published">Publish immediately</Label>
+                <Label htmlFor="published" className="text-slate-300">Publier immédiatement</Label>
               </div>
             </div>
 
@@ -515,11 +540,12 @@ export default function AdminBlog() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsCreateModalOpen(false)}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
-                Cancel
+                Annuler
               </Button>
-              <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Creating...' : 'Create Article'}
+              <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                {createMutation.isPending ? 'Création...' : 'Créer l\'Article'}
               </Button>
             </DialogFooter>
           </form>
@@ -528,80 +554,85 @@ export default function AdminBlog() {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Edit Article</DialogTitle>
-            <DialogDescription>
-              Update the article information and content.
+            <DialogTitle className="text-white">Modifier l'Article</DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Mettez à jour les informations de l'article et son contenu.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-title">Article Title</Label>
+                <Label htmlFor="edit-title" className="text-slate-300">Titre de l'Article</Label>
                 <Input
                   id="edit-title"
                   {...register('title')}
-                  placeholder="e.g., Les tendances du marketing digital au Cameroun en 2024"
+                  placeholder="ex: Les tendances du marketing digital au Cameroun en 2024"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.title && (
-                  <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="edit-author">Author</Label>
+                <Label htmlFor="edit-author" className="text-slate-300">Auteur</Label>
                 <Input
                   id="edit-author"
                   {...register('author')}
-                  placeholder="e.g., Marie Dubois"
+                  placeholder="ex: Marie Dubois"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.author && (
-                  <p className="text-sm text-red-600 mt-1">{errors.author.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.author.message}</p>
                 )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-category">Category</Label>
+                <Label htmlFor="edit-category" className="text-slate-300">Catégorie</Label>
                 <Input
                   id="edit-category"
                   {...register('category')}
-                  placeholder="e.g., Marketing Digital"
+                  placeholder="ex: Marketing Digital"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.category && (
-                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="edit-tags">Tags (comma-separated)</Label>
+                <Label htmlFor="edit-tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
                 <Input
                   id="edit-tags"
                   {...register('tags')}
-                  placeholder="e.g., Tendances, Marketing, Cameroun, 2024"
+                  placeholder="ex: Tendances, Marketing, Cameroun, 2024"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
                 />
                 {errors.tags && (
-                  <p className="text-sm text-red-600 mt-1">{errors.tags.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
                 )}
               </div>
             </div>
 
             <div>
-              <Label htmlFor="edit-excerpt">Excerpt</Label>
+              <Label htmlFor="edit-excerpt" className="text-slate-300">Extrait</Label>
               <Input
                 id="edit-excerpt"
                 {...register('excerpt')}
-                placeholder="Brief description of the article..."
+                placeholder="Brève description de l'article..."
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
               />
               {errors.excerpt && (
-                <p className="text-sm text-red-600 mt-1">{errors.excerpt.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.excerpt.message}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="edit-content">Content</Label>
+              <Label htmlFor="edit-content" className="text-slate-300">Contenu</Label>
               <div className="mt-1">
                 <ReactQuill
                   theme="snow"
@@ -609,24 +640,24 @@ export default function AdminBlog() {
                   onChange={(value) => setValue('content', value)}
                   modules={modules}
                   formats={formats}
-                  placeholder="Write your article content here..."
-                  className="h-64"
+                  placeholder="Écrivez le contenu de votre article ici..."
+                  className="h-64 [&_.ql-toolbar]:bg-slate-700 [&_.ql-toolbar]:border-slate-600 [&_.ql-container]:bg-slate-700 [&_.ql-container]:border-slate-600 [&_.ql-editor]:text-white"
                 />
               </div>
               {errors.content && (
-                <p className="text-sm text-red-600 mt-1">{errors.content.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.content.message}</p>
               )}
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6 p-4 bg-slate-700/50 rounded-lg">
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   id="edit-featured"
                   {...register('featured')}
-                  className="rounded border-gray-300"
+                  className="rounded border-slate-600 text-purple-500 focus:ring-purple-500"
                 />
-                <Label htmlFor="edit-featured">Mark as featured article</Label>
+                <Label htmlFor="edit-featured" className="text-slate-300">Marquer comme article en vedette</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -634,9 +665,9 @@ export default function AdminBlog() {
                   type="checkbox"
                   id="edit-published"
                   {...register('published')}
-                  className="rounded border-gray-300"
+                  className="rounded border-slate-600 text-purple-500 focus:ring-purple-500"
                 />
-                <Label htmlFor="edit-published">Publish immediately</Label>
+                <Label htmlFor="edit-published" className="text-slate-300">Publier immédiatement</Label>
               </div>
             </div>
 
@@ -645,11 +676,12 @@ export default function AdminBlog() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditModalOpen(false)}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
-                Cancel
+                Annuler
               </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? 'Updating...' : 'Update Article'}
+              <Button type="submit" disabled={updateMutation.isPending} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                {updateMutation.isPending ? 'Mise à jour...' : 'Mettre à Jour'}
               </Button>
             </DialogFooter>
           </form>
@@ -658,26 +690,28 @@ export default function AdminBlog() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
+        <DialogContent className="bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Delete Article</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete "{selectedBlog?.title}"? This action cannot be undone.
+            <DialogTitle className="text-white">Supprimer l'Article</DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Êtes-vous sûr de vouloir supprimer "{selectedBlog?.title}" ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDeleteModalOpen(false)}
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
             >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
             </Button>
           </DialogFooter>
         </DialogContent>

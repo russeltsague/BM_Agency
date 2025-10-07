@@ -59,7 +59,7 @@ export const Navbar = () => {
             <ThemeToggle />
             <Button variant="outline" size="sm" className="hidden lg:flex min-w-0">
               <Phone className="w-4 h-4 mr-1 lg:mr-2 flex-shrink-0" />
-              <span className="hidden xl:inline truncate">+237 222 123 456</span>
+              <span className="hidden xl:inline truncate">+237 675176974</span>
               <span className="xl:hidden">Tel</span>
             </Button>
             <Button size="sm" className="hidden lg:flex min-w-0">
@@ -111,7 +111,7 @@ export const Navbar = () => {
               <div className="flex flex-col space-y-2">
                 <Button variant="outline" className="w-full justify-center min-w-0">
                   <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">+237 222 123 456</span>
+                  <span className="truncate">+237 675176974</span>
                 </Button>
                 <Button className="w-full justify-center min-w-0">
                   <Mail className="w-4 h-4 mr-2 flex-shrink-0" />

@@ -45,11 +45,11 @@ export class ControllerFactory<T extends Document> {
   }
 }
 
-export function createController<T>(
+export function createController<T extends Document>(
   model: Model<T>,
   excludedMethods: ControllerActions[] = []
 ): Record<string, RequestHandler> {
-  return new ControllerFactory(model)
+  return new ControllerFactory<T>(model)
     .excludeMethods(...excludedMethods)
     .getHandlers();
 }

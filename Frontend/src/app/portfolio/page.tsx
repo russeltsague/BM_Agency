@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
@@ -14,108 +15,40 @@ import {
   Filter
 } from 'lucide-react'
 import Image from 'next/image'
+import { realisationsAPI, type Realisation } from '@/lib/api'
 
 export default function PortfolioPage() {
-  const projects = [
-    {
-      id: 1,
-      title: 'Plateforme E-commerce Mode Africaine',
-      category: 'E-commerce',
-      client: 'Maison de la Mode Africaine',
-      description: 'Refonte complète d\'une plateforme e-commerce spécialisée dans la mode africaine avec optimisation UX/UI et intégration de solutions de paiement locales. Résultat : +400% de conversions.',
-      image: '/images/portfolio-1.jpg',
-      tags: ['React', 'Node.js', 'MTN MoMo', 'SEO'],
-      metrics: [
-        { label: 'Conversions', value: '+400%', icon: TrendingUp },
-        { label: 'Temps de chargement', value: '-50%', icon: Star },
-        { label: 'Taux de rebond', value: '-30%', icon: Users }
-      ],
-      featured: true,
-      link: '#'
-    },
-    {
-      id: 2,
-      title: 'Application Mobile Bancaire',
-      category: 'Application Mobile',
-      client: 'Banque Atlantique Cameroun',
-      description: 'Développement d\'une application mobile bancaire avec authentification biométrique et gestion des comptes en temps réel pour les clients camerounais.',
-      image: '/images/portfolio-2.jpg',
-      tags: ['React Native', 'Node.js', 'MongoDB', 'Biometric'],
-      metrics: [
-        { label: 'Utilisateurs actifs', value: '50K+', icon: Users },
-        { label: 'Note App Store', value: '4.8/5', icon: Star },
-        { label: 'Temps de réponse', value: '< 2s', icon: TrendingUp }
-      ],
-      featured: true,
-      link: '#'
-    },
-    {
-      id: 3,
-      title: 'Site Corporate Industrie',
-      category: 'Site Web',
-      client: 'Tech Industries',
-      description: 'Création d\'un site corporate pour un leader de l\'industrie avec système de gestion de contenu personnalisé.',
-      image: '/images/portfolio-3.jpg',
-      tags: ['Next.js', 'Sanity CMS', 'Tailwind CSS', 'Animations'],
-      metrics: [
-        { label: 'Trafic organique', value: '+150%', icon: TrendingUp },
-        { label: 'Pages/sessions', value: '+80%', icon: Star },
-        { label: 'Taux conversion', value: '+45%', icon: Users }
-      ],
-      featured: false,
-      link: '#'
-    },
-    {
-      id: 4,
-      title: 'Plateforme SaaS RH',
-      category: 'SaaS',
-      client: 'HR Solutions',
-      description: 'Développement d\'une plateforme SaaS complète pour la gestion des ressources humaines avec dashboard analytics.',
-      image: '/images/portfolio-4.jpg',
-      tags: ['Vue.js', 'Python', 'PostgreSQL', 'Docker'],
-      metrics: [
-        { label: 'Utilisateurs', value: '10K+', icon: Users },
-        { label: 'Temps d\'implémentation', value: '-60%', icon: Star },
-        { label: 'ROI', value: '+400%', icon: TrendingUp }
-      ],
-      featured: false,
-      link: '#'
-    },
-    {
-      id: 5,
-      title: 'Campagne Publicitaire Digitale',
-      category: 'Marketing Digital',
-      client: 'StartupTech',
-      description: 'Stratégie digitale complète avec création de contenu, gestion des réseaux sociaux et optimisation publicitaire.',
-      image: '/images/portfolio-5.jpg',
-      tags: ['Social Media', 'Content Marketing', 'Ads', 'Analytics'],
-      metrics: [
-        { label: 'Portée', value: '1M+', icon: Users },
-        { label: 'Engagement', value: '+250%', icon: Star },
-        { label: 'Coût/acquisition', value: '-35%', icon: TrendingUp }
-      ],
-      featured: false,
-      link: '#'
-    },
-    {
-      id: 6,
-      title: 'Brand Identity Startup',
-      category: 'Branding',
-      client: 'FinTech Pro',
-      description: 'Création complète d\'identité visuelle pour une startup fintech, du logo au guideline de marque.',
-      image: '/images/portfolio-6.jpg',
-      tags: ['Logo Design', 'Brand Guidelines', 'Print', 'Digital Assets'],
-      metrics: [
-        { label: 'Notoriété', value: '+200%', icon: Star },
-        { label: 'Reconnaissance', value: '+85%', icon: Users },
-        { label: 'Cohérence', value: '100%', icon: TrendingUp }
-      ],
-      featured: false,
-      link: '#'
-    }
-  ]
+  const [realisations, setRealisations] = useState<Realisation[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState('Tous')
 
-  const categories = ['Tous', 'E-commerce', 'Application Mobile', 'Site Web', 'SaaS', 'Marketing Digital', 'Branding']
+  useEffect(() => {
+    const fetchRealisations = async () => {
+      try {
+        setIsLoading(true)
+        const response = await realisationsAPI.getAll()
+        const items = response?.data
+        setRealisations(Array.isArray(items) ? items : [])
+      } catch (err: any) {
+        console.error('Failed to fetch realisations:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchRealisations()
+  }, [])
+
+  const categories = ['Tous', ...Array.from(new Set(realisations.map(realisation => realisation.category).filter(Boolean)))]
+
+  const filteredRealisations = realisations.filter(realisation => {
+    return selectedCategory === 'Tous' || realisation.category === selectedCategory
+  })
+
+  const featuredRealisations = filteredRealisations.filter(realisation => realisation.featured)
+  const otherRealisations = filteredRealisations.filter(realisation => !realisation.featured)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -134,6 +67,38 @@ export default function PortfolioPage() {
       y: 0,
       transition: { duration: 0.6 }
     }
+  }
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-slate-400">Chargement des réalisations...</p>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">Erreur: {error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Réessayer
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
   }
 
   return (
@@ -167,9 +132,10 @@ export default function PortfolioPage() {
             {categories.map((category) => (
               <Button
                 key={category}
-                variant={category === 'Tous' ? 'primary' : 'outline'}
+                variant={category === selectedCategory ? 'primary' : 'outline'}
                 size="sm"
                 className="mb-2"
+                onClick={() => setSelectedCategory(category || 'Tous')}
               >
                 <Filter className="w-4 h-4 mr-1" />
                 {category}
@@ -189,9 +155,9 @@ export default function PortfolioPage() {
             viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {projects.map((project, index) => (
+            {filteredRealisations.map((realisation) => (
               <motion.div
-                key={project.id}
+                key={realisation._id}
                 variants={itemVariants}
                 whileHover={{ y: -10 }}
                 className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-slate-700"
@@ -200,17 +166,17 @@ export default function PortfolioPage() {
                 <div className="relative h-48 bg-gray-200 dark:bg-slate-700 overflow-hidden">
                   <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
                     <div className="text-6xl text-primary-300 dark:text-blue-400">
-                      {project.category === 'E-commerce' && '🛒'}
-                      {project.category === 'Application Mobile' && '📱'}
-                      {project.category === 'Site Web' && '🌐'}
-                      {project.category === 'SaaS' && '☁️'}
-                      {project.category === 'Marketing Digital' && '📢'}
-                      {project.category === 'Branding' && '🎨'}
+                      {realisation.category === 'E-commerce' && '🛒'}
+                      {realisation.category === 'Application Mobile' && '📱'}
+                      {realisation.category === 'Site Web' && '🌐'}
+                      {realisation.category === 'SaaS' && '☁️'}
+                      {realisation.category === 'Marketing Digital' && '📢'}
+                      {realisation.category === 'Branding' && '🎨'}
                     </div>
                   </div>
 
                   {/* Featured Badge */}
-                  {project.featured && (
+                  {realisation.featured && (
                     <div className="absolute top-4 left-4">
                       <span className="bg-yellow-500 dark:bg-yellow-600 text-white px-3 py-1 rounded-full text-xs font-medium">
                         ⭐ Projet phare
@@ -237,33 +203,22 @@ export default function PortfolioPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-primary-600 bg-primary-100 dark:text-blue-400 dark:bg-blue-900/30 px-2 py-1 rounded">
-                      {project.category}
+                      {realisation.category}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-slate-400">{project.client}</span>
+                    <span className="text-xs text-gray-500 dark:text-slate-400">{realisation.client}</span>
                   </div>
 
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-blue-400 transition-colors">
-                    {project.title}
+                    {realisation.title}
                   </h3>
 
                   <p className="text-gray-600 dark:text-slate-400 text-sm mb-4 line-clamp-3">
-                    {project.description}
+                    {realisation.description}
                   </p>
-
-                  {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    {project.metrics.map((metric, metricIndex) => (
-                      <div key={metricIndex} className="text-center p-2 bg-gray-50 dark:bg-slate-700 rounded">
-                        <metric.icon className="w-4 h-4 text-primary-600 dark:text-blue-400 mx-auto mb-1" />
-                        <div className="text-xs font-semibold text-gray-900 dark:text-slate-100">{metric.value}</div>
-                        <div className="text-xs text-gray-500 dark:text-slate-400">{metric.label}</div>
-                      </div>
-                    ))}
-                  </div>
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1 mb-4">
-                    {project.tags.map((tag, tagIndex) => (
+                    {realisation.tags?.map((tag, tagIndex) => (
                       <span
                         key={tagIndex}
                         className="text-xs bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300 px-2 py-1 rounded"

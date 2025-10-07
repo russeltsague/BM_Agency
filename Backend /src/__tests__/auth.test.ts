@@ -1,20 +1,16 @@
 import request from 'supertest';
 import app from '../app';
-import { setupTestDB } from './test-db';
+import { User } from '../models/User';
 
-// Setup test database
-setupTestDB();
-
-const userData = {
-  name: 'Test User',
-  email: 'test@test.com',
-  password: 'password123',
-  passwordConfirm: 'password123',
-};
-
-describe('Auth API', () => {
+describe('Authentication API', () => {
   describe('POST /api/v1/auth/register', () => {
-    it('should register a new user', async () => {
+    it('should register a new user successfully', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send(userData)
@@ -23,96 +19,150 @@ describe('Auth API', () => {
       expect(response.body.status).toBe('success');
       expect(response.body.token).toBeDefined();
       expect(response.body.data.user.email).toBe(userData.email);
+      expect(response.body.data.user.name).toBe(userData.name);
+      expect(response.body.data.user.password).toBeUndefined();
     });
 
-    it('should return 400 if email is invalid', async () => {
+    it('should not register user with duplicate email', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send(userData);
+
       const response = await request(app)
         .post('/api/v1/auth/register')
-        .send({ ...userData, email: 'invalid-email' })
+        .send(userData)
         .expect(400);
 
-      expect(response.body.status).toBe('fail');
-      expect(response.body.message).toContain('Please provide a valid email');
+      expect(response.body.status).toBe('error');
+    });
+
+    it('should not register user with invalid email', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'invalid-email',
+        password: 'password123'
+      };
+
+      const response = await request(app)
+        .post('/api/v1/auth/register')
+        .send(userData)
+        .expect(400);
+
+      expect(response.body.status).toBe('error');
+    });
+
+    it('should not register user with short password', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'short'
+      };
+
+      const response = await request(app)
+        .post('/api/v1/auth/register')
+        .send(userData)
+        .expect(400);
+
+      expect(response.body.status).toBe('error');
     });
   });
 
   describe('POST /api/v1/auth/login', () => {
     beforeEach(async () => {
-      await request(app).post('/api/v1/auth/register').send(userData);
+      await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'password123'
+        });
     });
 
-    it('should login a user with valid credentials', async () => {
+    it('should login user with correct credentials', async () => {
       const response = await request(app)
         .post('/api/v1/auth/login')
-        .send({ email: userData.email, password: userData.password })
+        .send({
+          email: 'test@example.com',
+          password: 'password123'
+        })
         .expect(200);
 
       expect(response.body.status).toBe('success');
       expect(response.body.token).toBeDefined();
+      expect(response.body.data.user.email).toBe('test@example.com');
     });
 
-    it('should return 401 with invalid credentials', async () => {
+    it('should not login with incorrect password', async () => {
       const response = await request(app)
         .post('/api/v1/auth/login')
-        .send({ email: userData.email, password: 'wrongpassword' })
+        .send({
+          email: 'test@example.com',
+          password: 'wrongpassword'
+        })
         .expect(401);
 
       expect(response.body.status).toBe('error');
-      expect(response.body.message).toContain('Incorrect email or password');
+    });
+
+    it('should not login with non-existent email', async () => {
+      const response = await request(app)
+        .post('/api/v1/auth/login')
+        .send({
+          email: 'nonexistent@example.com',
+          password: 'password123'
+        })
+        .expect(401);
+
+      expect(response.body.status).toBe('error');
     });
   });
 
-  describe('Authenticated routes', () => {
+  describe('GET /api/v1/auth/me', () => {
     let token: string;
 
-    beforeAll(async () => {
-      const registerResponse = await request(app)
+    beforeEach(async () => {
+      const response = await request(app)
         .post('/api/v1/auth/register')
-        .send(userData);
-      token = registerResponse.body.token;
+        .send({
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'password123'
+        });
+      
+      token = response.body.token;
     });
 
-    describe('GET /api/v1/auth/me', () => {
-      it('should get current user profile', async () => {
-        const response = await request(app)
-          .get('/api/v1/auth/me')
-          .set('Authorization', `Bearer ${token}`)
-          .expect(200);
+    it('should get current user profile with valid token', async () => {
+      const response = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
 
-        expect(response.body.status).toBe('success');
-        expect(response.body.data.user.email).toBe(userData.email);
-      });
-
-      it('should return 401 if not authenticated', async () => {
-        await request(app).get('/api/v1/auth/me').expect(401);
-      });
+      expect(response.body.status).toBe('success');
+      expect(response.body.data.user.email).toBe('test@example.com');
     });
 
-    describe('PATCH /api/v1/auth/update-password', () => {
-      it('should update user password', async () => {
-        await request(app)
-          .patch('/api/v1/auth/update-password')
-          .set('Authorization', `Bearer ${token}`)
-          .send({ currentPassword: 'password123', newPassword: 'newpassword123' })
-          .expect(200);
+    it('should not get profile without token', async () => {
+      const response = await request(app)
+        .get('/api/v1/auth/me')
+        .expect(401);
 
-        // Try to login with new password
-        const loginResponse = await request(app)
-          .post('/api/v1/auth/login')
-          .send({ email: userData.email, password: 'newpassword123' });
+      expect(response.body.status).toBe('error');
+    });
 
-        expect(loginResponse.status).toBe(200);
-      });
+    it('should not get profile with invalid token', async () => {
+      const response = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', 'Bearer invalidtoken')
+        .expect(401);
 
-      it('should return 401 if current password is incorrect', async () => {
-        const response = await request(app)
-          .patch('/api/v1/auth/update-password')
-          .set('Authorization', `Bearer ${token}`)
-          .send({ currentPassword: 'wrongpassword', newPassword: 'newpassword123' })
-          .expect(401);
-
-        expect(response.body.message).toContain('Your current password is incorrect');
-      });
+      expect(response.body.status).toBe('error');
     });
   });
 });

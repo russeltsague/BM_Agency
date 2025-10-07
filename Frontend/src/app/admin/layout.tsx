@@ -2,23 +2,32 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth, AuthProvider } from '@/contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
   LayoutDashboard,
   Settings,
-  Users,
-  FileText,
   Image,
+  FileText,
+  Users,
   Package,
   Menu,
   X,
   LogOut,
-  User
+  User,
+  Plus
 } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -62,17 +71,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AdminLayoutContent>{children}</AdminLayoutContent>
-      </AuthProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
     </QueryClientProvider>
   )
 }
 
 function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const { user, logout } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    // Temporarily disabled for testing - uncomment when ready
+    // router.push('/admin/login')
+    // return null
+    console.log('User not authenticated, but allowing access for testing')
+  }
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -136,6 +153,47 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 )
               })}
             </ul>
+
+            {/* Quick Actions */}
+            <div className="mt-8 pt-6 border-t border-slate-700">
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+                Quick Actions
+              </h3>
+              <div className="space-y-2">
+                <Link
+                  href="/admin/services"
+                  className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Plus className="mr-3 h-4 w-4" />
+                  Add Service
+                </Link>
+                <Link
+                  href="/admin/blog"
+                  className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <FileText className="mr-3 h-4 w-4" />
+                  New Article
+                </Link>
+                <Link
+                  href="/admin/portfolio"
+                  className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Image className="mr-3 h-4 w-4" />
+                  Add Project
+                </Link>
+                <Link
+                  href="/admin/testimonials"
+                  className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Users className="mr-3 h-4 w-4" />
+                  Add Testimonial
+                </Link>
+              </div>
+            </div>
           </nav>
 
           {/* User section */}
@@ -157,7 +215,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
               variant="outline"
               size="sm"
               className="w-full"
-              onClick={logout}
+              onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
@@ -191,6 +249,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
               <div className="hidden sm:block text-sm text-slate-300">
                 Welcome back, {user?.name || 'Admin'}
               </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowLogoutDialog(true)}
+                className="border-slate-600 hover:bg-slate-700"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
             </div>
           </div>
         </header>
@@ -202,6 +269,36 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           </div>
         </main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirm Logout</DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Are you sure you want to logout? You will need to login again to access the admin dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+              className="border-slate-600 hover:bg-slate-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                logout()
+                setShowLogoutDialog(false)
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

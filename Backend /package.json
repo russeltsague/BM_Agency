@@ -16,7 +16,7 @@
     "test:ci": "NODE_ENV=test jest --ci --coverage",
     "test:e2e": "NODE_ENV=test jest src/__tests__/e2e/*.test.ts",
     "db:init": "ts-node scripts/init-db.ts",
-    "db:reset": "NODE_ENV=test ts-node scripts/reset-db.ts"
+    "db:reset": "ts-node scripts/reset-db.ts"
   },
   "keywords": [
     "node",

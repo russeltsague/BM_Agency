@@ -1,67 +1,44 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { MotionDiv, MotionH2, MotionP } from '@/components/MotionComponents'
 import { ExternalLink, Eye } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/Button'
+import { realisationsAPI, type Realisation } from '@/lib/api'
+
+// Category emoji mapping
+const categoryEmojis: Record<string, string> = {
+  'E-commerce': '🛍️',
+  'Application Mobile': '📱',
+  'Site Web': '🌐',
+  'SaaS': '☁️',
+  'Marketing Digital': '📢',
+  'Branding': '🎨',
+  'default': '💼'
+}
 
 export const PortfolioSection = () => {
-  const projects = [
-    {
-      id: 1,
-      title: 'E-commerce Fashion Store',
-      category: 'E-commerce',
-      description: 'Refonte complète d\'une plateforme e-commerce avec optimisation UX/UI et intégration de solutions de paiement modernes.',
-      image: '/images/portfolio-1.jpg',
-      tags: ['React', 'Node.js', 'Stripe', 'SEO'],
-      link: '#'
-    },
-    {
-      id: 2,
-      title: 'Application Mobile Banque',
-      category: 'Application Mobile',
-      description: 'Développement d\'une application mobile bancaire avec authentification biométrique et gestion des comptes en temps réel.',
-      image: '/images/portfolio-2.jpg',
-      tags: ['React Native', 'Node.js', 'MongoDB', 'Biometric'],
-      link: '#'
-    },
-    {
-      id: 3,
-      title: 'Site Corporate Industrie',
-      category: 'Site Web',
-      description: 'Création d\'un site corporate pour un leader de l\'industrie avec système de gestion de contenu personnalisé.',
-      image: '/images/portfolio-3.jpg',
-      tags: ['Next.js', 'Sanity CMS', 'Tailwind CSS', 'Animations'],
-      link: '#'
-    },
-    {
-      id: 4,
-      title: 'Plateforme SaaS RH',
-      category: 'SaaS',
-      description: 'Développement d\'une plateforme SaaS complète pour la gestion des ressources humaines avec dashboard analytics.',
-      image: '/images/portfolio-4.jpg',
-      tags: ['Vue.js', 'Python', 'PostgreSQL', 'Docker'],
-      link: '#'
-    },
-    {
-      id: 5,
-      title: 'Campagne Publicitaire Digitale',
-      category: 'Marketing Digital',
-      description: 'Stratégie digitale complète avec création de contenu, gestion des réseaux sociaux et optimisation publicitaire.',
-      image: '/images/portfolio-5.jpg',
-      tags: ['Social Media', 'Content Marketing', 'Ads', 'Analytics'],
-      link: '#'
-    },
-    {
-      id: 6,
-      title: 'Brand Identity Startup',
-      category: 'Branding',
-      description: 'Création complète d\'identité visuelle pour une startup fintech, du logo au guideline de marque.',
-      image: '/images/portfolio-6.jpg',
-      tags: ['Logo Design', 'Brand Guidelines', 'Print', 'Digital Assets'],
-      link: '#'
+  const [realisations, setRealisations] = useState<Realisation[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  useEffect(() => {
+    const fetchRealisations = async () => {
+      try {
+        setIsLoading(true)
+        const response = await realisationsAPI.getAll()
+        const items = response?.data
+        setRealisations(Array.isArray(items) ? items.slice(0, 6) : [])
+      } catch (err: any) {
+        console.error('Failed to fetch realisations:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  ]
+
+    fetchRealisations()
+  }, [])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -101,85 +78,101 @@ export const PortfolioSection = () => {
           </MotionP>
         </MotionDiv>
 
-        <MotionDiv
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
-          {projects.map((project, index) => (
-            <MotionDiv
-              key={project.id}
-              variants={itemVariants}
-              whileHover={{ y: -10 }}
-              className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-slate-700"
-            >
-              {/* Project Image */}
-              <div className="relative h-48 bg-gray-200 dark:bg-slate-700 overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
-                  <div className="text-6xl text-primary-300 dark:text-blue-400">
-                    {project.category === 'E-commerce' && '🛒'}
-                    {project.category === 'Application Mobile' && '📱'}
-                    {project.category === 'Site Web' && '🌐'}
-                    {project.category === 'SaaS' && '☁️'}
-                    {project.category === 'Marketing Digital' && '📢'}
-                    {project.category === 'Branding' && '🎨'}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load portfolio</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
+        ) : !Array.isArray(realisations) || realisations.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-slate-400">No portfolio items available at the moment.</p>
+          </div>
+        ) : (
+          <MotionDiv
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {realisations.map((realisation, index) => (
+              <MotionDiv
+                key={realisation._id}
+                variants={itemVariants}
+                whileHover={{ y: -10 }}
+                className="group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-slate-700"
+              >
+                {/* Project Image */}
+                <div className="relative h-48 bg-gray-200 dark:bg-slate-700 overflow-hidden">
+                  <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
+                    <div className="text-6xl text-primary-300 dark:text-blue-400">
+                      {categoryEmojis[realisation.category || 'default'] || categoryEmojis.default}
+                    </div>
+                  </div>
+
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 dark:group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Button size="sm" variant="secondary" className="mr-2">
+                        <Eye className="w-4 h-4 mr-1" />
+                        Voir
+                      </Button>
+                      {realisation.link && (
+                        <Button size="sm">
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Live
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 dark:group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button size="sm" variant="secondary" className="mr-2">
-                      <Eye className="w-4 h-4 mr-1" />
-                      Voir
-                    </Button>
-                    <Button size="sm">
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Live
-                    </Button>
+                {/* Project Content */}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    {realisation.category && (
+                      <span className="text-xs font-medium text-primary-600 bg-primary-100 dark:text-blue-400 dark:bg-blue-900/30 px-2 py-1 rounded">
+                        {realisation.category}
+                      </span>
+                    )}
                   </div>
+
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-blue-400 transition-colors">
+                    {realisation.title}
+                  </h3>
+
+                  <p className="text-gray-600 dark:text-slate-400 text-sm mb-4 line-clamp-3">
+                    {realisation.description}
+                  </p>
+
+                  {/* Tags */}
+                  {realisation.tags && realisation.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {realisation.tags.map((tag, tagIndex) => (
+                        <span
+                          key={tagIndex}
+                          className="text-xs bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300 px-2 py-1 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* CTA */}
+                  <Button variant="outline" size="sm" className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
+                    Voir le projet
+                    <ExternalLink className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </div>
-              </div>
-
-              {/* Project Content */}
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-primary-600 bg-primary-100 dark:text-blue-400 dark:bg-blue-900/30 px-2 py-1 rounded">
-                    {project.category}
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-blue-400 transition-colors">
-                  {project.title}
-                </h3>
-
-                <p className="text-gray-600 dark:text-slate-400 text-sm mb-4 line-clamp-3">
-                  {project.description}
-                </p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {project.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="text-xs bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-slate-300 px-2 py-1 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* CTA */}
-                <Button variant="outline" size="sm" className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                  Voir le projet
-                  <ExternalLink className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </div>
-            </MotionDiv>
-          ))}
-        </MotionDiv>
+              </MotionDiv>
+            ))}
+          </MotionDiv>
+        )}
 
         <MotionDiv
           initial={{ opacity: 0, y: 30 }}

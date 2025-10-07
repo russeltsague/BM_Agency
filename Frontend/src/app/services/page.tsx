@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
@@ -17,177 +18,72 @@ import {
   Clock,
   Award
 } from 'lucide-react'
+import { servicesAPI, type Service } from '@/lib/api'
+
+// Icon mapping
+const iconMap: Record<string, any> = {
+  Megaphone,
+  Smartphone,
+  Palette,
+  TrendingUp,
+  ShoppingBag,
+  Users,
+}
 
 export default function ServicesPage() {
-  const services = [
-    {
-      id: 'digital-communication',
-      icon: Megaphone,
-      title: 'Communication Digitale',
-      description: 'Stratégies de communication globale et digitale pour développer votre présence en ligne et engager votre audience camerounaise.',
-      features: [
-        'Community Management',
-        'Publicité digitale (SEA)',
-        'Relations presse digitales',
-        'Content Marketing',
-        'Social Media Strategy',
-        'Influence Marketing'
-      ],
-      benefits: [
-        'Augmentation de la visibilité locale',
-        'Engagement accru des clients',
-        'Génération de leads qualifiés',
-        'Amélioration de l\'e-réputation'
-      ],
-      pricing: 'À partir de 250 000 FCFA/mois',
-      duration: '6-12 mois',
-      caseStudy: 'E-commerce +300% trafic social'
-    },
-    {
-      id: 'digital-marketing',
-      icon: Smartphone,
-      title: 'Marketing Digital',
-      description: 'Optimisation de votre visibilité et acquisition de nouveaux clients sur le web avec des stratégies data-driven adaptées au marché camerounais.',
-      features: [
-        'SEO/SEA avancé',
-        'Marketing automation',
-        'Analytics et tracking',
-        'Growth Hacking',
-        'Email marketing',
-        'Conversion optimization'
-      ],
-      benefits: [
-        'ROI mesurable',
-        'Acquisition clients optimisée',
-        'Taux de conversion amélioré',
-        'Suivi performance en temps réel'
-      ],
-      pricing: 'À partir de 2 000€/mois',
-      duration: '3-6 mois',
-      caseStudy: 'SaaS +150% conversions'
-    },
-    {
-      id: 'design-branding',
-      icon: Palette,
-      title: 'Design & Branding',
-      description: 'Création d\'identités visuelles uniques et mémorables pour votre marque, du concept à la déclinaison.',
-      features: [
-        'Identité visuelle complète',
-        'Charte graphique',
-        'Design web & mobile',
-        'Print design',
-        'Motion design',
-        'Brand guidelines'
-      ],
-      benefits: [
-        'Image de marque cohérente',
-        'Reconnaissance immédiate',
-        'Différenciation concurrentielle',
-        'Support tous formats'
-      ],
-      pricing: 'À partir de 3 000€',
-      duration: '4-8 semaines',
-      caseStudy: 'Startup fintech +200% notoriété'
-    },
-    {
-      id: 'digital-strategy',
-      icon: TrendingUp,
-      title: 'Stratégie Digitale',
-      description: 'Accompagnement stratégique complet pour votre transformation digitale et croissance business.',
-      features: [
-        'Audit digital complet',
-        'Plan de transformation',
-        'Formation équipes',
-        'Veille stratégique',
-        'Roadmap digitale',
-        'KPI et objectifs'
-      ],
-      benefits: [
-        'Vision claire et structurée',
-        'Priorités définies',
-        'Équipes formées',
-        'Résultats mesurables'
-      ],
-      pricing: 'À partir de 5 000€',
-      duration: '2-4 mois',
-      caseStudy: 'Industrie +400% efficacité digitale'
-    },
-    {
-      id: 'advertising-objects',
-      icon: ShoppingBag,
-      title: 'Objets Publicitaires',
-      description: 'Solutions de communication par l\'objet personnalisées et impactantes pour votre marque.',
-      features: [
-        'Goodies personnalisés',
-        'Textile corporate',
-        'Objets high-tech',
-        'Écologiques & durables',
-        'Packaging sur-mesure',
-        'Logistique et stockage'
-      ],
-      benefits: [
-        'Visibilité quotidienne',
-        'Cadeaux clients originaux',
-        'Événementiel impactant',
-        'Démarche RSE valorisée'
-      ],
-      pricing: 'À partir de 500€',
-      duration: '2-4 semaines',
-      caseStudy: 'Corporate +50% mémorisation'
-    },
-    {
-      id: 'training-coaching',
-      icon: Users,
-      title: 'Formation & Coaching',
-      description: 'Formation de vos équipes aux meilleures pratiques du digital et accompagnement personnalisé.',
-      features: [
-        'Formations sur mesure',
-        'Coaching individuel',
-        'Workshops pratiques',
-        'E-learning personnalisé',
-        'Certification digitale',
-        'Suivi post-formation'
-      ],
-      benefits: [
-        'Équipes autonomisées',
-        'Compétences actualisées',
-        'Productivité améliorée',
-        'Innovation encouragée'
-      ],
-      pricing: 'À partir de 150€/heure',
-      duration: '1-3 mois',
-      caseStudy: 'PME +300% compétences digitales'
-    }
-  ]
+  const [services, setServices] = useState<Service[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const processSteps = [
-    {
-      step: '01',
-      title: 'Brief & Analyse',
-      description: 'Compréhension de vos besoins et analyse de votre situation actuelle.'
-    },
-    {
-      step: '02',
-      title: 'Stratégie',
-      description: 'Élaboration d\'une stratégie personnalisée et définition des objectifs.'
-    },
-    {
-      step: '03',
-      title: 'Création',
-      description: 'Conception et développement des solutions selon le cahier des charges.'
-    },
-    {
-      step: '04',
-      title: 'Déploiement',
-      description: 'Mise en production et formation de vos équipes si nécessaire.'
-    },
-    {
-      step: '05',
-      title: 'Suivi & Optimisation',
-      description: 'Monitoring des performances et optimisations continues.'
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setIsLoading(true)
+        const response = await servicesAPI.getAll()
+        const items = response?.data
+        setServices(Array.isArray(items) ? items : [])
+      } catch (err: any) {
+        console.error('Failed to fetch services:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  ]
 
+    fetchServices()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-slate-400">Chargement des services...</p>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-slate-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">Erreur: {error}</p>
+            <Button onClick={() => window.location.reload()}>
+              Réessayer
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    )
+  }
   return (
     <main className="min-h-screen bg-white dark:bg-slate-900">
       <Navbar />
@@ -201,13 +97,12 @@ export default function ServicesPage() {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-slate-100 mb-6">
               Nos <span className="text-primary-600 dark:text-blue-400">Services</span>
             </h1>
-            <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
-              Découvrez notre gamme complète de services digitaux conçus pour propulser
-              votre entreprise vers le succès. Chaque solution est personnalisée selon vos
-              objectifs et votre secteur d'activité.
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-slate-400 leading-relaxed max-w-3xl mx-auto">
+              Découvrez notre gamme complète de services digitaux conçus pour accompagner
+              votre croissance et maximiser votre présence en ligne au Cameroun.
             </p>
           </motion.div>
         </div>
@@ -217,110 +112,61 @@ export default function ServicesPage() {
       <section className="py-20 bg-white dark:bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10 }}
-                className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-700"
-              >
-                <div className="flex items-center justify-center w-16 h-16 bg-primary-100 dark:bg-blue-900/30 rounded-lg mb-6">
-                  <service.icon className="w-8 h-8 text-primary-600 dark:text-blue-400" />
-                </div>
-
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-4">
-                  {service.title}
-                </h3>
-
-                <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
-                  {service.description}
-                </p>
-
-                <div className="mb-6">
-                  <h4 className="font-medium text-gray-900 dark:text-slate-100 mb-3">Inclus :</h4>
-                  <ul className="space-y-2">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center text-gray-600 dark:text-slate-400 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mb-6 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500 dark:text-slate-400">Prix :</span>
-                      <div className="font-semibold text-gray-900 dark:text-slate-100">{service.pricing}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500 dark:text-slate-400">Durée :</span>
-                      <div className="font-semibold text-gray-900 dark:text-slate-100">{service.duration}</div>
+            {services.map((service, index) => {
+              const IconComponent = iconMap[service.icon || ''] || Smartphone
+              return (
+                <motion.div
+                  key={service._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-slate-700 hover:border-primary-200 dark:hover:border-blue-600"
+                >
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-primary-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                      <IconComponent className="w-8 h-8 text-primary-600 dark:text-blue-400" />
                     </div>
                   </div>
-                  <div className="mt-2 text-xs text-primary-600 dark:text-blue-400 font-medium">
-                    📈 {service.caseStudy}
+
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-4 group-hover:text-primary-600 dark:group-hover:text-blue-400 transition-colors">
+                    {service.title}
+                  </h3>
+
+                  <p className="text-gray-600 dark:text-slate-400 mb-6 leading-relaxed">
+                    {service.description}
+                  </p>
+
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Ce que nous offrons :</h4>
+                    <ul className="space-y-2">
+                      {service.features?.slice(0, 4).map((feature: string, featureIndex: number) => (
+                        <li key={featureIndex} className="flex items-center text-gray-600 dark:text-slate-400">
+                          <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
 
-                <Button variant="outline" className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                  En savoir plus
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="py-20 bg-gray-50 dark:bg-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-              Notre Méthodologie
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-              Un processus éprouvé et collaboratif pour garantir le succès de votre projet.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-            {processSteps.map((step, index) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="relative">
-                  <div className="w-16 h-16 bg-primary-600 dark:bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                    {step.step}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">À partir de</p>
+                      <p className="text-lg font-bold text-primary-600 dark:text-blue-400">{service.pricing}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">Durée</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-slate-300">{service.duration}</p>
+                    </div>
                   </div>
-                  {index < processSteps.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-primary-200 dark:bg-blue-700 transform -translate-x-16"></div>
-                  )}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-gray-600 dark:text-slate-400 text-sm">
-                  {step.description}
-                </p>
-              </motion.div>
-            ))}
+
+                  <Button className="w-full bg-primary-600 hover:bg-primary-700 dark:bg-blue-600 dark:hover:bg-blue-700 group-hover:shadow-lg transition-all">
+                    En savoir plus
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -335,20 +181,18 @@ export default function ServicesPage() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Besoin d'une solution sur mesure ?
+              Prêt à transformer votre présence digitale ?
             </h2>
-            <p className="text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
-              Nos experts étudient votre projet et vous proposent une solution personnalisée
-              adaptée à vos besoins et votre budget.
+            <p className="text-lg lg:text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
+              Contactez-nous dès aujourd'hui pour une consultation gratuite et découvrez
+              comment nos services peuvent accélérer votre croissance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary">
-                <Clock className="mr-2 w-5 h-5" />
+              <Button variant="secondary" size="lg" className="bg-white dark:bg-slate-800 text-primary-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700">
                 Consultation gratuite
               </Button>
-              <Button size="lg">
-                <Award className="mr-2 w-5 h-5" />
-                Devis personnalisé
+              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary-600 dark:border-slate-300 dark:text-slate-300 dark:hover:bg-slate-300 dark:hover:text-blue-600">
+                Voir nos réalisations
               </Button>
             </div>
           </motion.div>
