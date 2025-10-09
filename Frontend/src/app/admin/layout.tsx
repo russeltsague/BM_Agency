@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import {
   LayoutDashboard,
   Settings,
-  Image,
+  Image as ImageIcon,
   FileText,
   Users,
   Package,
@@ -115,9 +116,15 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-slate-700">
-            <h1 className="text-xl font-bold text-blue-400">
-              BM Agency
-            </h1>
+            <div className="flex items-center">
+              <Image
+                src="/images/lightlogo2.png"
+                alt="BM Agency Logo"
+                width={120}
+                height={40}
+                className="h-8 w-auto object-contain"
+              />
+            </div>
             <Button
               variant="ghost"
               size="icon"
@@ -181,7 +188,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Image className="mr-3 h-4 w-4" />
+                  <ImageIcon className="mr-3 h-4 w-4" />
                   Add Project
                 </Link>
                 <Link
@@ -239,9 +246,18 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 <Menu className="h-5 w-5" />
               </Button>
               <div className="hidden lg:block">
-                <h2 className="text-lg font-semibold text-slate-100">
-                  {sidebarItems.find(item => item.href === pathname)?.title || 'Dashboard'}
-                </h2>
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src="/images/lightlogo2.png"
+                    alt="BM Agency Logo"
+                    width={100}
+                    height={33}
+                    className="h-6 w-auto object-contain"
+                  />
+                  <span className="text-lg font-semibold text-slate-100">
+                    {sidebarItems.find(item => item.href === pathname)?.title || 'Dashboard'}
+                  </span>
+                </div>
               </div>
             </div>
 

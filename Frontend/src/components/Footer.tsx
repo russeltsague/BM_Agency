@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { MotionDiv, MotionH4, MotionLi, MotionA } from '@/components/MotionComponents'
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react'
 import { Button } from './Button'
@@ -45,7 +46,15 @@ export const Footer = () => {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold mb-4 text-blue-600 dark:text-blue-400">BM Agency</h3>
+              <div className="flex items-center mb-4">
+                <Image
+                  src="/images/Lightlogo.png"
+                  alt="BM Agency Logo"
+                  width={400}
+                  height={134}
+                  className="h-24 w-auto object-contain"
+                />
+              </div>
               <p className="text-gray-600 dark:text-slate-400 mb-6">
                 Votre partenaire de confiance pour la communication digitale 360° au Cameroun.
                 Créativité, stratégie et résultats au service de votre succès numérique.

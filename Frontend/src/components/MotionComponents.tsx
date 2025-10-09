@@ -19,3 +19,4 @@ export const MotionForm = motion.form
 export const MotionInput = motion.input
 export const MotionTextarea = motion.textarea
 export const MotionArticle = motion.article
+export const MotionCard = motion.div

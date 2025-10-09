@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { MotionDiv } from '@/components/MotionComponents'
 import { Phone, Mail, Menu, X, User, Settings } from 'lucide-react'
 import { Button } from './Button'
@@ -27,9 +28,16 @@ export const Navbar = () => {
           <Link href="/" className="flex-shrink-0 min-w-0">
             <MotionDiv
               whileHover={{ scale: 1.05 }}
-              className="text-xl sm:text-2xl font-bold text-primary-600 dark:text-blue-400 truncate"
+              className="flex items-center min-w-0"
             >
-              BM Agency
+              <Image
+                src="/images/lightlogo2.png"
+                alt="BM Agency Logo"
+                width={160}
+                height={53}
+                className="h-10 w-auto object-contain"
+                priority
+              />
             </MotionDiv>
           </Link>
 
