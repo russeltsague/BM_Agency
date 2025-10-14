@@ -7,10 +7,6 @@ import { Button } from '@/components/Button'
 import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import {
   Users,
-  Target,
-  Award,
-  TrendingUp,
-  CheckCircle,
   Calendar,
   Mail
 } from 'lucide-react'

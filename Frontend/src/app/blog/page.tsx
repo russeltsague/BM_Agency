@@ -205,7 +205,7 @@ export default function BlogPage() {
                     </div>
                   </div>
                   <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-blue-600 dark:hover:bg-blue-700">
-                    Lire l'article
+                    Lire l&apos;article
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </div>
@@ -277,7 +277,7 @@ export default function BlogPage() {
 
                   <Button variant="outline" size="sm" className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
                     <BookOpen className="w-4 h-4 mr-1" />
-                    Lire l'article
+                    Lire l&apos;article
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
@@ -311,7 +311,7 @@ export default function BlogPage() {
                   className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-slate-100 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-white dark:focus:ring-blue-400"
                 />
                 <Button variant="secondary" className="bg-white dark:bg-slate-800 text-primary-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-700">
-                  S'abonner
+                  S&apos;abonner
                 </Button>
               </div>
             </div>

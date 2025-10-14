@@ -273,7 +273,7 @@ export default function AdminTeam() {
       {/* Enhanced Team Table */}
       <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardHeader className="pb-4">
-          <CardTitle className="text-white text-xl">Membres de l'Équipe ({filteredTeam.length})</CardTitle>
+          <CardTitle className="text-white text-xl">Membres de l&apos;Équipe ({filteredTeam.length})</CardTitle>
           <CardDescription className="text-slate-400">
             Gérez tous les membres de votre équipe
           </CardDescription>
@@ -291,7 +291,7 @@ export default function AdminTeam() {
                     <TableHead className="text-slate-300 font-semibold">Photo</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Nom</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Rôle</TableHead>
-                    <TableHead className="text-slate-300 font-semibold">Date d'ajout</TableHead>
+                    <TableHead className="text-slate-300 font-semibold">Date d&apos;ajout</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Réalisations</TableHead>
                     <TableHead className="text-slate-300 font-semibold w-[100px]">Actions</TableHead>
                   </TableRow>

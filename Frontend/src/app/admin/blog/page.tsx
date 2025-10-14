@@ -550,7 +550,7 @@ export default function AdminBlog() {
           <DialogHeader>
             <DialogTitle className="text-white">Modifier l&apos;Article</DialogTitle>
             <DialogDescription className="text-slate-300">
-              Mettez à jour les informations de l'article et son contenu.
+              Mettez à jour les informations de l&apos;article et son contenu.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">

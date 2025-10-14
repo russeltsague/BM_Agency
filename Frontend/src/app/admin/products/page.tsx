@@ -266,7 +266,7 @@ export default function AdminProducts() {
     }).format(price)
   }
 
-  const handleFileUpload = async (files: FileList | null, type: 'images' | 'pdf') => {
+  const handleFileUpload = async (files: FileList | null) => {
     if (!files) return
 
     const fileArray = Array.from(files)
