@@ -45,7 +45,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Dynamic import for React Quill to avoid SSR issues
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
@@ -54,33 +54,32 @@ import 'react-quill/dist/quill.snow.css'
 // Blog form schema
 const blogSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  excerpt: z.string().min(10, 'Excerpt must be at least 10 characters'),
+  excerpt: z.string().optional(),
   content: z.string().min(50, 'Content must be at least 50 characters'),
-  author: z.string().min(1, 'Author is required'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
   featured: z.boolean(),
   published: z.boolean(),
-}).transform((data) => ({
-  ...data,
-  featured: data.featured ?? false,
-  published: data.published ?? false,
-}))
+})
 
 type BlogForm = z.infer<typeof blogSchema>
 
 interface Blog {
-  id: string
+  _id: string
   title: string
-  excerpt: string
+  excerpt?: string
   content: string
-  author: string
-  category: string
-  tags: string[]
-  featured: boolean
-  published: boolean
+  author: {
+    _id: string
+    name: string
+    email: string
+  } | string
+  category?: string
+  tags?: string[]
+  featured?: boolean
+  published?: boolean
   thumbnail?: string
-  readTime: string
+  readTime?: string
   createdAt: string
   updatedAt: string
 }
@@ -88,11 +87,15 @@ interface Blog {
 // Mock data - replace with real API
 const mockBlog: Blog[] = [
   {
-    id: '1',
+    _id: '1',
     title: 'Les tendances du marketing digital au Cameroun en 2024',
     excerpt: 'Découvrez les principales tendances qui façonneront le marketing digital camerounais cette année et comment les intégrer dans votre stratégie d\'entreprise.',
     content: 'Le marketing digital au Cameroun évolue à un rythme effréné. En 2024, plusieurs tendances majeures se démarquent...',
-    author: 'Marie Dubois',
+    author: {
+      _id: 'user1',
+      name: 'Marie Dubois',
+      email: 'marie@example.com'
+    },
     category: 'Marketing Digital',
     tags: ['Tendances', 'Marketing', 'Cameroun', '2024'],
     featured: true,
@@ -103,11 +106,15 @@ const mockBlog: Blog[] = [
     updatedAt: '2024-01-15T00:00:00Z',
   },
   {
-    id: '2',
+    _id: '2',
     title: 'Comment optimiser son SEO pour les moteurs de recherche au Cameroun',
     excerpt: 'Guide complet pour améliorer le référencement de votre site web et augmenter votre visibilité sur Google et autres moteurs de recherche locaux.',
     content: 'Le SEO (Search Engine Optimization) reste un pilier fondamental du marketing digital camerounais...',
-    author: 'Thomas Martin',
+    author: {
+      _id: 'user2',
+      name: 'Thomas Martin',
+      email: 'thomas@example.com'
+    },
     category: 'SEO',
     tags: ['SEO', 'Référencement', 'Google', 'Cameroun'],
     featured: false,
@@ -145,80 +152,98 @@ export default function AdminBlog() {
   const { data: blog = [], isLoading } = useQuery({
     queryKey: ['admin-blog'],
     queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-      return mockBlog
+      const response = await articlesAPI.getAll()
+      return response?.data || []
     },
   })
 
   // Filter blog based on search
   const filteredBlog = blog.filter(post =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (post.author && typeof post.author === 'object' && 'name' in post.author
+      ? (post.author as { name: string }).name
+      : String(post.author)
+    ).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (post.category && post.category.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   // Create blog mutation
   const createMutation = useMutation({
     mutationFn: async (data: BlogForm) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const newBlog: Blog = {
-        id: Date.now().toString(),
-        ...data,
-        tags: data.tags.split(',').map(t => t.trim()),
-        thumbnail: '',
-        readTime: '5 min',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      try {
+        const articleData = {
+          title: data.title,
+          content: data.content,
+          excerpt: data.excerpt || undefined,
+          category: data.category,
+          tags: data.tags.split(',').map(t => t.trim()).filter(t => t.length > 0),
+          featured: data.featured,
+          published: data.published,
+        }
+        const response = await articlesAPI.create(articleData)
+        return response.data.article
+      } catch (error: any) {
+        console.error('Create blog error:', error)
+        throw new Error(error.message || 'Failed to create blog post')
       }
-      return newBlog
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog'] })
       setIsCreateModalOpen(false)
-      reset()
+      resetForm()
       toast.success('Blog post created successfully!')
     },
-    onError: () => {
-      toast.error('Failed to create blog post')
+    onError: (error: any) => {
+      console.error('Create blog mutation error:', error)
+      toast.error(error.message || 'Failed to create blog post')
     },
   })
 
   // Update blog mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: BlogForm }) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return { id, ...data, tags: data.tags.split(',').map(t => t.trim()) }
+      try {
+        const articleData = {
+          title: data.title,
+          content: data.content,
+          excerpt: data.excerpt || undefined,
+          category: data.category,
+          tags: data.tags.split(',').map(t => t.trim()).filter(t => t.length > 0),
+          featured: data.featured,
+          published: data.published,
+        }
+        const response = await articlesAPI.update(id, articleData)
+        return response.data.article
+      } catch (error: any) {
+        console.error('Update blog error:', error)
+        throw new Error(error.message || 'Failed to update blog post')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog'] })
       setIsEditModalOpen(false)
-      setSelectedBlog(null)
-      reset()
+      resetForm()
       toast.success('Blog post updated successfully!')
     },
-    onError: () => {
-      toast.error('Failed to update blog post')
+    onError: (error: any) => {
+      console.error('Update blog mutation error:', error)
+      toast.error(error.message || 'Failed to update blog post')
     },
   })
 
   // Delete blog mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await articlesAPI.delete(id)
       return id
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog'] })
-      setIsDeleteModalOpen(false)
-      setSelectedBlog(null)
+      closeDeleteModal()
       toast.success('Blog post deleted successfully!')
     },
-    onError: () => {
-      toast.error('Failed to delete blog post')
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete blog post')
     },
   })
 
@@ -229,31 +254,51 @@ export default function AdminBlog() {
   const handleEdit = (blog: Blog) => {
     setSelectedBlog(blog)
     setValue('title', blog.title)
-    setValue('excerpt', blog.excerpt)
+    setValue('excerpt', blog.excerpt || '')
     setValue('content', blog.content)
-    setValue('author', blog.author)
-    setValue('category', blog.category)
-    setValue('tags', blog.tags.join(', '))
-    setValue('featured', blog.featured)
-    setValue('published', blog.published)
+    setValue('category', blog.category || '')
+    setValue('tags', blog.tags?.join(', ') || '')
+    setValue('featured', blog.featured || false)
+    setValue('published', blog.published || false)
     setIsEditModalOpen(true)
   }
 
   const handleUpdate = (data: BlogForm) => {
     if (selectedBlog) {
-      updateMutation.mutate({ id: selectedBlog.id, data })
+      updateMutation.mutate({ id: selectedBlog._id, data })
     }
   }
 
   const handleDelete = () => {
     if (selectedBlog) {
-      deleteMutation.mutate(selectedBlog.id)
+      deleteMutation.mutate(selectedBlog._id)
     }
   }
 
   const openDeleteModal = (blog: Blog) => {
     setSelectedBlog(blog)
     setIsDeleteModalOpen(true)
+  }
+
+  // Reset form and close modals
+  const resetForm = () => {
+    reset()
+    setSelectedBlog(null)
+  }
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false)
+    resetForm()
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false)
+    resetForm()
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setSelectedBlog(null)
   }
 
   // React Quill modules
@@ -344,7 +389,7 @@ export default function AdminBlog() {
                   <AnimatePresence>
                     {filteredBlog.map((post) => (
                       <motion.tr
-                        key={post.id}
+                        key={post._id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -355,11 +400,16 @@ export default function AdminBlog() {
                           <div>
                             <div className="font-semibold text-lg">{post.title}</div>
                             <div className="text-sm text-slate-400 line-clamp-2">
-                              {post.excerpt}
+                              {post.excerpt || 'No excerpt provided'}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-300">{post.author}</TableCell>
+                        <TableCell className="text-slate-300">
+                          {post.author && typeof post.author === 'object' && 'name' in post.author
+                            ? (post.author as { name: string }).name
+                            : String(post.author)
+                          }
+                        </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="border-slate-600 text-slate-300">
                             {post.category}
@@ -441,21 +491,6 @@ export default function AdminBlog() {
               </div>
 
               <div>
-                <Label htmlFor="author" className="text-slate-300">Auteur</Label>
-                <Input
-                  id="author"
-                  {...register('author')}
-                  placeholder="ex: Marie Dubois"
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                />
-                {errors.author && (
-                  <p className="text-sm text-red-400 mt-1">{errors.author.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
                 <Label htmlFor="category" className="text-slate-300">Catégorie</Label>
                 <Input
                   id="category"
@@ -467,19 +502,19 @@ export default function AdminBlog() {
                   <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
                 )}
               </div>
+            </div>
 
-              <div>
-                <Label htmlFor="tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
-                <Input
-                  id="tags"
-                  {...register('tags')}
-                  placeholder="ex: Tendances, Marketing, Cameroun, 2024"
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                />
-                {errors.tags && (
-                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
+              <Input
+                id="tags"
+                {...register('tags')}
+                placeholder="ex: Tendances, Marketing, Cameroun, 2024"
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
+              />
+              {errors.tags && (
+                <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
+              )}
             </div>
 
             <div>
@@ -496,7 +531,7 @@ export default function AdminBlog() {
             </div>
 
             <div>
-              <Label htmlFor="content" className="text-slate-300">Contenu</Label>
+              <Label className="text-slate-300">Contenu</Label>
               <div className="mt-1">
                 <ReactQuill
                   theme="snow"
@@ -505,7 +540,7 @@ export default function AdminBlog() {
                   modules={modules}
                   formats={formats}
                   placeholder="Écrivez le contenu de votre article ici..."
-                  className="h-64 [&_.ql-toolbar]:bg-slate-700 [&_.ql-toolbar]:border-slate-600 [&_.ql-container]:bg-slate-700 [&_.ql-container]:border-slate-600 [&_.ql-editor]:text-white"
+                  className="blog-editor"
                 />
               </div>
               {errors.content && (
@@ -539,7 +574,7 @@ export default function AdminBlog() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsCreateModalOpen(false)}
+                onClick={closeCreateModal}
                 className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 Annuler
@@ -577,21 +612,6 @@ export default function AdminBlog() {
               </div>
 
               <div>
-                <Label htmlFor="edit-author" className="text-slate-300">Auteur</Label>
-                <Input
-                  id="edit-author"
-                  {...register('author')}
-                  placeholder="ex: Marie Dubois"
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                />
-                {errors.author && (
-                  <p className="text-sm text-red-400 mt-1">{errors.author.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
                 <Label htmlFor="edit-category" className="text-slate-300">Catégorie</Label>
                 <Input
                   id="edit-category"
@@ -603,19 +623,19 @@ export default function AdminBlog() {
                   <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
                 )}
               </div>
+            </div>
 
-              <div>
-                <Label htmlFor="edit-tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
-                <Input
-                  id="edit-tags"
-                  {...register('tags')}
-                  placeholder="ex: Tendances, Marketing, Cameroun, 2024"
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                />
-                {errors.tags && (
-                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="edit-tags" className="text-slate-300">Tags (séparés par des virgules)</Label>
+              <Input
+                id="edit-tags"
+                {...register('tags')}
+                placeholder="ex: Tendances, Marketing, Cameroun, 2024"
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
+              />
+              {errors.tags && (
+                <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
+              )}
             </div>
 
             <div>
@@ -632,7 +652,7 @@ export default function AdminBlog() {
             </div>
 
             <div>
-              <Label htmlFor="edit-content" className="text-slate-300">Contenu</Label>
+              <Label className="text-slate-300">Contenu</Label>
               <div className="mt-1">
                 <ReactQuill
                   theme="snow"
@@ -641,7 +661,7 @@ export default function AdminBlog() {
                   modules={modules}
                   formats={formats}
                   placeholder="Écrivez le contenu de votre article ici..."
-                  className="h-64 [&_.ql-toolbar]:bg-slate-700 [&_.ql-toolbar]:border-slate-600 [&_.ql-container]:bg-slate-700 [&_.ql-container]:border-slate-600 [&_.ql-editor]:text-white"
+                  className="blog-editor"
                 />
               </div>
               {errors.content && (
@@ -675,7 +695,7 @@ export default function AdminBlog() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsEditModalOpen(false)}
+                onClick={closeEditModal}
                 className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 Annuler
@@ -700,7 +720,7 @@ export default function AdminBlog() {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setIsDeleteModalOpen(false)}
+              onClick={closeDeleteModal}
               className="border-slate-600 text-slate-300 hover:bg-slate-700"
             >
               Annuler

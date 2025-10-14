@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
@@ -15,38 +16,39 @@ import {
   MapPin,
   Mail
 } from 'lucide-react'
+import { teamAPI } from '@/lib/api'
+
+interface TeamMember {
+  _id: string;
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  achievements: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function AgencyPage() {
-  const teamMembers = [
-    {
-      name: 'Jean Dupont',
-      role: 'Directeur Général',
-      description: 'Expert en stratégie digitale avec 15 ans d\'expérience dans le secteur.',
-      image: '/images/team-1.jpg',
-      achievements: ['MBA HEC', '15 ans d\'expérience', '50+ projets réussis']
-    },
-    {
-      name: 'Marie Martin',
-      role: 'Directrice Artistique',
-      description: 'Créative passionnée spécialisée dans l\'identité visuelle et l\'UX design.',
-      image: '/images/team-2.jpg',
-      achievements: ['Design Award 2023', '10 ans d\'expérience', '200+ marques créées']
-    },
-    {
-      name: 'Pierre Durand',
-      role: 'Consultant SEO/SEA',
-      description: 'Spécialiste en référencement naturel et publicité digitale.',
-      image: '/images/team-3.jpg',
-      achievements: ['Google Partner', '8 ans d\'expérience', 'ROI +300% moyen']
-    },
-    {
-      name: 'Sophie Chen',
-      role: 'Développeuse Full-Stack',
-      description: 'Experte en développement web et applications mobiles.',
-      image: '/images/team-4.jpg',
-      achievements: ['React Expert', 'Node.js Specialist', '100+ apps développées']
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await teamAPI.getAll()
+        setTeamMembers(response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch team members:', error)
+        // Fallback to empty array
+        setTeamMembers([])
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchTeamMembers()
+  }, [])
 
   const values = [
     {
@@ -251,40 +253,46 @@ export default function AgencyPage() {
             </p>
           </MotionDiv>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member, index) => (
-              <MotionDiv
-                key={member.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10 }}
-                className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center border border-gray-100 dark:border-slate-700"
-              >
-                <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <Users className="w-12 h-12 text-primary-600 dark:text-blue-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-1">
-                  {member.name}
-                </h3>
-                <p className="text-primary-600 dark:text-blue-400 font-medium mb-3">
-                  {member.role}
-                </p>
-                <p className="text-gray-600 dark:text-slate-400 text-sm mb-4">
-                  {member.description}
-                </p>
-                <div className="space-y-1">
-                  {member.achievements.map((achievement, achievementIndex) => (
-                    <div key={achievementIndex} className="flex items-center text-xs text-gray-500 dark:text-slate-400">
-                      <CheckCircle className="w-3 h-3 mr-2 text-green-500" />
-                      {achievement}
-                    </div>
-                  ))}
-                </div>
-              </MotionDiv>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {teamMembers.map((member, index) => (
+                <MotionDiv
+                  key={member._id || index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -10 }}
+                  className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 text-center border border-gray-100 dark:border-slate-700"
+                >
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Users className="w-12 h-12 text-primary-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100 mb-1">
+                    {member.name}
+                  </h3>
+                  <p className="text-primary-600 dark:text-blue-400 font-medium mb-3">
+                    {member.role}
+                  </p>
+                  <p className="text-gray-600 dark:text-slate-400 text-sm mb-4">
+                    {member.description}
+                  </p>
+                  <div className="space-y-1">
+                    {member.achievements?.map((achievement, achievementIndex) => (
+                      <div key={achievementIndex} className="flex items-center text-xs text-gray-500 dark:text-slate-400">
+                        <CheckCircle className="w-3 h-3 mr-2 text-green-500" />
+                        {achievement}
+                      </div>
+                    ))}
+                  </div>
+                </MotionDiv>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

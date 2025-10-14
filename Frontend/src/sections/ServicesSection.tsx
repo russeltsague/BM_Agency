@@ -15,7 +15,7 @@ import { Button } from '@/components/Button'
 import { servicesAPI, type Service } from '@/lib/api'
 
 // Icon mapping
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Megaphone,
   Smartphone,
   Palette,
@@ -36,9 +36,9 @@ export const ServicesSection = () => {
         const response = await servicesAPI.getAll()
         const items = response?.data
         setServices(Array.isArray(items) ? items : [])
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch services:', err)
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setIsLoading(false)
       }
@@ -107,7 +107,7 @@ export const ServicesSection = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {services.map((service, index) => {
+            {services.map((service) => {
               const IconComponent = iconMap[service.icon || 'Megaphone'] || Megaphone
               return (
                 <MotionDiv
@@ -157,7 +157,7 @@ export const ServicesSection = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600 dark:text-slate-400 mb-6">
-            Besoin d'une solution personnalisée ? Nos experts sont là pour vous accompagner.
+            Besoin d&apos;une solution personnalisée ? Nos experts sont là pour vous accompagner.
           </p>
           <Button size="lg">
             Demander un devis personnalisé

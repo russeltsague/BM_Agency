@@ -147,4 +147,40 @@
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  /* React Quill Dark Theme Styles */
+  .blog-editor .ql-toolbar {
+    border-color: rgb(51 65 85) !important;
+    background: rgb(51 65 85) !important;
+  }
+
+  .blog-editor .ql-container {
+    border-color: rgb(51 65 85) !important;
+    background: rgb(51 65 85) !important;
+  }
+
+  .blog-editor .ql-editor {
+    color: white !important;
+    min-height: 200px;
+  }
+
+  .blog-editor .ql-editor.ql-blank::before {
+    color: rgb(148 163 184) !important;
+  }
+
+  .blog-editor .ql-toolbar .ql-stroke {
+    stroke: rgb(203 213 225) !important;
+  }
+
+  .blog-editor .ql-toolbar .ql-fill {
+    fill: rgb(203 213 225) !important;
+  }
+
+  .blog-editor .ql-toolbar button:hover {
+    background: rgb(71 85 105) !important;
+  }
+
+  .blog-editor .ql-toolbar button.ql-active {
+    background: rgb(99 102 241) !important;
+  }
 }

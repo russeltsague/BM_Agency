@@ -53,12 +53,10 @@ const portfolioSchema = z.object({
   client: z.string().min(1, 'Client name is required'),
   category: z.string().min(1, 'Category is required'),
   tags: z.string().min(1, 'Tags are required'),
-  link: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  featured: z.boolean(),
-}).transform((data) => ({
-  ...data,
-  featured: data.featured ?? false,
-}))
+  image: z.string().optional(),
+  link: z.string().optional(),
+  featured: z.boolean().optional(),
+})
 
 type PortfolioForm = z.infer<typeof portfolioSchema>
 
@@ -69,6 +67,7 @@ interface Portfolio {
   client?: string
   category?: string
   tags?: string[]
+  image?: string
   link?: string
   featured?: boolean
   createdAt: string
@@ -81,6 +80,8 @@ export default function AdminPortfolio() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null)
+  const [selectedImage, setSelectedImage] = useState<string>('')
+  const [imagePreview, setImagePreview] = useState<string>('')
   const queryClient = useQueryClient()
 
   const {
@@ -125,9 +126,10 @@ export default function AdminPortfolio() {
         description: data.description,
         client: data.client,
         category: data.category,
-        tags: data.tags.split(',').map(t => t.trim()),
-        link: data.link,
-        featured: data.featured,
+        tags: data.tags.split(',').map(t => t.trim()).filter(t => t.length > 0),
+        image: data.image || 'https://via.placeholder.com/800x600/4B5563/9CA3AF?text=No+Image',
+        link: data.link || undefined,
+        featured: data.featured ?? false,
       }
       const response = await realisationsAPI.create(portfolioData)
       return response.data.realisation
@@ -151,9 +153,10 @@ export default function AdminPortfolio() {
         description: data.description,
         client: data.client,
         category: data.category,
-        tags: data.tags.split(',').map(t => t.trim()),
-        link: data.link,
-        featured: data.featured,
+        tags: data.tags.split(',').map(t => t.trim()).filter(t => t.length > 0),
+        image: data.image || 'https://via.placeholder.com/800x600/4B5563/9CA3AF?text=No+Image',
+        link: data.link || undefined,
+        featured: data.featured ?? false,
       }
       const response = await realisationsAPI.update(id, portfolioData)
       return response.data.realisation
@@ -198,8 +201,10 @@ export default function AdminPortfolio() {
     setValue('client', portfolio.client || '')
     setValue('category', portfolio.category || '')
     setValue('tags', portfolio.tags?.join(', ') || '')
+    setValue('image', portfolio.image || 'https://via.placeholder.com/800x600/4B5563/9CA3AF?text=No+Image')
     setValue('link', portfolio.link || '')
     setValue('featured', portfolio.featured || false)
+    setImagePreview(portfolio.image || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image')
     setIsEditModalOpen(true)
   }
 
@@ -209,15 +214,35 @@ export default function AdminPortfolio() {
     }
   }
 
-  const handleDelete = () => {
-    if (selectedPortfolio) {
-      deleteMutation.mutate(selectedPortfolio._id)
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.size <= 5 * 1024 * 1024) { // 5MB limit
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setImagePreview(result)
+        setValue('image', result)
+      }
+      reader.readAsDataURL(file)
+    } else if (file) {
+      toast.error('File size too large. Please select an image smaller than 5MB.')
     }
   }
 
   const openDeleteModal = (portfolio: Portfolio) => {
     setSelectedPortfolio(portfolio)
     setIsDeleteModalOpen(true)
+  }
+
+  const handleDelete = () => {
+    if (selectedPortfolio) {
+      deleteMutation.mutate(selectedPortfolio._id)
+    }
+  }
+
+  const resetImagePreview = () => {
+    setImagePreview('https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image')
+    setValue('image', 'https://via.placeholder.com/800x600/4B5563/9CA3AF?text=No+Image')
   }
 
   return (
@@ -280,6 +305,7 @@ export default function AdminPortfolio() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-700/50 border-slate-700">
+                    <TableHead className="text-slate-300 font-semibold">Image</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Titre</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Client</TableHead>
                     <TableHead className="text-slate-300 font-semibold">Date</TableHead>
@@ -299,6 +325,13 @@ export default function AdminPortfolio() {
                         layout
                         className="border-slate-700 hover:bg-slate-700/30 transition-colors"
                       >
+                        <TableCell className="w-20">
+                          <img
+                            src={item.image || 'https://via.placeholder.com/64x64/4B5563/9CA3AF?text=No+Image'}
+                            alt={item.title}
+                            className="w-16 h-16 object-cover rounded-lg border border-slate-600"
+                          />
+                        </TableCell>
                         <TableCell className="font-medium text-white">
                           <div>
                             <div className="font-semibold text-lg">{item.title}</div>
@@ -372,98 +405,167 @@ export default function AdminPortfolio() {
 
       {/* Create Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Add New Project</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white text-2xl">Add New Project</DialogTitle>
+            <DialogDescription className="text-slate-300">
               Create a new portfolio project to showcase your work.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
-            <div>
-              <Label htmlFor="title">Project Title</Label>
-              <Input
-                id="title"
-                {...register('title')}
-                placeholder="e.g., Plateforme E-commerce Mode Africaine"
-              />
-              {errors.title && (
-                <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
-              )}
+          <form onSubmit={handleSubmit(handleCreate)} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <Label className="text-slate-300 text-lg font-medium">Project Image</Label>
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <img
+                    src={imagePreview || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
+                    alt="Project preview"
+                    className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 bg-slate-700 border-slate-600 hover:bg-slate-600"
+                    onClick={resetImagePreview}
+                  >
+                    <ImageIcon className="h-4 w-4 text-slate-300" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <Label
+                    htmlFor="image-upload"
+                    className="inline-flex items-center px-4 py-2 border border-slate-600 rounded-lg cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Choose Image
+                  </Label>
+                  <p className="text-sm text-slate-400 mt-2">
+                    Recommended: 800x600px, max 2MB
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="title" className="text-slate-300 font-medium">Project Title</Label>
+                <Input
+                  id="title"
+                  {...register('title')}
+                  placeholder="e.g., Plateforme E-commerce Mode Africaine"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.title && (
+                  <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="client" className="text-slate-300 font-medium">Client</Label>
+                <Input
+                  id="client"
+                  {...register('client')}
+                  placeholder="e.g., Maison de la Mode Africaine"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.client && (
+                  <p className="text-sm text-red-400 mt-1">{errors.client.message}</p>
+                )}
+              </div>
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-slate-300 font-medium">Description</Label>
               <Textarea
                 id="description"
                 {...register('description')}
                 placeholder="Describe the project in detail..."
                 rows={4}
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
               />
               {errors.description && (
-                <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.description.message}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="client">Client</Label>
-                <Input
-                  id="client"
-                  {...register('client')}
-                  placeholder="e.g., Maison de la Mode Africaine"
-                />
-                {errors.client && (
-                  <p className="text-sm text-red-600 mt-1">{errors.client.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category" className="text-slate-300 font-medium">Category</Label>
                 <Input
                   id="category"
                   {...register('category')}
                   placeholder="e.g., E-commerce, Application Mobile, Site Web"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
                 />
                 {errors.category && (
-                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="tags" className="text-slate-300 font-medium">Tags (comma-separated)</Label>
+                <Input
+                  id="tags"
+                  {...register('tags')}
+                  placeholder="e.g., React, Node.js, MTN MoMo, SEO"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.tags && (
+                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
                 )}
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="tags">Tags (comma-separated)</Label>
-              <Input
-                id="tags"
-                {...register('tags')}
-                placeholder="e.g., React, Node.js, MTN MoMo, SEO"
-              />
-              {errors.tags && (
-                <p className="text-sm text-red-600 mt-1">{errors.tags.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="link" className="text-slate-300 font-medium">Project Link (optional)</Label>
+                <Input
+                  id="link"
+                  {...register('link')}
+                  placeholder="https://example.com"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.link && (
+                  <p className="text-sm text-red-400 mt-1">{errors.link.message}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  {...register('featured')}
+                  className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
+                />
+                <Label htmlFor="featured" className="text-slate-300 font-medium">
+                  Featured Project
+                </Label>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="link">Project Link (optional)</Label>
-              <Input
-                id="link"
-                {...register('link')}
-                placeholder="https://example.com"
-              />
-              {errors.link && (
-                <p className="text-sm text-red-600 mt-1">{errors.link.message}</p>
-              )}
-            </div>
-
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsCreateModalOpen(false)}
+                onClick={() => {
+                  setIsCreateModalOpen(false)
+                  reset()
+                  setImagePreview('')
+                }}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={createMutation.isPending}>
+              <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
                 {createMutation.isPending ? 'Creating...' : 'Create Project'}
               </Button>
             </DialogFooter>
@@ -473,98 +575,168 @@ export default function AdminPortfolio() {
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Edit Project</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white text-2xl">Edit Project</DialogTitle>
+            <DialogDescription className="text-slate-300">
               Update the project information.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-title">Project Title</Label>
-              <Input
-                id="edit-title"
-                {...register('title')}
-                placeholder="e.g., Plateforme E-commerce Mode Africaine"
-              />
-              {errors.title && (
-                <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
-              )}
+          <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <Label className="text-slate-300 text-lg font-medium">Project Image</Label>
+              <div className="flex items-center space-x-6">
+                <div className="relative">
+                  <img
+                    src={imagePreview || selectedPortfolio?.image || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
+                    alt="Project preview"
+                    className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 bg-slate-700 border-slate-600 hover:bg-slate-600"
+                    onClick={resetImagePreview}
+                  >
+                    <ImageIcon className="h-4 w-4 text-slate-300" />
+                  </Button>
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="edit-image-upload"
+                  />
+                  <Label
+                    htmlFor="edit-image-upload"
+                    className="inline-flex items-center px-4 py-2 border border-slate-600 rounded-lg cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Choose New Image
+                  </Label>
+                  <p className="text-sm text-slate-400 mt-2">
+                    Recommended: 800x600px, max 2MB
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="edit-title" className="text-slate-300 font-medium">Project Title</Label>
+                <Input
+                  id="edit-title"
+                  {...register('title')}
+                  placeholder="e.g., Plateforme E-commerce Mode Africaine"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.title && (
+                  <p className="text-sm text-red-400 mt-1">{errors.title.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="edit-client" className="text-slate-300 font-medium">Client</Label>
+                <Input
+                  id="edit-client"
+                  {...register('client')}
+                  placeholder="e.g., Maison de la Mode Africaine"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.client && (
+                  <p className="text-sm text-red-400 mt-1">{errors.client.message}</p>
+                )}
+              </div>
             </div>
 
             <div>
-              <Label htmlFor="edit-description">Description</Label>
+              <Label htmlFor="edit-description" className="text-slate-300 font-medium">Description</Label>
               <Textarea
                 id="edit-description"
                 {...register('description')}
                 placeholder="Describe the project in detail..."
                 rows={4}
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
               />
               {errors.description && (
-                <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
+                <p className="text-sm text-red-400 mt-1">{errors.description.message}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="edit-client">Client</Label>
-                <Input
-                  id="edit-client"
-                  {...register('client')}
-                  placeholder="e.g., Maison de la Mode Africaine"
-                />
-                {errors.client && (
-                  <p className="text-sm text-red-600 mt-1">{errors.client.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="edit-category">Category</Label>
+                <Label htmlFor="edit-category" className="text-slate-300 font-medium">Category</Label>
                 <Input
                   id="edit-category"
                   {...register('category')}
                   placeholder="e.g., E-commerce, Application Mobile, Site Web"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
                 />
                 {errors.category && (
-                  <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+                  <p className="text-sm text-red-400 mt-1">{errors.category.message}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="edit-tags" className="text-slate-300 font-medium">Tags (comma-separated)</Label>
+                <Input
+                  id="edit-tags"
+                  {...register('tags')}
+                  placeholder="e.g., React, Node.js, MTN MoMo, SEO"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.tags && (
+                  <p className="text-sm text-red-400 mt-1">{errors.tags.message}</p>
                 )}
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="edit-tags">Tags (comma-separated)</Label>
-              <Input
-                id="edit-tags"
-                {...register('tags')}
-                placeholder="e.g., React, Node.js, MTN MoMo, SEO"
-              />
-              {errors.tags && (
-                <p className="text-sm text-red-600 mt-1">{errors.tags.message}</p>
-              )}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="edit-link" className="text-slate-300 font-medium">Project Link (optional)</Label>
+                <Input
+                  id="edit-link"
+                  {...register('link')}
+                  placeholder="https://example.com"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-green-400 focus:ring-green-400"
+                />
+                {errors.link && (
+                  <p className="text-sm text-red-400 mt-1">{errors.link.message}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="edit-featured"
+                  {...register('featured')}
+                  className="w-4 h-4 text-green-400 bg-slate-700 border-slate-600 rounded focus:ring-green-400"
+                />
+                <Label htmlFor="edit-featured" className="text-slate-300 font-medium">
+                  Featured Project
+                </Label>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="edit-link">Project Link (optional)</Label>
-              <Input
-                id="edit-link"
-                {...register('link')}
-                placeholder="https://example.com"
-              />
-              {errors.link && (
-                <p className="text-sm text-red-600 mt-1">{errors.link.message}</p>
-              )}
-            </div>
-
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsEditModalOpen(false)}
+                onClick={() => {
+                  setIsEditModalOpen(false)
+                  setSelectedPortfolio(null)
+                  reset()
+                  setImagePreview('')
+                }}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
+              <Button type="submit" disabled={updateMutation.isPending} className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
                 {updateMutation.isPending ? 'Updating...' : 'Update Project'}
               </Button>
             </DialogFooter>

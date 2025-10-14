@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/contexts/AuthContext'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   LayoutDashboard,
   Settings,
@@ -48,7 +48,7 @@ const sidebarItems = [
   {
     title: 'Portfolio',
     href: '/admin/portfolio',
-    icon: Image,
+    icon: ImageIcon,
   },
   {
     title: 'Blog',
@@ -56,22 +56,25 @@ const sidebarItems = [
     icon: FileText,
   },
   {
+    title: 'Team',
+    href: '/admin/team',
+    icon: Users,
+  },
+  {
     title: 'Testimonials',
     href: '/admin/testimonials',
     icon: Users,
   },
   {
-    title: 'Products',
-    href: '/admin/products',
-    icon: Package,
+    title: 'Users',
+    href: '/admin/users',
+    icon: Users,
   },
 ]
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const queryClient = new QueryClient()
-
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={new QueryClient()}>
       <AdminLayoutContent>{children}</AdminLayoutContent>
     </QueryClientProvider>
   )
@@ -82,14 +85,17 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const { user, logout } = useAuth()
   const pathname = usePathname()
-  const router = useRouter()
 
-  // Redirect to login if not authenticated
-  if (!user) {
-    // Temporarily disabled for testing - uncomment when ready
-    // router.push('/admin/login')
-    // return null
-    console.log('User not authenticated, but allowing access for testing')
+  // Redirect to login if not authenticated (but not on login page itself)
+  useEffect(() => {
+    if (!user && pathname !== '/admin/login') {
+      window.location.href = '/admin/login'
+    }
+  }, [user, pathname])
+
+  // Don't render anything if user is not authenticated (but not on login page)
+  if (!user && pathname !== '/admin/login') {
+    return null
   }
 
   return (
@@ -107,12 +113,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <motion.aside
-        initial={{ x: -280 }}
-        animate={{ x: sidebarOpen ? 0 : -280 }}
-        className="fixed left-0 top-0 z-50 h-full w-64 bg-slate-800 shadow-lg lg:translate-x-0"
-      >
+      {/* Sidebar - Always visible on large screens */}
+      <aside className="fixed left-0 top-0 z-50 h-full w-64 bg-slate-800 shadow-lg">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-slate-700">
@@ -139,7 +141,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           <nav className="flex-1 px-4 py-6">
             <ul className="space-y-2">
               {sidebarItems.map((item) => {
-                const Icon = item.icon
+                const IconComponent = item.icon
                 const isActive = pathname === item.href
 
                 return (
@@ -153,7 +155,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
-                      <Icon className="mr-3 h-5 w-5" />
+                      <IconComponent className="mr-3 h-5 w-5" />
                       {item.title}
                     </Link>
                   </li>
@@ -199,6 +201,14 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <Users className="mr-3 h-4 w-4" />
                   Add Testimonial
                 </Link>
+                <Link
+                  href="/admin/users"
+                  className="flex items-center px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-slate-100 rounded-lg transition-colors"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Users className="mr-3 h-4 w-4" />
+                  Manage Users
+                </Link>
               </div>
             </div>
           </nav>
@@ -221,7 +231,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             <Button
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-400/50 transition-all duration-200 shadow-sm"
               onClick={() => setShowLogoutDialog(true)}
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -229,7 +239,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             </Button>
           </div>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Main content */}
       <div className="lg:pl-64">
@@ -269,7 +279,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowLogoutDialog(true)}
-                className="border-slate-600 hover:bg-slate-700"
+                className="border-red-500/30 bg-red-500/5 text-red-400 hover:bg-red-500/15 hover:text-red-300 hover:border-red-400/60 transition-all duration-200 shadow-sm backdrop-blur-sm"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
@@ -299,7 +309,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             <Button
               variant="outline"
               onClick={() => setShowLogoutDialog(false)}
-              className="border-slate-600 hover:bg-slate-700"
+              className="border-slate-600 hover:bg-slate-700 hover:text-slate-200 transition-all duration-200"
             >
               Cancel
             </Button>
@@ -308,9 +318,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 logout()
                 setShowLogoutDialog(false)
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
-              Logout
+              <LogOut className="mr-2 h-4 w-4" />
+              Confirm Logout
             </Button>
           </DialogFooter>
         </DialogContent>

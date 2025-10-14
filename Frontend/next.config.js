@@ -1,11 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optimize for Vercel deployment
-  output: 'standalone',
-  // Disable static optimization for better Vercel compatibility
-  generateBuildId: async () => {
-    return 'build-cache-' + Date.now()
-  },
   // Enable hybrid rendering
   experimental: {
     esmExternals: 'loose',
@@ -18,10 +12,10 @@ const nextConfig = {
     })
     return config
   },
-  // Optimize images for Vercel
+  // Optimize images
   images: {
     unoptimized: true,
-    domains: ['localhost'],
+    domains: ['localhost', 'via.placeholder.com'],
   },
   // Enable SWC minifier for better performance
   swcMinify: true,

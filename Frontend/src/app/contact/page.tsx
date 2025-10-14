@@ -4,6 +4,8 @@ import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
 import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Phone,
   Mail,
@@ -17,26 +19,94 @@ import {
 } from 'lucide-react'
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [isSubscribing, setIsSubscribing] = useState(false)
+
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    const formData = new FormData(e.currentTarget)
+    const contactData = {
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      company: formData.get('company') as string,
+      service: formData.get('service') as string,
+      message: formData.get('message') as string,
+    }
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/contacts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactData),
+      })
+
+      if (response.ok) {
+        toast.success('Votre message a été envoyé avec succès ! Nous vous répondrons sous 24h.')
+        e.currentTarget.reset()
+      } else {
+        const error = await response.json()
+        toast.error(error.message || 'Erreur lors de l\'envoi du message')
+      }
+    } catch (error) {
+      toast.error('Erreur de connexion. Veuillez réessayer.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubscribing(true)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/newsletter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: newsletterEmail }),
+      })
+
+      if (response.ok) {
+        toast.success('Merci pour votre inscription à notre newsletter !')
+        setNewsletterEmail('')
+      } else {
+        const error = await response.json()
+        toast.error(error.message || 'Erreur lors de l\'inscription')
+      }
+    } catch (error) {
+      toast.error('Erreur de connexion. Veuillez réessayer.')
+    } finally {
+      setIsSubscribing(false)
+    }
+  }
   const contactInfo = [
     {
       icon: Phone,
       title: 'Téléphone',
-      details: ['+237 222 123 456', '+237 222 123 457'],
+      details: ['+237 675 176 974', '+237 222 123 457'],
       description: 'Nos conseillers sont disponibles du lundi au vendredi de 8h à 17h',
       color: 'blue'
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['contact@camer-digital.cm', 'devis@camer-digital.cm'],
+      details: ['contact@bm-agency.net', 'devis@bm-agency.net'],
       description: 'Réponse garantie sous 24h pour les demandes de devis',
       color: 'green'
     },
     {
       icon: MapPin,
       title: 'Adresse',
-      details: ['123 Avenue Kennedy', 'BP 12345 Yaoundé, Cameroun'],
-      description: 'Quartier Bastos - Face à l\'Hôtel Hilton',
+      details: ['11595 Yaoundé-Kondengui', 'BP 12345 Yaoundé, Cameroun'],
+      description: 'Situé au cœur de Yaoundé pour mieux vous servir',
       color: 'purple'
     },
     {
@@ -69,27 +139,15 @@ export default function ContactPage() {
 
   const testimonials = [
     {
-      name: 'Jean-Pierre Nkoa',
-      company: 'Société Générale Cameroun',
-      content: 'Excellente collaboration avec Camer Digital Agency. Notre présence digitale a augmenté de 200% en 6 mois.',
+      name: 'Jean-Paul Nguema',
+      company: 'Cameroun Télécom',
+      content: 'BM Agency a complètement transformé notre présence digitale. Leur expertise et leur professionnalisme sont exceptionnels.',
       rating: 5
     },
     {
-      name: 'Marie-Thérèse Mbarga',
-      company: 'MTN Cameroon',
-      content: 'Service professionnel et résultats au rendez-vous. Je recommande vivement cette équipe compétente.',
-      rating: 5
-    },
-    {
-      name: 'Paul-Emmanuel Ngono',
-      company: 'Orange Cameroun',
-      content: 'Un partenaire de confiance pour notre stratégie digitale. Excellent travail sur notre refonte web.',
-      rating: 5
-    },
-    {
-      name: 'Emma Wilson',
-      company: 'E-commerce Pro',
-      content: 'Un partenaire de confiance pour notre stratégie digitale. Excellent travail !',
+      name: 'Fatima Mbarga',
+      company: 'Fashion Africa Group',
+      content: 'L\'équipe de BM Agency comprend parfaitement les spécificités du marché camerounais. Résultats au-delà de nos attentes.',
       rating: 5
     }
   ]
@@ -178,7 +236,7 @@ export default function ContactPage() {
                   Envoyez-nous un message
                 </h2>
 
-                <form className="space-y-6">
+                <form onSubmit={handleContactSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
@@ -219,7 +277,7 @@ export default function ContactPage() {
                       name="email"
                       required
                       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                      placeholder="votre.email@exemple.fr"
+                      placeholder="votre.email@exemple.com"
                     />
                   </div>
 
@@ -300,9 +358,18 @@ export default function ContactPage() {
                     </label>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full">
-                    <Send className="mr-2 w-5 h-5" />
-                    Envoyer le message
+                  <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="mr-2 w-5 h-5" />
+                        Envoyer le message
+                      </>
+                    )}
                   </Button>
                 </form>
               </div>
@@ -321,7 +388,7 @@ export default function ContactPage() {
                 <div className="text-center text-gray-500 dark:text-slate-400">
                   <MapPin className="w-16 h-16 mx-auto mb-4" />
                   <p className="text-lg font-medium">Carte interactive</p>
-                  <p className="text-sm">123 Avenue Kennedy, Yaoundé, Cameroun</p>
+                  <p className="text-sm">11595 Yaoundé-Kondengui, Cameroun</p>
                 </div>
               </div>
 
@@ -400,32 +467,46 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-primary-600 dark:bg-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Newsletter Section */}
+      <section className="py-16 bg-gray-50 dark:bg-slate-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
+            className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Prêt à commencer votre projet ?
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
+              Restez informé
             </h2>
-            <p className="text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
-              Rejoignez les centaines d'entreprises qui nous font confiance.
-              Consultation gratuite et sans engagement.
+            <p className="text-xl text-gray-600 dark:text-slate-400 mb-8">
+              Recevez nos dernières actualités, conseils et offres exclusives directement dans votre boîte mail.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary">
-                <Phone className="mr-2 w-5 h-5" />
-                +237 222 123 456
+
+            <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex gap-4">
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="votre.email@exemple.com"
+                className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                required
+              />
+              <Button type="submit" disabled={isSubscribing} className="whitespace-nowrap">
+                {isSubscribing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Inscription...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="mr-2 w-4 h-4" />
+                    S'abonner
+                  </>
+                )}
               </Button>
-              <Button size="lg">
-                <Mail className="mr-2 w-5 h-5" />
-                Consultation gratuite
-              </Button>
-            </div>
+            </form>
           </motion.div>
         </div>
       </section>

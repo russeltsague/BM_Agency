@@ -67,16 +67,16 @@ export default function AdminDashboard() {
     },
   })
 
-  const { data: productsData, isLoading: productsLoading } = useQuery({
-    queryKey: ['admin-products'],
+  const { data: teamData, isLoading: teamLoading } = useQuery({
+    queryKey: ['admin-team'],
     queryFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/products`)
-      if (!response.ok) throw new Error('Failed to fetch products')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/team`)
+      if (!response.ok) throw new Error('Failed to fetch team')
       return response.json()
     },
   })
 
-  const isLoading = servicesLoading || realisationsLoading || articlesLoading || testimonialsLoading || productsLoading
+  const isLoading = servicesLoading || realisationsLoading || articlesLoading || testimonialsLoading || teamLoading
 
   // Update stats with real data
   const realStats = {
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
     portfolio: realisationsData?.results || 0,
     blog: articlesData?.results || 0,
     testimonials: testimonialsData?.results || 0,
-    products: productsData?.results || 0,
+    team: teamData?.results || 0,
   }
 
   const statCards = [
@@ -129,14 +129,14 @@ export default function AdminDashboard() {
       gradient: 'from-orange-500/20 to-red-500/20'
     },
     {
-      title: 'Products',
-      value: realStats.products,
-      icon: Package,
-      href: '/admin/products',
-      color: 'text-pink-400',
-      bgColor: 'bg-pink-900/30',
-      description: 'Your product catalog',
-      gradient: 'from-pink-500/20 to-rose-500/20'
+      title: 'Team Management',
+      value: realStats.team,
+      icon: Users,
+      href: '/admin/team',
+      color: 'text-indigo-400',
+      bgColor: 'bg-indigo-900/30',
+      description: 'Manage your team',
+      gradient: 'from-indigo-500/20 to-blue-500/20'
     },
   ]
 
@@ -249,9 +249,9 @@ export default function AdminDashboard() {
             </div>
             <div className="text-center p-6 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl border border-slate-700">
               <div className="text-4xl font-bold text-purple-400 mb-2">
-                {realStats.testimonials + realStats.products}
+                {realStats.testimonials + realStats.team}
               </div>
-              <p className="text-sm text-slate-300 font-medium">Reviews & Products</p>
+              <p className="text-sm text-slate-300 font-medium">Reviews & Team</p>
               <p className="text-xs text-slate-500 mt-1">Customer engagement</p>
             </div>
           </div>

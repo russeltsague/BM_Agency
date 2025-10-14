@@ -1,0 +1,488 @@
+/**
+ * API Client Utilities
+ * Centralized API calls with authentication and error handling
+ */
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Helper to get auth token from localStorage
+const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('admin-token');
+  }
+  return null;
+};
+
+// Helper to build headers with optional auth
+const buildHeaders = (includeAuth: boolean = false): HeadersInit => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  if (includeAuth) {
+    const token = getAuthToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
+  return headers;
+};
+
+// Generic fetch wrapper with error handling
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {},
+  requireAuth: boolean = false
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const headers = buildHeaders(requireAuth);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+    });
+
+    // Handle non-JSON responses
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return {} as T;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Handle authentication errors specifically
+      if (response.status === 401) {
+        // Clear stored authentication data
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin-token');
+          localStorage.removeItem('admin-user');
+          document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
+          // Redirect to login page
+          window.location.href = '/admin/login';
+        }
+        throw new Error('Invalid token or session expired. Please log in again.');
+      }
+
+      throw new Error(data.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API Request Error:', error);
+
+    // Handle network errors or other issues that might indicate authentication problems
+    if (error instanceof Error && (error.message.includes('token') || error.message.includes('session'))) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin-token');
+        localStorage.removeItem('admin-user');
+        document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+        window.location.href = '/admin/login';
+      }
+    }
+
+    throw error;
+  }
+}
+
+// ============================================================================
+// AUTHENTICATION API
+// ============================================================================
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  status: string;
+  token: string;
+  data: {
+    user: {
+      _id: string;
+      name: string;
+      email: string;
+      role: string;
+    };
+  };
+}
+
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export const authAPI = {
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    return apiRequest<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+  },
+
+  register: async (data: { name: string; email: string; password: string }): Promise<AuthResponse> => {
+    return apiRequest<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getMe: async (): Promise<{ status: string; data: { user: User } }> => {
+    return apiRequest('/auth/me', {}, true);
+  },
+
+  updatePassword: async (data: { currentPassword: string; newPassword: string }) => {
+    return apiRequest('/auth/update-password', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+};
+
+// ============================================================================
+// SERVICES API
+// ============================================================================
+
+export interface Service {
+  _id: string;
+  title: string;
+  description: string;
+  features: string[];
+  pricing?: string;
+  duration?: string;
+  caseStudy?: string;
+  icon?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ServiceInput {
+  title: string;
+  description: string;
+  features: string[];
+  pricing?: string;
+  duration?: string;
+  caseStudy?: string;
+  icon?: string;
+}
+
+export const servicesAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: Service[] }> => {
+    return apiRequest('/services');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { service: Service } }> => {
+    return apiRequest(`/services/${id}`);
+  },
+
+  create: async (data: ServiceInput): Promise<{ status: string; data: { service: Service } }> => {
+    return apiRequest('/services', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: ServiceInput): Promise<{ status: string; data: { service: Service } }> => {
+    return apiRequest(`/services/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/services/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// ARTICLES (BLOG) API
+// ============================================================================
+
+export interface Article {
+  _id: string;
+  title: string;
+  content: string;
+  excerpt?: string;
+  author: string;
+  category?: string;
+  tags?: string[];
+  image?: string;
+  published: boolean;
+  featured?: boolean;
+  readTime?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ArticleInput {
+  title: string;
+  content: string;
+  excerpt?: string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  image?: string;
+  published?: boolean;
+  featured?: boolean;
+  readTime?: string;
+}
+
+export const articlesAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: Article[] }> => {
+    return apiRequest('/articles');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { article: Article } }> => {
+    return apiRequest(`/articles/${id}`);
+  },
+
+  create: async (data: ArticleInput): Promise<{ status: string; data: { article: Article } }> => {
+    return apiRequest('/articles', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: ArticleInput): Promise<{ status: string; data: { article: Article } }> => {
+    return apiRequest(`/articles/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/articles/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// REALISATIONS (PORTFOLIO) API
+// ============================================================================
+export interface Realisation {
+  _id: string;
+  title: string;
+  description: string;
+  image?: string;
+  client: string;
+  date: string;
+  category?: string;
+  tags?: string[];
+  link?: string;
+  featured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RealisationInput {
+  title: string;
+  description: string;
+  image?: string;
+  client: string;
+  category?: string;
+  tags?: string[];
+  link?: string;
+  featured?: boolean;
+}
+
+export const realisationsAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: Realisation[] }> => {
+    return apiRequest('/realisations');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { realisation: Realisation } }> => {
+    return apiRequest(`/realisations/${id}`);
+  },
+
+  create: async (data: RealisationInput): Promise<{ status: string; data: { realisation: Realisation } }> => {
+    return apiRequest('/realisations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: RealisationInput): Promise<{ status: string; data: { realisation: Realisation } }> => {
+    return apiRequest(`/realisations/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/realisations/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// TESTIMONIALS API
+// ============================================================================
+
+export interface Testimonial {
+  _id: string;
+  name: string;
+  content: string;
+  role?: string;
+  company?: string;
+  image?: string;
+  rating?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestimonialInput {
+  name: string;
+  content: string;
+  role?: string;
+  company?: string;
+  image?: string;
+  rating?: number;
+}
+
+export const testimonialsAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: Testimonial[] }> => {
+    return apiRequest('/testimonials');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { testimonial: Testimonial } }> => {
+    return apiRequest(`/testimonials/${id}`);
+  },
+
+  create: async (data: TestimonialInput): Promise<{ status: string; data: { testimonial: Testimonial } }> => {
+    return apiRequest('/testimonials', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: TestimonialInput): Promise<{ status: string; data: { testimonial: Testimonial } }> => {
+    return apiRequest(`/testimonials/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/testimonials/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// PRODUCTS API
+// ============================================================================
+
+export interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  stock: number;
+  featured?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductInput {
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  stock: number;
+  featured?: boolean;
+}
+
+export const productsAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: Product[] }> => {
+    return apiRequest('/products');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { product: Product } }> => {
+    return apiRequest(`/products/${id}`);
+  },
+
+  create: async (data: ProductInput): Promise<{ status: string; data: { product: Product } }> => {
+    return apiRequest('/products', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: ProductInput): Promise<{ status: string; data: { product: Product } }> => {
+    return apiRequest(`/products/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+// ============================================================================
+// TEAM API
+// ============================================================================
+
+export interface TeamMember {
+  _id: string;
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  achievements: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TeamMemberInput {
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  achievements: string[];
+}
+
+export const teamAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: TeamMember[] }> => {
+    return apiRequest('/team');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest(`/team/${id}`);
+  },
+
+  create: async (data: TeamMemberInput): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest('/team', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: TeamMemberInput): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest(`/team/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/team/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};

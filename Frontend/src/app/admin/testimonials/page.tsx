@@ -16,6 +16,8 @@ import {
   Star,
   Quote
 } from 'lucide-react'
+import { testimonialsAPI } from '@/lib/api'
+import type { Testimonial, TestimonialInput } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -44,81 +46,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Testimonial form schema
 const testimonialSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  company: z.string().min(1, 'Company is required'),
-  position: z.string().min(1, 'Position is required'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-  rating: z.number().min(1).max(5),
-  featured: z.boolean(),
-  published: z.boolean(),
-}).transform((data) => ({
-  ...data,
-  featured: data.featured ?? false,
-  published: data.published ?? false,
-}))
+  content: z.string().min(10, 'Content must be at least 10 characters'),
+  company: z.string().optional(),
+  role: z.string().optional(),
+  rating: z.number().min(1).max(5).optional(),
+})
 
 type TestimonialForm = z.infer<typeof testimonialSchema>
-
-interface Testimonial {
-  id: string
-  name: string
-  company: string
-  position: string
-  message: string
-  rating: number
-  featured: boolean
-  published: boolean
-  photo?: string
-  createdAt: string
-  updatedAt: string
-}
-
-// Mock data - replace with real API
-const mockTestimonials: Testimonial[] = [
-  {
-    id: '1',
-    name: 'Jean-Pierre Ndiaye',
-    company: 'Société Générale Cameroun',
-    position: 'Directeur Marketing',
-    message: 'BM Agency nous a accompagnés dans notre transformation digitale avec un professionnalisme exemplaire. Leur expertise et leur réactivité ont dépassé nos attentes.',
-    rating: 5,
-    featured: true,
-    published: true,
-    photo: '/images/testimonial-1.jpg',
-    createdAt: '2024-01-10T00:00:00Z',
-    updatedAt: '2024-01-10T00:00:00Z',
-  },
-  {
-    id: '2',
-    name: 'Fatou Sow',
-    company: 'MTN Cameroon',
-    position: 'Chef de Projet Digital',
-    message: 'Excellente collaboration ! L\'équipe de BM Agency comprend parfaitement les enjeux du marché camerounais et propose des solutions adaptées.',
-    rating: 5,
-    featured: true,
-    published: true,
-    photo: '/images/testimonial-2.jpg',
-    createdAt: '2024-01-08T00:00:00Z',
-    updatedAt: '2024-01-08T00:00:00Z',
-  },
-  {
-    id: '3',
-    name: 'Paul Mbarga',
-    company: 'Orange Cameroun',
-    position: 'Responsable Communication',
-    message: 'Un partenaire de confiance pour notre stratégie digitale. Excellent travail sur notre plateforme e-commerce !',
-    rating: 5,
-    featured: false,
-    published: true,
-    photo: '/images/testimonial-3.jpg',
-    createdAt: '2024-01-05T00:00:00Z',
-    updatedAt: '2024-01-05T00:00:00Z',
-  },
-]
 
 export default function AdminTestimonials() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -143,9 +82,13 @@ export default function AdminTestimonials() {
   const { data: testimonials = [], isLoading } = useQuery({
     queryKey: ['admin-testimonials'],
     queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-      return mockTestimonials
+      try {
+        const response = await testimonialsAPI.getAll()
+        return response?.data || []
+      } catch (error) {
+        console.error('Failed to fetch testimonials:', error)
+        return []
+      }
     },
   })
 
@@ -155,23 +98,20 @@ export default function AdminTestimonials() {
   // Filter testimonials based on search
   const filteredTestimonials = testimonialsArray.filter(testimonial =>
     testimonial.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    testimonial.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    testimonial.message.toLowerCase().includes(searchTerm.toLowerCase())
+    (testimonial.company && testimonial.company.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    testimonial.content.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   // Create testimonial mutation
   const createMutation = useMutation({
     mutationFn: async (data: TestimonialForm) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const newTestimonial: Testimonial = {
-        id: Date.now().toString(),
-        ...data,
-        photo: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      try {
+        const response = await testimonialsAPI.create(data)
+        return response.data.testimonial
+      } catch (error: any) {
+        console.error('Create testimonial error:', error)
+        throw new Error(error.message || 'Failed to create testimonial')
       }
-      return newTestimonial
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] })
@@ -179,17 +119,22 @@ export default function AdminTestimonials() {
       reset()
       toast.success('Testimonial created successfully!')
     },
-    onError: () => {
-      toast.error('Failed to create testimonial')
+    onError: (error: any) => {
+      console.error('Create testimonial mutation error:', error)
+      toast.error(error.message || 'Failed to create testimonial')
     },
   })
 
   // Update testimonial mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: TestimonialForm }) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return { id, ...data }
+      try {
+        const response = await testimonialsAPI.update(id, data)
+        return response.data.testimonial
+      } catch (error: any) {
+        console.error('Update testimonial error:', error)
+        throw new Error(error.message || 'Failed to update testimonial')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-testimonials'] })
@@ -198,16 +143,16 @@ export default function AdminTestimonials() {
       reset()
       toast.success('Testimonial updated successfully!')
     },
-    onError: () => {
-      toast.error('Failed to update testimonial')
+    onError: (error: any) => {
+      console.error('Update testimonial mutation error:', error)
+      toast.error(error.message || 'Failed to update testimonial')
     },
   })
 
   // Delete testimonial mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await testimonialsAPI.delete(id)
       return id
     },
     onSuccess: () => {
@@ -216,8 +161,8 @@ export default function AdminTestimonials() {
       setSelectedTestimonial(null)
       toast.success('Testimonial deleted successfully!')
     },
-    onError: () => {
-      toast.error('Failed to delete testimonial')
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to delete testimonial')
     },
   })
 
@@ -228,24 +173,22 @@ export default function AdminTestimonials() {
   const handleEdit = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial)
     setValue('name', testimonial.name)
-    setValue('company', testimonial.company)
-    setValue('position', testimonial.position)
-    setValue('message', testimonial.message)
-    setValue('rating', testimonial.rating)
-    setValue('featured', testimonial.featured)
-    setValue('published', testimonial.published)
+    setValue('content', testimonial.content)
+    setValue('company', testimonial.company || '')
+    setValue('role', testimonial.role || '')
+    setValue('rating', testimonial.rating || 5)
     setIsEditModalOpen(true)
   }
 
   const handleUpdate = (data: TestimonialForm) => {
     if (selectedTestimonial) {
-      updateMutation.mutate({ id: selectedTestimonial.id, data })
+      updateMutation.mutate({ id: selectedTestimonial._id, data })
     }
   }
 
   const handleDelete = () => {
     if (selectedTestimonial) {
-      deleteMutation.mutate(selectedTestimonial.id)
+      deleteMutation.mutate(selectedTestimonial._id)
     }
   }
 
@@ -254,15 +197,40 @@ export default function AdminTestimonials() {
     setIsDeleteModalOpen(true)
   }
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${
-          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-        }`}
-      />
-    ))
+  // Reset form and close modals
+  const resetForm = () => {
+    reset()
+    setSelectedTestimonial(null)
+  }
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false)
+    resetForm()
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false)
+    resetForm()
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setSelectedTestimonial(null)
+  }
+
+  const renderStars = (rating?: number) => {
+    const stars = []
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Star
+          key={i}
+          className={`h-4 w-4 ${
+            rating && i <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+          }`}
+        />
+      )
+    }
+    return stars
   }
 
   return (
@@ -337,7 +305,7 @@ export default function AdminTestimonials() {
                   <AnimatePresence>
                     {filteredTestimonials.map((testimonial) => (
                       <motion.tr
-                        key={testimonial.id}
+                        key={testimonial._id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -348,37 +316,31 @@ export default function AdminTestimonials() {
                           <div>
                             <div className="font-semibold text-lg">{testimonial.name}</div>
                             <div className="text-sm text-slate-400">
-                              {testimonial.position}
+                              {testimonial.role || 'N/A'}
                             </div>
                             <div className="text-sm text-slate-400 line-clamp-2 mt-1">
                               <Quote className="inline h-3 w-3 mr-1" />
-                              "{testimonial.message.substring(0, 60)}..."
+                              "{testimonial.content.substring(0, 60)}..."
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-300">{testimonial.company}</TableCell>
+                        <TableCell className="text-slate-300">{testimonial.company || 'N/A'}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
                             {renderStars(testimonial.rating)}
-                            <span className="ml-2 text-sm text-slate-400">({testimonial.rating}/5)</span>
+                            <span className="ml-2 text-sm text-slate-400">({testimonial.rating || 0}/5)</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
-                            <div className={`w-2 h-2 rounded-full ${
-                              testimonial.published ? 'bg-green-500' : 'bg-yellow-500'
-                            }`} />
+                            <div className={`w-2 h-2 rounded-full bg-green-500`} />
                             <span className="text-sm text-slate-300">
-                              {testimonial.published ? 'Publié' : 'Brouillon'}
+                              Actif
                             </span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          {testimonial.featured ? (
-                            <Badge className="bg-orange-100 text-orange-800">En vedette</Badge>
-                          ) : (
-                            <Badge variant="outline" className="border-slate-600 text-slate-300">Standard</Badge>
-                          )}
+                          <Badge variant="outline" className="border-slate-600 text-slate-300">Standard</Badge>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -455,15 +417,15 @@ export default function AdminTestimonials() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="position" className="text-slate-300">Poste</Label>
+                <Label htmlFor="role" className="text-slate-300">Poste</Label>
                 <Input
-                  id="position"
-                  {...register('position')}
+                  id="role"
+                  {...register('role')}
                   placeholder="ex: Directeur Marketing"
                   className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-orange-400"
                 />
-                {errors.position && (
-                  <p className="text-sm text-red-400 mt-1">{errors.position.message}</p>
+                {errors.role && (
+                  <p className="text-sm text-red-400 mt-1">{errors.role.message}</p>
                 )}
               </div>
 
@@ -488,39 +450,17 @@ export default function AdminTestimonials() {
             </div>
 
             <div>
-              <Label htmlFor="message" className="text-slate-300">Message du Témoignage</Label>
+              <Label htmlFor="content" className="text-slate-300">Message du Témoignage</Label>
               <Textarea
-                id="message"
-                {...register('message')}
+                id="content"
+                {...register('content')}
                 placeholder="Partagez le message du témoignage client..."
                 rows={4}
                 className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-orange-400"
               />
-              {errors.message && (
-                <p className="text-sm text-red-400 mt-1">{errors.message.message}</p>
+              {errors.content && (
+                <p className="text-sm text-red-400 mt-1">{errors.content.message}</p>
               )}
-            </div>
-
-            <div className="flex items-center space-x-6 p-4 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="featured"
-                  {...register('featured')}
-                  className="rounded border-slate-600 text-orange-500 focus:ring-orange-500"
-                />
-                <Label htmlFor="featured" className="text-slate-300">Marquer comme témoignage en vedette</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="published"
-                  {...register('published')}
-                  className="rounded border-slate-600 text-orange-500 focus:ring-orange-500"
-                />
-                <Label htmlFor="published" className="text-slate-300">Publier immédiatement</Label>
-              </div>
             </div>
 
             <DialogFooter>
@@ -580,15 +520,15 @@ export default function AdminTestimonials() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-position" className="text-slate-300">Poste</Label>
+                <Label htmlFor="edit-role" className="text-slate-300">Poste</Label>
                 <Input
-                  id="edit-position"
-                  {...register('position')}
+                  id="edit-role"
+                  {...register('role')}
                   placeholder="ex: Directeur Marketing"
                   className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-orange-400"
                 />
-                {errors.position && (
-                  <p className="text-sm text-red-400 mt-1">{errors.position.message}</p>
+                {errors.role && (
+                  <p className="text-sm text-red-400 mt-1">{errors.role.message}</p>
                 )}
               </div>
 
@@ -613,39 +553,17 @@ export default function AdminTestimonials() {
             </div>
 
             <div>
-              <Label htmlFor="edit-message" className="text-slate-300">Message du Témoignage</Label>
+              <Label htmlFor="edit-content" className="text-slate-300">Message du Témoignage</Label>
               <Textarea
-                id="edit-message"
-                {...register('message')}
+                id="edit-content"
+                {...register('content')}
                 placeholder="Partagez le message du témoignage client..."
                 rows={4}
                 className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-orange-400"
               />
-              {errors.message && (
-                <p className="text-sm text-red-400 mt-1">{errors.message.message}</p>
+              {errors.content && (
+                <p className="text-sm text-red-400 mt-1">{errors.content.message}</p>
               )}
-            </div>
-
-            <div className="flex items-center space-x-6 p-4 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="edit-featured"
-                  {...register('featured')}
-                  className="rounded border-slate-600 text-orange-500 focus:ring-orange-500"
-                />
-                <Label htmlFor="edit-featured" className="text-slate-300">Marquer comme témoignage en vedette</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="edit-published"
-                  {...register('published')}
-                  className="rounded border-slate-600 text-orange-500 focus:ring-orange-500"
-                />
-                <Label htmlFor="edit-published" className="text-slate-300">Publier immédiatement</Label>
-              </div>
             </div>
 
             <DialogFooter>

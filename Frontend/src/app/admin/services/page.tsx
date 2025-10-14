@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -49,7 +50,7 @@ import { servicesAPI } from '@/lib/api'
 
 // Service form schema
 const serviceSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   features: z.string().min(1, 'Features are required'),
   pricing: z.string().optional(),
@@ -80,6 +81,7 @@ export default function AdminServices() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   const {
     register,
@@ -90,6 +92,38 @@ export default function AdminServices() {
   } = useForm<ServiceForm>({
     resolver: zodResolver(serviceSchema),
   })
+
+  // Check authentication on component mount
+  useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
+    const token = localStorage.getItem('admin-token')
+    const user = localStorage.getItem('admin-user')
+
+    if (!token || !user) {
+      toast.error('Authentication required', {
+        description: 'Please log in to access the admin panel.',
+        duration: 4000,
+      })
+      router.push('/admin/login')
+      return
+    }
+
+    // Validate token format
+    try {
+      JSON.parse(user)
+    } catch {
+      toast.error('Invalid session', {
+        description: 'Please log in again.',
+        duration: 4000,
+      })
+      localStorage.removeItem('admin-token')
+      localStorage.removeItem('admin-user')
+      router.push('/admin/login')
+      return
+    }
+  }, [router])
 
   // Fetch services
   const { data: services = [], isLoading } = useQuery({
@@ -137,7 +171,19 @@ export default function AdminServices() {
       toast.success('Service created successfully!')
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to create service')
+      console.error('Create service error:', error)
+      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+        toast.error('Authentication expired', {
+          description: 'Please log in again to continue.',
+          duration: 4000,
+        })
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.push('/admin/login')
+        }, 2000)
+      } else {
+        toast.error(error.message || 'Failed to create service')
+      }
     },
   })
 
@@ -164,7 +210,19 @@ export default function AdminServices() {
       toast.success('Service updated successfully!')
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to update service')
+      console.error('Update service error:', error)
+      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+        toast.error('Authentication expired', {
+          description: 'Please log in again to continue.',
+          duration: 4000,
+        })
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.push('/admin/login')
+        }, 2000)
+      } else {
+        toast.error(error.message || 'Failed to update service')
+      }
     },
   })
 
@@ -181,7 +239,19 @@ export default function AdminServices() {
       toast.success('Service deleted successfully!')
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete service')
+      console.error('Delete service error:', error)
+      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+        toast.error('Authentication expired', {
+          description: 'Please log in again to continue.',
+          duration: 4000,
+        })
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.push('/admin/login')
+        }, 2000)
+      } else {
+        toast.error(error.message || 'Failed to delete service')
+      }
     },
   })
 

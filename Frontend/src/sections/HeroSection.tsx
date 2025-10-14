@@ -66,18 +66,11 @@ export const HeroSection = () => {
           >
             <Button
               size="lg"
+              onClick={() => window.open('https://wa.me/237675176974?text=Bonjour,%20je%20souhaite%20demander%20un%20devis%20gratuit%20pour%20mon%20projet.', '_blank')}
               className="group bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-8 py-4 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 dark:from-blue-500 dark:to-cyan-500 dark:hover:from-blue-600 dark:hover:to-cyan-600"
             >
               Demander un devis gratuit
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="group border-2 border-slate-300 hover:border-blue-400 bg-white/80 backdrop-blur-sm hover:bg-blue-50 px-8 py-4 text-lg font-semibold transition-all duration-300 dark:border-slate-600 dark:hover:border-blue-500 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 dark:text-slate-300"
-            >
-              <Play className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform text-blue-600 dark:text-blue-400" />
-              Voir notre vidéo
             </Button>
           </MotionDiv>
 

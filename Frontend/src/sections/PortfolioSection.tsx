@@ -29,9 +29,9 @@ export const PortfolioSection = () => {
         const response = await realisationsAPI.getAll()
         const items = response?.data
         setRealisations(Array.isArray(items) ? items.slice(0, 6) : [])
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch realisations:', err)
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Unknown error')
       } finally {
         setIsLoading(false)
       }
@@ -99,7 +99,7 @@ export const PortfolioSection = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {realisations.map((realisation, index) => (
+            {realisations.map((realisation) => (
               <MotionDiv
                 key={realisation._id}
                 variants={itemVariants}
@@ -108,11 +108,21 @@ export const PortfolioSection = () => {
               >
                 {/* Project Image */}
                 <div className="relative h-48 bg-gray-200 dark:bg-slate-700 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
-                    <div className="text-6xl text-primary-300 dark:text-blue-400">
-                      {categoryEmojis[realisation.category || 'default'] || categoryEmojis.default}
+                  {realisation.image ? (
+                    <Image
+                      src={realisation.image}
+                      alt={realisation.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
+                      <div className="text-6xl text-primary-300 dark:text-blue-400">
+                        {categoryEmojis[realisation.category || 'default'] || categoryEmojis.default}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Overlay */}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 dark:group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
@@ -182,7 +192,7 @@ export const PortfolioSection = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600 dark:text-slate-400 mb-6">
-            Vous souhaitez voir plus de projets ou discuter d'une collaboration ?
+            Vous souhaitez voir plus de projets ou discuter d&apos;une collaboration ?
           </p>
           <Button size="lg">
             Voir tous nos projets

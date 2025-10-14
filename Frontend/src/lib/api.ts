@@ -3,7 +3,7 @@
  * Centralized API calls with authentication and error handling
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Helper to get auth token from localStorage
 const getAuthToken = (): string | null => {
@@ -59,12 +59,37 @@ async function apiRequest<T>(
     const data = await response.json();
 
     if (!response.ok) {
+      // Handle authentication errors specifically
+      if (response.status === 401) {
+        // Clear stored authentication data
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('admin-token');
+          localStorage.removeItem('admin-user');
+          document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
+          // Redirect to login page
+          window.location.href = '/admin/login';
+        }
+        throw new Error('Invalid token or session expired. Please log in again.');
+      }
+
       throw new Error(data.message || `HTTP error! status: ${response.status}`);
     }
 
     return data;
   } catch (error) {
     console.error('API Request Error:', error);
+
+    // Handle network errors or other issues that might indicate authentication problems
+    if (error instanceof Error && (error.message.includes('token') || error.message.includes('session'))) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('admin-token');
+        localStorage.removeItem('admin-user');
+        document.cookie = 'admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+        window.location.href = '/admin/login';
+      }
+    }
+
     throw error;
   }
 }
@@ -206,7 +231,7 @@ export interface ArticleInput {
   title: string;
   content: string;
   excerpt?: string;
-  author: string;
+  author?: string;
   category?: string;
   tags?: string[];
   image?: string;
@@ -253,11 +278,12 @@ export interface Realisation {
   _id: string;
   title: string;
   description: string;
+  image?: string;
+  client: string;
+  date: string;
   category?: string;
   tags?: string[];
-  image?: string;
   link?: string;
-  client?: string;
   featured?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -266,11 +292,11 @@ export interface Realisation {
 export interface RealisationInput {
   title: string;
   description: string;
+  image?: string;
+  client: string;
   category?: string;
   tags?: string[];
-  image?: string;
   link?: string;
-  client?: string;
   featured?: boolean;
 }
 
@@ -412,6 +438,107 @@ export const productsAPI = {
   delete: async (id: string): Promise<{ status: string }> => {
     return apiRequest(`/products/${id}`, {
       method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// TEAM API
+// ============================================================================
+
+export interface TeamMember {
+  _id: string;
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  achievements: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TeamMemberInput {
+  name: string;
+  role: string;
+  description: string;
+  image?: string;
+  achievements: string[];
+}
+
+export const teamAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: TeamMember[] }> => {
+    return apiRequest('/team');
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest(`/team/${id}`);
+  },
+
+  create: async (data: TeamMemberInput): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest('/team', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: TeamMemberInput): Promise<{ status: string; data: { teamMember: TeamMember } }> => {
+    return apiRequest(`/team/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/team/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+};
+
+// ============================================================================
+// USERS API
+// ============================================================================
+
+export interface UserInput {
+  name: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'editor';
+}
+
+export const usersAPI = {
+  getAll: async (): Promise<{ status: string; results: number; data: User[] }> => {
+    return apiRequest('/auth/users', {}, true);
+  },
+
+  getById: async (id: string): Promise<{ status: string; data: { user: User } }> => {
+    return apiRequest(`/auth/users/${id}`, {}, true);
+  },
+
+  create: async (data: UserInput): Promise<{ status: string; data: { user: User } }> => {
+    return apiRequest('/auth/admin', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  update: async (id: string, data: Partial<UserInput>): Promise<{ status: string; data: { user: User } }> => {
+    return apiRequest(`/auth/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }, true);
+  },
+
+  delete: async (id: string): Promise<{ status: string }> => {
+    return apiRequest(`/auth/users/${id}`, {
+      method: 'DELETE',
+    }, true);
+  },
+
+  updateProfile: async (data: { name?: string; email?: string }): Promise<{ status: string; data: { user: User } }> => {
+    return apiRequest('/auth/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
     }, true);
   },
 };

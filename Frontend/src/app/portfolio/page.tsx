@@ -164,16 +164,26 @@ export default function PortfolioPage() {
               >
                 {/* Project Image */}
                 <div className="relative h-48 bg-gray-200 dark:bg-slate-700 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
-                    <div className="text-6xl text-primary-300 dark:text-blue-400">
-                      {realisation.category === 'E-commerce' && '🛒'}
-                      {realisation.category === 'Application Mobile' && '📱'}
-                      {realisation.category === 'Site Web' && '🌐'}
-                      {realisation.category === 'SaaS' && '☁️'}
-                      {realisation.category === 'Marketing Digital' && '📢'}
-                      {realisation.category === 'Branding' && '🎨'}
+                  {realisation.image ? (
+                    <Image
+                      src={realisation.image}
+                      alt={realisation.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center">
+                      <div className="text-6xl text-primary-300 dark:text-blue-400">
+                        {realisation.category === 'E-commerce' && '🛒'}
+                        {realisation.category === 'Application Mobile' && '📱'}
+                        {realisation.category === 'Site Web' && '🌐'}
+                        {realisation.category === 'SaaS' && '☁️'}
+                        {realisation.category === 'Marketing Digital' && '📢'}
+                        {realisation.category === 'Branding' && '🎨'}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Featured Badge */}
                   {realisation.featured && (
