@@ -1,6 +1,6 @@
 'use client'
 
-import { MotionDiv, MotionH2, MotionH4 } from '@/components/MotionComponents'
+import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react'
 import { Button } from '@/components/Button'
 
@@ -65,7 +65,7 @@ export const ContactSection = () => {
             Contactez-nous
           </MotionH2>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Prêt à démarrer votre projet digital ? Contactez notre équipe d'experts
+            Prêt à démarrer votre projet digital ? Contactez notre équipe d&apos;experts
             pour une consultation gratuite et personnalisée.
           </p>
         </MotionDiv>

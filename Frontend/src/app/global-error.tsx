@@ -37,11 +37,11 @@ export default function GlobalError({
               </div>
 
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Quelque chose s'est mal passé
+                Quelque chose s&apos;est mal passé
               </h2>
 
               <p className="text-gray-600 mb-6">
-                Une erreur inattendue s'est produite. Nos équipes ont été notifiées et travaillent à résoudre le problème.
+                Une erreur inattendue s&apos;est produite. Nos équipes ont été notifiées et travaillent à résoudre le problème.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -61,14 +61,14 @@ export default function GlobalError({
               </div>
 
               <div className="mt-6 text-sm text-gray-500">
-                <p>Code d'erreur: {error.digest || Date.now()}</p>
+                <p>Code d&apos;erreur: {error.digest || Date.now()}</p>
                 <p>Erreur logged dans la console pour le développement.</p>
               </div>
 
               {process.env.NODE_ENV === 'development' && (
                 <details className="mt-4 text-left">
                   <summary className="cursor-pointer text-sm font-medium text-gray-700">
-                    Détails de l'erreur (développement)
+                    Détails de l&apos;erreur (développement)
                   </summary>
                   <pre className="mt-2 p-3 bg-gray-100 rounded text-xs overflow-auto">
                     {error.stack}

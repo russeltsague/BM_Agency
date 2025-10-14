@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { authAPI, type User as APIUser } from '@/lib/api'
+import { authAPI } from '@/lib/api'
 
 interface User {
   id: string
@@ -73,9 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(userData)
 
       return { success: true }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error)
-      return { success: false, error: error.message || 'Network error occurred' }
+      return { success: false, error: error instanceof Error ? error.message : 'Network error occurred' }
     } finally {
       setIsLoading(false)
     }

@@ -29,7 +29,7 @@ const Tabs = React.forwardRef<
           return React.cloneElement(child, {
             activeTab,
             onValueChange: handleValueChange,
-          } as any)
+          } as React.HTMLAttributes<HTMLDivElement>)
         }
         return child
       })}

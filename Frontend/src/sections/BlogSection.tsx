@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MotionDiv, MotionH2, MotionH4, MotionArticle } from '@/components/MotionComponents'
+import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import { Calendar, User, ArrowRight, Clock } from 'lucide-react'
-import Image from 'next/image'
 import { Button } from '@/components/Button'
 import { articlesAPI, type Article } from '@/lib/api'
 
@@ -18,8 +17,8 @@ export const BlogSection = () => {
         const response = await articlesAPI.getAll()
         const items = response?.data
         setArticles(Array.isArray(items) ? items.slice(0, 3) : [])
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load articles')
       } finally {
         setIsLoading(false)
       }
@@ -67,7 +66,7 @@ export const BlogSection = () => {
           </MotionH2>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
             Restez informé des dernières tendances du digital et découvrez nos conseils
-            d'experts pour développer votre présence en ligne.
+            d&apos;experts pour développer votre présence en ligne.
           </p>
         </MotionDiv>
 
