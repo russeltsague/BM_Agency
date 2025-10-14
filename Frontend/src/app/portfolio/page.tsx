@@ -9,9 +9,6 @@ import {
   ExternalLink,
   Eye,
   Calendar,
-  Users,
-  TrendingUp,
-  Star,
   Filter
 } from 'lucide-react'
 import Image from 'next/image'
@@ -30,9 +27,9 @@ export default function PortfolioPage() {
         const response = await realisationsAPI.getAll()
         const items = response?.data
         setRealisations(Array.isArray(items) ? items : [])
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch realisations:', err)
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Failed to fetch realisations')
       } finally {
         setIsLoading(false)
       }
@@ -46,9 +43,6 @@ export default function PortfolioPage() {
   const filteredRealisations = realisations.filter(realisation => {
     return selectedCategory === 'Tous' || realisation.category === selectedCategory
   })
-
-  const featuredRealisations = filteredRealisations.filter(realisation => realisation.featured)
-  const otherRealisations = filteredRealisations.filter(realisation => !realisation.featured)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -119,7 +113,7 @@ export default function PortfolioPage() {
             </h1>
             <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
               Découvrez une sélection de nos projets les plus marquants et les résultats
-              exceptionnels obtenus pour nos clients dans divers secteurs d'activité.
+              exceptionnels obtenus pour nos clients dans divers secteurs d&apos;activité.
             </p>
           </motion.div>
         </div>
