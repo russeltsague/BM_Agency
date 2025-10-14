@@ -64,14 +64,26 @@ const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhos
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // TEMPORARILY DISABLE CORS FOR DEBUGGING
+    console.log('CORS request from origin:', origin);
+    console.log('TEMPORARILY ALLOWING ALL ORIGINS FOR DEBUGGING');
 
-    if (allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('Allowing request with no origin');
       return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'), false);
     }
+
+    // TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
+    console.log('TEMPORARILY allowing origin:', origin);
+    return callback(null, true);
+
+    // ORIGINAL LOGIC (commented out for debugging):
+    // if (allowedOrigins.includes(origin)) {
+    //   return callback(null, true);
+    // } else {
+    //   return callback(new Error('Not allowed by CORS'), false);
+    // }
   },
   credentials: true,
   optionsSuccessStatus: 200
