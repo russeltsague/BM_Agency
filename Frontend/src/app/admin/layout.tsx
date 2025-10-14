@@ -14,7 +14,6 @@ import {
   Image as ImageIcon,
   FileText,
   Users,
-  Package,
   Menu,
   X,
   LogOut,

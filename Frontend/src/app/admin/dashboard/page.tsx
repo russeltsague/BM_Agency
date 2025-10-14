@@ -4,18 +4,12 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import {
-  LayoutDashboard,
   Settings,
   Image,
   FileText,
   Users,
-  Package,
-  TrendingUp,
-  Clock,
-  Plus,
   ChevronRight,
   Activity,
-  BarChart3,
   Database
 } from 'lucide-react'
 import Link from 'next/link'
@@ -159,7 +153,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
-              <p className="text-slate-300 text-lg">Welcome back! Here's an overview of your content management system.</p>
+              <p className="text-slate-300 text-lg">Welcome back! Here&apos;s an overview of your content management system.</p>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-slate-400">

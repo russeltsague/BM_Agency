@@ -80,7 +80,6 @@ export default function AdminPortfolio() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null)
-  const [selectedImage, setSelectedImage] = useState<string>('')
   const [imagePreview, setImagePreview] = useState<string>('')
   const queryClient = useQueryClient()
 
@@ -140,8 +139,8 @@ export default function AdminPortfolio() {
       reset()
       toast.success('Project created successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to create project')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to create project')
     },
   })
 
@@ -168,8 +167,8 @@ export default function AdminPortfolio() {
       reset()
       toast.success('Project updated successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to update project')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to update project')
     },
   })
 
@@ -185,8 +184,8 @@ export default function AdminPortfolio() {
       setSelectedPortfolio(null)
       toast.success('Project deleted successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete project')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete project')
     },
   })
 
@@ -750,7 +749,7 @@ export default function AdminPortfolio() {
           <DialogHeader>
             <DialogTitle>Delete Project</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedPortfolio?.title}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedPortfolio?.title}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
