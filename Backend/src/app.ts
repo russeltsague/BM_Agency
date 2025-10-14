@@ -99,18 +99,14 @@ const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
+    sameSite: 'none' // Allow cross-origin requests
   }
 });
 
 // Apply CSRF protection to all routes except GET, HEAD, OPTIONS and API routes
 app.use((req, res, next) => {
-  // Skip CSRF for API routes
-  if (req.path.startsWith('/api/v1/')) {
-    return next();
-  }
-
-  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+  // Skip CSRF for API routes and safe methods
+  if (req.path.startsWith('/api/v1/') || ['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
     return next();
   }
   return csrfProtection(req, res, next);
