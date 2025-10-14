@@ -160,7 +160,7 @@ export const Footer = () => {
                 className="px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
               <Button size="sm" className="w-full">
-                S'abonner
+                S&apos;abonner
               </Button>
             </div>
           </div>

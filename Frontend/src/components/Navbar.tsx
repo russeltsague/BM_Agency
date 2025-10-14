@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { MotionDiv } from '@/components/MotionComponents'
-import { Phone, Mail, Menu, X, User, Settings } from 'lucide-react'
+import { Phone, Mail, Menu, X, Settings } from 'lucide-react'
 import { Button } from './Button'
 import { ThemeToggle } from './ThemeToggle'
 
