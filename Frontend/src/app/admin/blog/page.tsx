@@ -14,7 +14,6 @@ import {
   Search,
   MoreHorizontal,
   FileText,
-  Calendar,
   Clock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -84,48 +83,6 @@ interface Blog {
   updatedAt: string
 }
 
-// Mock data - replace with real API
-const mockBlog: Blog[] = [
-  {
-    _id: '1',
-    title: 'Les tendances du marketing digital au Cameroun en 2024',
-    excerpt: 'Découvrez les principales tendances qui façonneront le marketing digital camerounais cette année et comment les intégrer dans votre stratégie d\'entreprise.',
-    content: 'Le marketing digital au Cameroun évolue à un rythme effréné. En 2024, plusieurs tendances majeures se démarquent...',
-    author: {
-      _id: 'user1',
-      name: 'Marie Dubois',
-      email: 'marie@example.com'
-    },
-    category: 'Marketing Digital',
-    tags: ['Tendances', 'Marketing', 'Cameroun', '2024'],
-    featured: true,
-    published: true,
-    thumbnail: '/images/blog-1.jpg',
-    readTime: '8 min',
-    createdAt: '2024-01-15T00:00:00Z',
-    updatedAt: '2024-01-15T00:00:00Z',
-  },
-  {
-    _id: '2',
-    title: 'Comment optimiser son SEO pour les moteurs de recherche au Cameroun',
-    excerpt: 'Guide complet pour améliorer le référencement de votre site web et augmenter votre visibilité sur Google et autres moteurs de recherche locaux.',
-    content: 'Le SEO (Search Engine Optimization) reste un pilier fondamental du marketing digital camerounais...',
-    author: {
-      _id: 'user2',
-      name: 'Thomas Martin',
-      email: 'thomas@example.com'
-    },
-    category: 'SEO',
-    tags: ['SEO', 'Référencement', 'Google', 'Cameroun'],
-    featured: false,
-    published: true,
-    thumbnail: '/images/blog-2.jpg',
-    readTime: '12 min',
-    createdAt: '2024-01-12T00:00:00Z',
-    updatedAt: '2024-01-12T00:00:00Z',
-  },
-]
-
 export default function AdminBlog() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
@@ -182,9 +139,9 @@ export default function AdminBlog() {
         }
         const response = await articlesAPI.create(articleData)
         return response.data.article
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Create blog error:', error)
-        throw new Error(error.message || 'Failed to create blog post')
+        throw new Error(error instanceof Error ? error.message : 'Failed to create blog post')
       }
     },
     onSuccess: () => {
@@ -193,9 +150,9 @@ export default function AdminBlog() {
       resetForm()
       toast.success('Blog post created successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Create blog mutation error:', error)
-      toast.error(error.message || 'Failed to create blog post')
+      toast.error(error instanceof Error ? error.message : 'Failed to create blog post')
     },
   })
 
@@ -214,9 +171,9 @@ export default function AdminBlog() {
         }
         const response = await articlesAPI.update(id, articleData)
         return response.data.article
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Update blog error:', error)
-        throw new Error(error.message || 'Failed to update blog post')
+        throw new Error(error instanceof Error ? error.message : 'Failed to update blog post')
       }
     },
     onSuccess: () => {
@@ -225,9 +182,9 @@ export default function AdminBlog() {
       resetForm()
       toast.success('Blog post updated successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update blog mutation error:', error)
-      toast.error(error.message || 'Failed to update blog post')
+      toast.error(error instanceof Error ? error.message : 'Failed to update blog post')
     },
   })
 
@@ -242,8 +199,8 @@ export default function AdminBlog() {
       closeDeleteModal()
       toast.success('Blog post deleted successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete blog post')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete blog post')
     },
   })
 
@@ -580,7 +537,7 @@ export default function AdminBlog() {
                 Annuler
               </Button>
               <Button type="submit" disabled={createMutation.isPending} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                {createMutation.isPending ? 'Création...' : 'Créer l\'Article'}
+                {createMutation.isPending ? 'Création...' : 'Créer l&apos;Article'}
               </Button>
             </DialogFooter>
           </form>
@@ -591,7 +548,7 @@ export default function AdminBlog() {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle className="text-white">Modifier l'Article</DialogTitle>
+            <DialogTitle className="text-white">Modifier l&apos;Article</DialogTitle>
             <DialogDescription className="text-slate-300">
               Mettez à jour les informations de l'article et son contenu.
             </DialogDescription>
@@ -712,7 +669,7 @@ export default function AdminBlog() {
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent className="bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle className="text-white">Supprimer l'Article</DialogTitle>
+            <DialogTitle className="text-white">Supprimer l&apos;Article</DialogTitle>
             <DialogDescription className="text-slate-300">
               Êtes-vous sûr de vouloir supprimer "{selectedBlog?.title}" ? Cette action ne peut pas être annulée.
             </DialogDescription>
