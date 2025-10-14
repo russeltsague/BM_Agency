@@ -14,8 +14,6 @@ import {
   Trash2,
   Search,
   MoreHorizontal,
-  Eye,
-  EyeOff,
   Settings
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -170,9 +168,9 @@ export default function AdminServices() {
       reset()
       toast.success('Service created successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Create service error:', error)
-      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+      if (error instanceof Error && (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login'))) {
         toast.error('Authentication expired', {
           description: 'Please log in again to continue.',
           duration: 4000,
@@ -182,7 +180,7 @@ export default function AdminServices() {
           router.push('/admin/login')
         }, 2000)
       } else {
-        toast.error(error.message || 'Failed to create service')
+        toast.error(error instanceof Error ? error.message : 'Failed to create service')
       }
     },
   })
@@ -209,9 +207,9 @@ export default function AdminServices() {
       reset()
       toast.success('Service updated successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update service error:', error)
-      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+      if (error instanceof Error && (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login'))) {
         toast.error('Authentication expired', {
           description: 'Please log in again to continue.',
           duration: 4000,
@@ -221,7 +219,7 @@ export default function AdminServices() {
           router.push('/admin/login')
         }, 2000)
       } else {
-        toast.error(error.message || 'Failed to update service')
+        toast.error(error instanceof Error ? error.message : 'Failed to update service')
       }
     },
   })
@@ -238,9 +236,9 @@ export default function AdminServices() {
       setSelectedService(null)
       toast.success('Service deleted successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Delete service error:', error)
-      if (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login')) {
+      if (error instanceof Error && (error.message?.includes('token') || error.message?.includes('session') || error.message?.includes('login'))) {
         toast.error('Authentication expired', {
           description: 'Please log in again to continue.',
           duration: 4000,
@@ -250,7 +248,7 @@ export default function AdminServices() {
           router.push('/admin/login')
         }, 2000)
       } else {
-        toast.error(error.message || 'Failed to delete service')
+        toast.error(error instanceof Error ? error.message : 'Failed to delete service')
       }
     },
   })
@@ -652,7 +650,7 @@ export default function AdminServices() {
           <DialogHeader>
             <DialogTitle className="text-white">Supprimer le Service</DialogTitle>
             <DialogDescription className="text-slate-300">
-              Êtes-vous sûr de vouloir supprimer "{selectedService?.title}" ? Cette action ne peut pas être annulée.
+              Êtes-vous sûr de vouloir supprimer &quot;{selectedService?.title}&quot; ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
