@@ -77,7 +77,7 @@ const handleJWTExpiredError = () =>
   new AppError('Your token has expired! Please log in again.', 401);
 
 const sendErrorDev = (err: any, req: Request, res: Response) => {
-  // API
+  // API - always send JSON
   if (req.originalUrl.startsWith('/api')) {
     return res.status(err.statusCode).json({
       status: err.status,
@@ -86,16 +86,16 @@ const sendErrorDev = (err: any, req: Request, res: Response) => {
       stack: err.stack,
     });
   }
-  // Rendered website
+  // For non-API routes, send JSON as well since this is an API-only server
   console.error('ERROR 💥', err);
-  res.status(err.statusCode).render('error', {
-    title: 'Something went wrong!',
-    msg: err.message,
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
   });
 };
 
 const sendErrorProd = (err: any, req: Request, res: Response) => {
-  // API
+  // API - always send JSON
   if (req.originalUrl.startsWith('/api')) {
     // Operational, trusted error: send message to client
     if (err.isOperational) {
@@ -113,19 +113,19 @@ const sendErrorProd = (err: any, req: Request, res: Response) => {
       message: 'Something went very wrong!',
     });
   }
-  // Rendered website
+  // For non-API routes, send JSON as well since this is an API-only server
   if (err.isOperational) {
-    return res.status(err.statusCode).render('error', {
-      title: 'Something went wrong!',
-      msg: err.message,
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
     });
   }
   // Programming or other unknown error: don't leak error details
   // 1) Log error
   console.error('ERROR 💥', err);
   // 2) Send generic message
-  return res.status(err.statusCode).render('error', {
-    title: 'Something went wrong!',
-    msg: 'Please try again later.',
+  return res.status(err.statusCode).json({
+    status: 'error',
+    message: 'Please try again later.',
   });
 };
