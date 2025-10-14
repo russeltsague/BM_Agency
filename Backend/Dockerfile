@@ -8,8 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
 
 # Copy source code
 COPY src ./src
@@ -28,10 +28,12 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-# Copy built application
+# Copy built application and necessary files
 COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nextjs:nodejs /app/package*.json ./
-COPY --from=builder --chown=nextjs:nodejs /app/.env.example ./
+
+# Note: For production, use environment variables instead of .env file
+# The .env file should not be copied to production for security reasons
 
 # Install only production dependencies
 RUN npm ci --only=production && npm cache clean --force
