@@ -13,15 +13,12 @@ import {
   ShoppingBag,
   Users,
   CheckCircle,
-  ArrowRight,
-  Star,
-  Clock,
-  Award
+  ArrowRight
 } from 'lucide-react'
 import { servicesAPI, type Service } from '@/lib/api'
 
 // Icon mapping
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Megaphone,
   Smartphone,
   Palette,
@@ -42,9 +39,9 @@ export default function ServicesPage() {
         const response = await servicesAPI.getAll()
         const items = response?.data
         setServices(Array.isArray(items) ? items : [])
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch services:', err)
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Failed to fetch services')
       } finally {
         setIsLoading(false)
       }
@@ -184,7 +181,7 @@ export default function ServicesPage() {
               Prêt à transformer votre présence digitale ?
             </h2>
             <p className="text-lg lg:text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
-              Contactez-nous dès aujourd'hui pour une consultation gratuite et découvrez
+              Contactez-nous dès aujourd&apos;hui pour une consultation gratuite et découvrez
               comment nos services peuvent accélérer votre croissance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
