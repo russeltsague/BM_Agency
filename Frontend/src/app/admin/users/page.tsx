@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, Edit, Trash2, Eye, MoreHorizontal, Users, Shield, UserCheck, UserX } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, MoreHorizontal, Users, Shield, UserCheck } from 'lucide-react'
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +43,8 @@ import { Badge } from '@/components/ui/badge';
 import { usersAPI } from '@/lib/api';
 import type { User, UserInput } from '@/lib/api';
 
+import { toast } from 'sonner';
+
 // User form schema
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -82,8 +84,9 @@ export default function AdminUsers() {
       setIsCreateDialogOpen(false);
       reset();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create user');
+    onError: (error: unknown) => {
+      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? String(error.response.data.message) : 'Failed to create user';
+      toast.error(errorMessage);
     },
   });
 
@@ -98,8 +101,9 @@ export default function AdminUsers() {
       setEditingUser(null);
       reset();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update user');
+    onError: (error: unknown) => {
+      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? error.response.data.message : 'Failed to update user';
+      toast.error(errorMessage);
     },
   });
 
@@ -112,8 +116,9 @@ export default function AdminUsers() {
       setIsDeleteDialogOpen(false);
       setDeletingUser(null);
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete user');
+    onError: (error: unknown) => {
+      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? error.response.data.message : 'Failed to delete user';
+      toast.error(errorMessage);
     },
   });
 
@@ -149,7 +154,7 @@ export default function AdminUsers() {
     setEditingUser(user);
     setValue('name', user.name);
     setValue('email', user.email);
-    setValue('role', user.role);
+    setValue('role', user.role as 'admin' | 'editor');
     // Don't set password for editing
     setIsEditDialogOpen(true);
   };
@@ -244,7 +249,6 @@ export default function AdminUsers() {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Created</TableHead>
                   <TableHead className="w-[50px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -261,9 +265,6 @@ export default function AdminUsers() {
                         {getRoleIcon(user.role)}
                         {user.role}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
