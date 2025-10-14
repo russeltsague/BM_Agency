@@ -102,7 +102,7 @@ export default function AdminUsers() {
       reset();
     },
     onError: (error: unknown) => {
-      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? error.response.data.message : 'Failed to update user';
+      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? (error.response.data as { message: string }).message : 'Failed to update user';
       toast.error(errorMessage);
     },
   });
@@ -117,7 +117,7 @@ export default function AdminUsers() {
       setDeletingUser(null);
     },
     onError: (error: unknown) => {
-      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? error.response.data.message : 'Failed to delete user';
+      const errorMessage = error && typeof error === 'object' && 'response' in error && error.response && typeof error.response === 'object' && 'data' in error.response && error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data ? (error.response.data as { message: string }).message : 'Failed to delete user';
       toast.error(errorMessage);
     },
   });
