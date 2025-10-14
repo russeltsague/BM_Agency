@@ -1,6 +1,7 @@
 'use client'
 
-import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
+import React from 'react'
+import { MotionDiv } from '@/components/MotionComponents'
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react'
 import { Button } from '@/components/Button'
 
@@ -32,15 +33,6 @@ export const ContactSection = () => {
     }
   ]
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  }
-
   return (
     <section className="py-20 bg-white dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,9 +43,9 @@ export const ContactSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <MotionH2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
             Contactez-nous
-          </MotionH2>
+          </h2>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
             Prêt à démarrer votre projet digital ? Contactez notre équipe d&apos;experts
             pour une consultation gratuite et personnalisée.
@@ -182,13 +174,12 @@ export const ContactSection = () => {
                 <div className="flex items-start">
                   <input
                     type="checkbox"
-                    id="privacy"
                     name="privacy"
                     required
                     className="mt-1 mr-3"
                   />
                   <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-slate-400">
-                    J'accepte que mes données soient traitées conformément à la{' '}
+                    J&apos;accepte que mes données soient traitées conformément à la{' '}
                     <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
                       politique de confidentialité
                     </a>
@@ -252,7 +243,7 @@ export const ContactSection = () => {
               viewport={{ once: true }}
               className="bg-primary-600 dark:bg-blue-600 text-white rounded-xl p-6 text-center"
             >
-              <h4 className="font-semibold mb-2">Besoin d'un devis rapide ?</h4>
+              <h4 className="font-semibold mb-2">Besoin d&apos;un devis rapide ?</h4>
               <p className="text-primary-100 dark:text-blue-100 mb-4">
                 Obtenez une estimation gratuite en moins de 24h
               </p>
@@ -260,7 +251,7 @@ export const ContactSection = () => {
                 Devis express
               </Button>
             </MotionDiv>
-{{ ... }}
+          </MotionDiv>
         </div>
       </div>
     </section>

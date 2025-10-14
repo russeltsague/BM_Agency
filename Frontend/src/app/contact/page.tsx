@@ -1,5 +1,4 @@
 'use client'
-
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
@@ -12,10 +11,7 @@ import {
   MapPin,
   Clock,
   Send,
-  CheckCircle,
-  Star,
-  Users,
-  Award
+  Star
 } from 'lucide-react'
 
 export default function ContactPage() {
@@ -46,15 +42,14 @@ export default function ContactPage() {
         },
         body: JSON.stringify(contactData),
       })
-
       if (response.ok) {
-        toast.success('Votre message a été envoyé avec succès ! Nous vous répondrons sous 24h.')
+        toast.success('Message envoyé avec succès ! Nous vous répondrons sous 24h.')
         e.currentTarget.reset()
       } else {
         const error = await response.json()
         toast.error(error.message || 'Erreur lors de l\'envoi du message')
       }
-    } catch (error) {
+    } catch {
       toast.error('Erreur de connexion. Veuillez réessayer.')
     } finally {
       setIsSubmitting(false)
@@ -73,7 +68,6 @@ export default function ContactPage() {
         },
         body: JSON.stringify({ email: newsletterEmail }),
       })
-
       if (response.ok) {
         toast.success('Merci pour votre inscription à notre newsletter !')
         setNewsletterEmail('')
@@ -81,7 +75,7 @@ export default function ContactPage() {
         const error = await response.json()
         toast.error(error.message || 'Erreur lors de l\'inscription')
       }
-    } catch (error) {
+    } catch {
       toast.error('Erreur de connexion. Veuillez réessayer.')
     } finally {
       setIsSubscribing(false)
@@ -169,7 +163,7 @@ export default function ContactPage() {
               Contactez <span className="text-primary-600 dark:text-blue-400"> BM Agency</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
-              Prêt à donner un coup d'accélérateur à votre présence digitale ?
+              Prêt à donner un coup d&apos;accélérateur à votre présence digitale ?
               Nos experts vous accompagnent pour transformer vos idées en succès.
             </p>
           </motion.div>
@@ -350,7 +344,7 @@ export default function ContactPage() {
                       className="mt-1 mr-3"
                     />
                     <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-slate-400">
-                      J'accepte que mes données soient traitées conformément à la{' '}
+                      J&apos;accepte que mes données soient traitées conformément à la{' '}
                       <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
                         politique de confidentialité
                       </a>
@@ -394,7 +388,7 @@ export default function ContactPage() {
 
               {/* Quick Actions */}
               <div className="bg-primary-600 dark:bg-blue-600 text-white rounded-xl p-6 text-center">
-                <h3 className="text-xl font-semibold mb-2">Besoin d'un devis rapide ?</h3>
+                <h3 className="text-xl font-semibold mb-2">Besoin d&apos;un devis rapide ?</h3>
                 <p className="text-primary-100 dark:text-blue-100 mb-4">
                   Obtenez une estimation gratuite en moins de 24h
                 </p>
@@ -415,7 +409,7 @@ export default function ContactPage() {
                         <Star key={i} className="w-4 h-4 text-yellow-500 fill-current" />
                       ))}
                     </div>
-                    <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">"{testimonial.content}"</p>
+                    <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">&quot;{testimonial.content}&quot;</p>
                     <div className="text-xs text-gray-500 dark:text-slate-400">
                       <strong>{testimonial.name}</strong> - {testimonial.company}
                     </div>
@@ -502,7 +496,7 @@ export default function ContactPage() {
                 ) : (
                   <>
                     <Mail className="mr-2 w-4 h-4" />
-                    S'abonner
+                    S&apos;abonner
                   </>
                 )}
               </Button>

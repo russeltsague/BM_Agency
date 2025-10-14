@@ -15,6 +15,7 @@ import {
   Users,
   Edit,
 } from 'lucide-react'
+import Image from 'next/image'
 import { teamAPI } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -308,9 +309,11 @@ export default function AdminTeam() {
                         className="border-slate-700 hover:bg-slate-700/30 transition-colors"
                       >
                         <TableCell className="w-20">
-                          <img
+                          <Image
                             src={member.image || 'https://via.placeholder.com/64x64/4B5563/9CA3AF?text=No+Image'}
                             alt={member.name}
+                            width={64}
+                            height={64}
                             className="w-16 h-16 object-cover rounded-full border border-slate-600"
                           />
                         </TableCell>
@@ -390,9 +393,11 @@ export default function AdminTeam() {
               <Label className="text-slate-300 text-lg font-medium">Member Photo</Label>
               <div className="flex items-center space-x-6">
                 <div className="relative">
-                  <img
+                  <Image
                     src={imagePreview || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
                     alt="Member preview"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-full border-2 border-slate-600"
                   />
                   <Button
@@ -518,9 +523,11 @@ export default function AdminTeam() {
               <Label className="text-slate-300 text-lg font-medium">Member Photo</Label>
               <div className="flex items-center space-x-6">
                 <div className="relative">
-                  <img
+                  <Image
                     src={imagePreview || selectedTeamMember?.image || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
                     alt="Member preview"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-full border-2 border-slate-600"
                   />
                   <Button
@@ -651,9 +658,11 @@ export default function AdminTeam() {
 
           <div className="bg-slate-700/50 rounded-lg p-4 my-4">
             <div className="flex items-center space-x-3">
-              <img
+              <Image
                 src={selectedTeamMember?.image || 'https://via.placeholder.com/48x48/4B5563/9CA3AF?text=No+Image'}
-                alt={selectedTeamMember?.name}
+                alt={selectedTeamMember?.name || 'Team Member'}
+                width={48}
+                height={48}
                 className="w-12 h-12 object-cover rounded-full border border-slate-600"
               />
               <div>

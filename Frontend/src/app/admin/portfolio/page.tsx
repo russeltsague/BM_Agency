@@ -13,10 +13,11 @@ import {
   Trash2,
   MoreHorizontal,
   Calendar,
-  Image as ImageIcon,
+  ImageIcon,
   Edit,
 } from 'lucide-react'
 import { realisationsAPI } from '@/lib/api'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -325,9 +326,11 @@ export default function AdminPortfolio() {
                         className="border-slate-700 hover:bg-slate-700/30 transition-colors"
                       >
                         <TableCell className="w-20">
-                          <img
+                          <Image
                             src={item.image || 'https://via.placeholder.com/64x64/4B5563/9CA3AF?text=No+Image'}
                             alt={item.title}
+                            width={64}
+                            height={64}
                             className="w-16 h-16 object-cover rounded-lg border border-slate-600"
                           />
                         </TableCell>
@@ -417,9 +420,11 @@ export default function AdminPortfolio() {
               <Label className="text-slate-300 text-lg font-medium">Project Image</Label>
               <div className="flex items-center space-x-6">
                 <div className="relative">
-                  <img
+                  <Image
                     src={imagePreview || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
                     alt="Project preview"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
                   />
                   <Button
@@ -587,9 +592,11 @@ export default function AdminPortfolio() {
               <Label className="text-slate-300 text-lg font-medium">Project Image</Label>
               <div className="flex items-center space-x-6">
                 <div className="relative">
-                  <img
+                  <Image
                     src={imagePreview || selectedPortfolio?.image || 'https://via.placeholder.com/128x128/4B5563/9CA3AF?text=No+Image'}
                     alt="Project preview"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-cover rounded-lg border-2 border-slate-600"
                   />
                   <Button

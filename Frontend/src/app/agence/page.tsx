@@ -8,7 +8,8 @@ import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import {
   Users,
   Calendar,
-  Mail
+  Mail,
+  CheckCircle
 } from 'lucide-react'
 import { teamAPI } from '@/lib/api'
 
@@ -134,7 +135,7 @@ export default function AgencyPage() {
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-primary-600 dark:text-blue-400 mb-2">6</div>
-                    <div className="text-gray-600 dark:text-slate-400">Années d'expérience</div>
+                    <div className="text-gray-600 dark:text-slate-400">Années d&apos;expérience</div>
                   </div>
                 </div>
               </div>
@@ -173,7 +174,7 @@ export default function AgencyPage() {
               </h3>
               <p className="text-gray-600 dark:text-slate-400 mb-6">
                 Nous croyons que le digital est un levier de croissance essentiel pour toutes les entreprises.
-                Notre mission est d'accompagner nos clients dans cette transformation avec des solutions
+                Notre mission est d&apos;accompagner nos clients dans cette transformation avec des solutions
                 innovantes et personnalisées.
               </p>
               <div className="grid grid-cols-2 gap-6">

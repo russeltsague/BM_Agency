@@ -32,15 +32,6 @@ export const BlogSection = () => {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  }
-
   return (
     <section className="py-20 bg-gray-50 dark:bg-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -119,7 +110,7 @@ export const BlogSection = () => {
                     </p>
 
                     <Button variant="outline" className="group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                      Lire l'article
+                      Lire l&apos;article
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>

@@ -272,7 +272,7 @@ export default function AdminProducts() {
     const fileArray = Array.from(files)
 
     // Simulate file upload
-    for (const file of fileArray) {
+    for (let i = 0; i < fileArray.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 2000))
     }
 
@@ -546,7 +546,7 @@ export default function AdminProducts() {
                           className="sr-only"
                           multiple
                           accept="image/*"
-                          onChange={(e) => handleFileUpload(e.target.files, 'images')}
+                          onChange={(e) => handleFileUpload(e.target.files)}
                         />
                       </label>
                       <p className="pl-1">or drag and drop</p>
@@ -573,7 +573,7 @@ export default function AdminProducts() {
                           type="file"
                           className="sr-only"
                           accept=".pdf"
-                          onChange={(e) => handleFileUpload(e.target.files, 'pdf')}
+                          onChange={(e) => handleFileUpload(e.target.files)}
                         />
                       </label>
                       <p className="pl-1">or drag and drop</p>
