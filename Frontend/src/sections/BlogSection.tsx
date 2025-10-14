@@ -32,16 +32,6 @@ export const BlogSection = () => {
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  }
-
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -120,7 +110,6 @@ export const BlogSection = () => {
                         </div>
                       )}
                     </div>
-
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-3">
                       {articles[0].title}
                     </h3>

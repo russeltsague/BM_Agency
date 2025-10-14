@@ -32,16 +32,6 @@ export const ContactSection = () => {
     }
   ]
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  }
-
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -266,11 +256,11 @@ export const ContactSection = () => {
               <p className="text-primary-100 dark:text-blue-100 mb-4">
                 Obtenez une estimation gratuite en moins de 24h
               </p>
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" className="w-full">
                 Devis express
               </Button>
             </MotionDiv>
-          </MotionDiv>
+{{ ... }}
         </div>
       </div>
     </section>

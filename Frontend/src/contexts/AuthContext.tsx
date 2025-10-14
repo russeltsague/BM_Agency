@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = JSON.parse(storedUser)
         setToken(storedToken)
         setUser(userData)
-      } catch (error) {
+      } catch {
         // Invalid stored data, clear it
         localStorage.removeItem('admin-token')
         localStorage.removeItem('admin-user')
