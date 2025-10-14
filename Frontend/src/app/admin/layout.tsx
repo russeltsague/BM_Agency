@@ -112,8 +112,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         )}
       </AnimatePresence>
 
-      {/* Sidebar - Always visible on large screens */}
-      <aside className="fixed left-0 top-0 z-50 h-full w-64 bg-slate-800 shadow-lg">
+      {/* Sidebar - Hidden on mobile, visible on large screens */}
+      <aside className={`fixed left-0 top-0 z-50 h-full w-64 bg-slate-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-slate-700">
@@ -241,7 +243,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="min-h-screen lg:ml-64">
         {/* Top navbar */}
         <header className="sticky top-0 z-30 bg-slate-800 border-b border-slate-700 shadow-sm">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">

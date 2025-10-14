@@ -147,7 +147,7 @@ export default function AdminLogin() {
                     type="email"
                     autoComplete="email"
                     required
-                    className="pl-11 pr-4 py-3 border-gray-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm"
+                    className="pl-11 pr-4 py-3 border-gray-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm"
                     placeholder="admin@bm-agency.net"
                     {...register('email')}
                   />
@@ -181,7 +181,7 @@ export default function AdminLogin() {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     required
-                    className="pl-11 pr-12 py-3 border-gray-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm"
+                    className="pl-11 pr-12 py-3 border-gray-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm"
                     placeholder="••••••••"
                     {...register('password')}
                   />
