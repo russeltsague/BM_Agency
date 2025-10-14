@@ -63,26 +63,24 @@ export const app = express();
 const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000'];
 
 const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) {
-      console.log('Allowing request with no origin');
-      return callback(null, true);
-    }
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
+      console.log('CORS request from origin:', origin);
+      console.log('TEMPORARILY ALLOWING ALL ORIGINS FOR DEBUGGING');
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        console.log('Allowing request with no origin');
+        return callback(null, true);
+      }
 
-    // Check if the origin is in the allowed origins list
-    if (allowedOrigins.includes(origin)) {
-      console.log('Allowing origin:', origin);
+      // TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
+      console.log('TEMPORARILY allowing origin:', origin);
       return callback(null, true);
-    } else {
-      console.log('Blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
-      return callback(new Error('Not allowed by CORS'), false);
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+  };
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression()); // Compress responses
@@ -178,6 +176,13 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
   
   app.get('*', (req, res) => {
+    // Don't serve React app for API routes
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({
+        status: 'fail',
+        message: `Can't find ${req.originalUrl} on this server!`
+      });
+    }
     res.sendFile(path.resolve(__dirname, '../client/build/index.html'));
   });
 }
