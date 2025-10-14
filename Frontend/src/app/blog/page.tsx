@@ -12,8 +12,7 @@ import {
   ArrowRight,
   Search,
   Filter,
-  BookOpen,
-  TrendingUp
+  BookOpen
 } from 'lucide-react'
 import { articlesAPI, type Article } from '@/lib/api'
 
@@ -31,9 +30,9 @@ export default function BlogPage() {
         const response = await articlesAPI.getAll()
         const items = response?.data
         setArticles(Array.isArray(items) ? items : [])
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch articles:', err)
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Failed to fetch articles')
       } finally {
         setIsLoading(false)
       }
@@ -122,7 +121,7 @@ export default function BlogPage() {
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-slate-400 leading-relaxed max-w-3xl mx-auto">
               Restez à la pointe des dernières tendances du digital avec nos articles
-              d'experts. Conseils pratiques, analyses et insights pour votre stratégie digitale.
+              d&apos;experts. Conseils pratiques, analyses et insights pour votre stratégie digitale.
             </p>
           </motion.div>
         </div>
@@ -226,7 +225,7 @@ export default function BlogPage() {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           >
-            {otherArticles.map((post: Article, index: number) => (
+            {otherArticles.map((post: Article) => (
               <motion.article
                 key={post._id}
                 variants={itemVariants}

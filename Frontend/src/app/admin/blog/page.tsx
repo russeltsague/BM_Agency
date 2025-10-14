@@ -435,7 +435,7 @@ export default function AdminBlog() {
           <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="title" className="text-slate-300">Titre de l'Article</Label>
+                <Label htmlFor="title" className="text-slate-300">Titre de l&apos;Article</Label>
                 <Input
                   id="title"
                   {...register('title')}
@@ -556,7 +556,7 @@ export default function AdminBlog() {
           <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-title" className="text-slate-300">Titre de l'Article</Label>
+                <Label htmlFor="edit-title" className="text-slate-300">Titre de l&apos;Article</Label>
                 <Input
                   id="edit-title"
                   {...register('title')}
@@ -671,7 +671,7 @@ export default function AdminBlog() {
           <DialogHeader>
             <DialogTitle className="text-white">Supprimer l&apos;Article</DialogTitle>
             <DialogDescription className="text-slate-300">
-              Êtes-vous sûr de vouloir supprimer "{selectedBlog?.title}" ? Cette action ne peut pas être annulée.
+              Êtes-vous sûr de vouloir supprimer &quot;{selectedBlog?.title}&quot; ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

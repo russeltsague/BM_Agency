@@ -73,7 +73,6 @@ export default function AdminTeam() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedTeamMember, setSelectedTeamMember] = useState<TeamMember | null>(null)
-  const [selectedImage, setSelectedImage] = useState<string>('')
   const [imagePreview, setImagePreview] = useState<string>('')
   const queryClient = useQueryClient()
 

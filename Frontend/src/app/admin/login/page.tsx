@@ -34,7 +34,6 @@ export default function AdminLogin() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   })

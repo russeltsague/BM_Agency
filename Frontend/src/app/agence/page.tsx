@@ -4,16 +4,14 @@ import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/Button'
-import { MotionDiv, MotionH2, MotionH4 } from '@/components/MotionComponents'
+import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import {
   Users,
   Target,
   Award,
   TrendingUp,
   CheckCircle,
-  Quote,
   Calendar,
-  MapPin,
   Mail
 } from 'lucide-react'
 import { teamAPI } from '@/lib/api'
@@ -50,29 +48,6 @@ export default function AgencyPage() {
     fetchTeamMembers()
   }, [])
 
-  const values = [
-    {
-      icon: Target,
-      title: 'Excellence',
-      description: 'Nous visons l\'excellence dans chaque projet que nous réalisons.'
-    },
-    {
-      icon: Users,
-      title: 'Collaboration',
-      description: 'Nous travaillons main dans la main avec nos clients pour des résultats optimaux.'
-    },
-    {
-      icon: Award,
-      title: 'Innovation',
-      description: 'Nous restons à la pointe des dernières tendances et technologies digitales.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Résultats',
-      description: 'Nous nous engageons sur des objectifs mesurables et un ROI démontré.'
-    }
-  ]
-
   const milestones = [
     { year: '2018', event: 'Création de BM Agency' },
     { year: '2019', event: 'Ouverture du bureau de douala ' },
@@ -103,7 +78,7 @@ export default function AgencyPage() {
             <p className="text-xl text-gray-600 dark:text-slate-400 leading-relaxed">
               Depuis 2018, nous accompagnons les entreprises dans leur transformation digitale
               avec passion, expertise et innovation. Notre mission : faire briller votre marque
-              dans l'univers numérique.
+              dans l&apos;univers numérique.
             </p>
           </MotionDiv>
         </div>
@@ -125,7 +100,7 @@ export default function AgencyPage() {
               <div className="space-y-6 text-gray-600 dark:text-slate-400">
                 <p>
                   BM Agency est née de la passion de deux entrepreneurs visionnaires qui ont
-                  compris très tôt l'importance du digital dans la stratégie des entreprises.
+                  compris très tôt l&apos;importance du digital dans la stratégie des entreprises.
                 </p>
                 <p>
                   Depuis notre création en 2018, nous avons grandi en gardant toujours la même
@@ -133,7 +108,7 @@ export default function AgencyPage() {
                   innovantes et personnalisées.
                 </p>
                 <p>
-                  Aujourd'hui, avec une équipe de plus de 50 experts et des centaines de projets
+                  Aujourd&apos;hui, avec une équipe de plus de 50 experts et des centaines de projets
                   réussis, nous sommes devenus un partenaire de confiance pour les entreprises
                   de toutes tailles.
                 </p>
@@ -363,7 +338,7 @@ export default function AgencyPage() {
               Prêt à travailler avec nous ?
             </h2>
             <p className="text-xl text-primary-100 dark:text-blue-100 mb-8 max-w-3xl mx-auto">
-              Rejoignez les centaines d'entreprises qui nous font confiance pour leur transformation digitale.
+              Rejoignez les centaines d&apos;entreprises qui nous font confiance pour leur transformation digitale.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary">

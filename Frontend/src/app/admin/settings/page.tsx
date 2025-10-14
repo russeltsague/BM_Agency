@@ -11,8 +11,6 @@ import {
   User,
   Lock,
   Globe,
-  Bell,
-  Palette,
   Save,
   Eye,
   EyeOff

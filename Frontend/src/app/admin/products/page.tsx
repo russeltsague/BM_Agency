@@ -12,11 +12,8 @@ import {
   Trash2,
   Search,
   MoreHorizontal,
-  Package,
-  DollarSign,
   FileText,
-  Upload,
-  X
+  Upload
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -134,7 +131,6 @@ export default function AdminProducts() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [uploadingFiles, setUploadingFiles] = useState<string[]>([])
   const queryClient = useQueryClient()
 
   const {
@@ -142,7 +138,6 @@ export default function AdminProducts() {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
@@ -275,14 +270,12 @@ export default function AdminProducts() {
     if (!files) return
 
     const fileArray = Array.from(files)
-    setUploadingFiles(prev => [...prev, ...fileArray.map(f => f.name)])
 
     // Simulate file upload
     for (const file of fileArray) {
       await new Promise(resolve => setTimeout(resolve, 2000))
     }
 
-    setUploadingFiles(prev => prev.filter(name => !fileArray.some(f => f.name === name)))
     toast.success(`${fileArray.length} file(s) uploaded successfully!`)
   }
 
@@ -746,7 +739,7 @@ export default function AdminProducts() {
           <DialogHeader>
             <DialogTitle>Delete Product</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedProduct?.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedProduct?.name}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
