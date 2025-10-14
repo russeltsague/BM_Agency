@@ -17,7 +17,7 @@ import {
   Quote
 } from 'lucide-react'
 import { testimonialsAPI } from '@/lib/api'
-import type { Testimonial, TestimonialInput } from '@/lib/api'
+import type { Testimonial } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -72,7 +72,6 @@ export default function AdminTestimonials() {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<TestimonialForm>({
     resolver: zodResolver(testimonialSchema),
@@ -108,9 +107,9 @@ export default function AdminTestimonials() {
       try {
         const response = await testimonialsAPI.create(data)
         return response.data.testimonial
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Create testimonial error:', error)
-        throw new Error(error.message || 'Failed to create testimonial')
+        throw new Error(error instanceof Error ? error.message : 'Failed to create testimonial')
       }
     },
     onSuccess: () => {
@@ -119,9 +118,9 @@ export default function AdminTestimonials() {
       reset()
       toast.success('Testimonial created successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Create testimonial mutation error:', error)
-      toast.error(error.message || 'Failed to create testimonial')
+      toast.error(error instanceof Error ? error.message : 'Failed to create testimonial')
     },
   })
 
@@ -131,9 +130,9 @@ export default function AdminTestimonials() {
       try {
         const response = await testimonialsAPI.update(id, data)
         return response.data.testimonial
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Update testimonial error:', error)
-        throw new Error(error.message || 'Failed to update testimonial')
+        throw new Error(error instanceof Error ? error.message : 'Failed to update testimonial')
       }
     },
     onSuccess: () => {
@@ -143,9 +142,9 @@ export default function AdminTestimonials() {
       reset()
       toast.success('Testimonial updated successfully!')
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update testimonial mutation error:', error)
-      toast.error(error.message || 'Failed to update testimonial')
+      toast.error(error instanceof Error ? error.message : 'Failed to update testimonial')
     },
   })
 
@@ -161,8 +160,8 @@ export default function AdminTestimonials() {
       setSelectedTestimonial(null)
       toast.success('Testimonial deleted successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete testimonial')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete testimonial')
     },
   })
 
@@ -195,27 +194,6 @@ export default function AdminTestimonials() {
   const openDeleteModal = (testimonial: Testimonial) => {
     setSelectedTestimonial(testimonial)
     setIsDeleteModalOpen(true)
-  }
-
-  // Reset form and close modals
-  const resetForm = () => {
-    reset()
-    setSelectedTestimonial(null)
-  }
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false)
-    resetForm()
-  }
-
-  const closeEditModal = () => {
-    setIsEditModalOpen(false)
-    resetForm()
-  }
-
-  const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false)
-    setSelectedTestimonial(null)
   }
 
   const renderStars = (rating?: number) => {
@@ -320,7 +298,7 @@ export default function AdminTestimonials() {
                             </div>
                             <div className="text-sm text-slate-400 line-clamp-2 mt-1">
                               <Quote className="inline h-3 w-3 mr-1" />
-                              "{testimonial.content.substring(0, 60)}..."
+                              &quot;{testimonial.content.substring(0, 60)}...&quot;
                             </div>
                           </div>
                         </TableCell>
@@ -589,7 +567,7 @@ export default function AdminTestimonials() {
           <DialogHeader>
             <DialogTitle className="text-white">Supprimer le Témoignage</DialogTitle>
             <DialogDescription className="text-slate-300">
-              Êtes-vous sûr de vouloir supprimer le témoignage de "{selectedTestimonial?.name}" ? Cette action ne peut pas être annulée.
+              Êtes-vous sûr de vouloir supprimer le témoignage de &quot;{selectedTestimonial?.name}&quot; ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
