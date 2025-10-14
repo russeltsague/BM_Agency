@@ -63,24 +63,26 @@ export const app = express();
 const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000'];
 
 const corsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      // TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
-      console.log('CORS request from origin:', origin);
-      console.log('TEMPORARILY ALLOWING ALL ORIGINS FOR DEBUGGING');
-      
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) {
-        console.log('Allowing request with no origin');
-        return callback(null, true);
-      }
-
-      // TEMPORARILY ALLOW ALL ORIGINS FOR DEBUGGING
-      console.log('TEMPORARILY allowing origin:', origin);
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      console.log('Allowing request with no origin');
       return callback(null, true);
-    },
-    credentials: true,
-    optionsSuccessStatus: 200
-  };
+    }
+
+    // Check if the origin is in the allowed origins list
+    if (allowedOrigins.includes(origin)) {
+      console.log('Allowing origin:', origin);
+      return callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      console.log('Allowed origins:', allowedOrigins);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression()); // Compress responses
