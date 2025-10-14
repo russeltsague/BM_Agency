@@ -130,8 +130,8 @@ export default function AdminTeam() {
       reset()
       toast.success('Team member created successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to create team member')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to create team member')
     },
   })
 
@@ -155,8 +155,8 @@ export default function AdminTeam() {
       reset()
       toast.success('Team member updated successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to update team member')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to update team member')
     },
   })
 
@@ -172,8 +172,8 @@ export default function AdminTeam() {
       setSelectedTeamMember(null)
       toast.success('Team member deleted successfully!')
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to delete team member')
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete team member')
     },
   })
 
