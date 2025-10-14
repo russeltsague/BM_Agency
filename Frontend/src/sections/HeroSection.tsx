@@ -1,7 +1,7 @@
 'use client'
 
-import { MotionDiv, MotionH1, MotionP, MotionSection } from '@/components/MotionComponents'
-import { Play, ArrowRight, CheckCircle, MessageCircle } from 'lucide-react'
+import { MotionDiv, MotionH1, MotionP } from '@/components/MotionComponents'
+import { ArrowRight, CheckCircle, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 
 export const HeroSection = () => {
@@ -54,7 +54,7 @@ export const HeroSection = () => {
             >
               Depuis 2018, nous accompagnons les entreprises camerounaises dans leur transformation digitale
               avec passion, expertise et innovation. Notre mission : faire briller votre marque
-              dans l'univers numérique africain.
+              dans l&apos;univers numérique africain.
             </MotionP>
           </MotionDiv>
 
