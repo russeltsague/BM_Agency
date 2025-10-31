@@ -13,8 +13,6 @@ const nextConfig = {
   // Disable static optimization for all pages
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
-    // Disable static optimization
-    isrMemoryCacheSize: 0,
     // Disable static pages
     staticPageGeneration: {
       maxConcurrentGenerations: 1,
