@@ -4,8 +4,8 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.tsx');
 
 const nextConfig = {
   reactStrictMode: true,
-  // Increase static page generation timeout (in seconds)
-  staticPageGenerationTimeout: 300,
+  // Disable static page generation timeout for Vercel
+  staticPageGenerationTimeout: 0,
   
   // Handle file uploads
   webpack: (config, { isServer }) => {
@@ -48,11 +48,13 @@ const nextConfig = {
   // Configure server components
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+    // Enable incremental static regeneration
+    isrMemoryCacheSize: 0,
   },
   
   // Disable TypeScript type checking during build for faster builds
   typescript: {
-    ignoreBuildErrors: true, // Temporarily ignore TypeScript errors during build
+    ignoreBuildErrors: true,
   },
   
   // Disable ESLint during build
@@ -80,6 +82,11 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          // Add cache control for dynamic routes
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },

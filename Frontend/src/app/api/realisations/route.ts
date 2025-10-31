@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { realisationsAPI } from '@/lib/api';
 
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
+
 export async function GET() {
   try {
     const response = await realisationsAPI.getAll();
