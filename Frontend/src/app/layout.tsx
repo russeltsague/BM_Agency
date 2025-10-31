@@ -1,32 +1,22 @@
-import type { Metadata } from 'next'
-import { ThemeProvider } from '@/components/ThemeProvider'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { Toaster } from 'sonner'
-import './globals.css'
+import type { Metadata } from 'next';
+import './globals.css';
+import { Providers } from './providers';
 
-export const metadata: Metadata = {
-  title: 'BM Agency - Agence de Communication Digitale 360°',
-  description: 'BM Agency est votre partenaire de confiance pour la communication digitale, le marketing, les objets publicitaires et la création de contenu au Cameroun.',
-}
+// Import metadata from a separate file
+export { metadata } from './metadata';
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className="font-sans antialiased">
-        <ThemeProvider
-          defaultTheme="light"
-          storageKey="bm-agency-theme"
-        >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
-        </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-white dark:bg-slate-900">
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
-  )
+  );
 }

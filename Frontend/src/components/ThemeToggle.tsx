@@ -12,17 +12,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, setTheme } = useTheme()
 
   const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark')
-    } else if (theme === 'dark') {
-      setTheme('light')
-    } else {
-      // If system, toggle to the opposite of current system preference
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'light'
-        : 'dark'
-      setTheme(systemTheme)
-    }
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   return (

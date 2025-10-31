@@ -4,32 +4,35 @@ import React from 'react'
 import { MotionDiv } from '@/components/MotionComponents'
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react'
 import { Button } from '@/components/Button'
+import { useTranslations } from 'next-intl'
 
 export const ContactSection = () => {
+  const t = useTranslations('ContactSection')
+  
   const contactInfo = [
     {
       icon: Phone,
-      title: 'Téléphone',
-      details: ['+237 675176974'],
-      description: 'Nos conseillers sont disponibles du lundi au vendredi'
+      title: t('contactInfo.phone.title'),
+      details: [t('contactInfo.phone.detail')],
+      description: t('contactInfo.phone.description')
     },
     {
       icon: Mail,
-      title: 'Email',
-      details: ['contact@bm-agency.net'],
-      description: 'Réponse sous 24h garantie'
+      title: t('contactInfo.email.title'),
+      details: [t('contactInfo.email.detail')],
+      description: t('contactInfo.email.description')
     },
     {
       icon: MapPin,
-      title: 'Adresse',
-      details: ['11595 Yaoundé-Kondengui'],
-      description: 'Métro ligne 1 - Station Concorde'
+      title: t('contactInfo.address.title'),
+      details: [t('contactInfo.address.detail')],
+      description: t('contactInfo.address.description')
     },
     {
       icon: Clock,
-      title: 'Horaires',
-      details: ['Lundi - Vendredi: 9h - 18h', 'Samedi: 9h - 12h'],
-      description: 'Accueil téléphonique et physique'
+      title: t('contactInfo.hours.title'),
+      details: [t('contactInfo.hours.detail')],
+      description: t('contactInfo.hours.description')
     }
   ]
 
@@ -44,11 +47,10 @@ export const ContactSection = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-            Contactez-nous
+            {t('title')}
           </h2>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Prêt à démarrer votre projet digital ? Contactez notre équipe d&apos;experts
-            pour une consultation gratuite et personnalisée.
+            {t('subtitle')}
           </p>
         </MotionDiv>
 
@@ -63,14 +65,14 @@ export const ContactSection = () => {
           >
             <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-8 border border-gray-100 dark:border-slate-700">
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-6">
-                Envoyez-nous un message
+                {t('contactInfo.title')}
               </h3>
 
               <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                      Prénom *
+                      {t('form.firstName.label')} *
                     </label>
                     <input
                       type="text"
@@ -78,13 +80,13 @@ export const ContactSection = () => {
                       name="firstName"
                       required
                       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                      placeholder="Votre prénom"
+                      placeholder={t('form.firstName.placeholder')}
                     />
                   </div>
 
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                      Nom *
+                      {t('form.lastName.label')} *
                     </label>
                     <input
                       type="text"
@@ -92,14 +94,14 @@ export const ContactSection = () => {
                       name="lastName"
                       required
                       className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                      placeholder="Votre nom"
+                      placeholder={t('form.lastName.placeholder')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Email *
+                    {t('form.email.label')} *
                   </label>
                   <input
                     type="email"
@@ -107,59 +109,59 @@ export const ContactSection = () => {
                     name="email"
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                    placeholder="votre.email@exemple.fr"
+                    placeholder={t('form.email.placeholder')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Téléphone
+                    {t('form.phone.label')}
                   </label>
                   <input
                     type="tel"
                     id="phone"
                     name="phone"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                    placeholder="01 23 45 67 89"
+                    placeholder={t('form.phone.placeholder')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Entreprise
+                    {t('form.company.label')}
                   </label>
                   <input
                     type="text"
                     id="company"
                     name="company"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                    placeholder="Nom de votre entreprise"
+                    placeholder={t('form.company.placeholder')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="service" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Service souhaité
+                    {t('form.service.label')}
                   </label>
                   <select
                     id="service"
                     name="service"
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                   >
-                    <option value="">Choisissez un service</option>
-                    <option value="digital">Communication digitale</option>
-                    <option value="marketing">Marketing digital</option>
-                    <option value="design">Design & Branding</option>
-                    <option value="strategy">Stratégie digitale</option>
-                    <option value="objects">Objets publicitaires</option>
-                    <option value="training">Formation & Coaching</option>
-                    <option value="other">Autre</option>
+                    <option value="">{t('form.service.options.choose')}</option>
+                    <option value="digital">{t('form.service.options.digital')}</option>
+                    <option value="marketing">{t('form.service.options.marketing')}</option>
+                    <option value="design">{t('form.service.options.design')}</option>
+                    <option value="strategy">{t('form.service.options.strategy')}</option>
+                    <option value="objects">{t('form.service.options.objects')}</option>
+                    <option value="training">{t('form.service.options.training')}</option>
+                    <option value="other">{t('form.service.options.other')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                    Message *
+                    {t('form.message.label')} *
                   </label>
                   <textarea
                     id="message"
@@ -167,7 +169,7 @@ export const ContactSection = () => {
                     rows={5}
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                    placeholder="Décrivez votre projet ou votre demande..."
+                    placeholder={t('form.message.placeholder')}
                   />
                 </div>
 
@@ -179,17 +181,29 @@ export const ContactSection = () => {
                     className="mt-1 mr-3"
                   />
                   <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-slate-400">
-                    J&apos;accepte que mes données soient traitées conformément à la{' '}
-                    <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
-                      politique de confidentialité
-                    </a>
-                    *
+                    {(() => {
+                      const privacyText = t('form.privacy', {
+                        privacy: t('form.privacyLink')
+                      });
+                      const parts = privacyText.split('{privacy}');
+                      
+                      return parts.map((part, i) => (
+                        <React.Fragment key={i}>
+                          {part}
+                          {i < parts.length - 1 && (
+                            <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
+                              {t('form.privacyLink')}
+                            </a>
+                          )}
+                        </React.Fragment>
+                      ));
+                    })()}
                   </label>
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">
                   <Send className="mr-2 w-5 h-5" />
-                  Envoyer le message
+                  {t('form.submit')}
                 </Button>
               </form>
             </div>
@@ -217,6 +231,7 @@ export const ContactSection = () => {
                     <info.icon className="w-6 h-6 text-primary-600 dark:text-blue-400" />
                   </div>
                   <div>
+                    <span className="sr-only">{t('social.facebook')}</span>
                     <h4 className="font-semibold text-gray-900 dark:text-slate-100">{info.title}</h4>
                   </div>
                 </div>
@@ -244,8 +259,8 @@ export const ContactSection = () => {
               className="bg-primary-600 dark:bg-blue-600 text-white rounded-xl p-6 text-center"
             >
               <h4 className="font-semibold mb-2">Besoin d&apos;un devis rapide ?</h4>
-              <p className="text-primary-100 dark:text-blue-100 mb-4">
-                Obtenez une estimation gratuite en moins de 24h
+              <p className="text-gray-600 dark:text-slate-400 mb-8">
+                {t('contactInfo.description')}
               </p>
               <Button variant="secondary" size="sm" className="w-full">
                 Devis express

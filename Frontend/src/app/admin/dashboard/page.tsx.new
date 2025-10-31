@@ -1,0 +1,404 @@
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Briefcase,
+  Settings,
+  TrendingUp,
+  Activity,
+  Clock,
+  Plus,
+  Eye,
+  Star,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  Edit3,
+  AlertCircle,
+  ArrowRight,
+  RefreshCw
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useTheme } from '@/components/ThemeProvider';
+import { servicesAPI, articlesAPI, realisationsAPI, teamAPI, testimonialsAPI, productsAPI, usersAPI } from '@/lib/api';
+
+interface DashboardStats {
+  services: number;
+  portfolio: number;
+  articles: number;
+  team: number;
+  testimonials: number;
+  products: number;
+  users: number;
+  recentActivity: any[];
+  pendingPosts: any[];
+}
+
+interface PendingPost {
+  _id: string;
+  title: string;
+  excerpt?: string;
+  author: string | { name: string; email: string };
+  category?: string;
+  tags?: string[];
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+export default function AdminDashboard() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { theme } = useTheme();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Approval mutations
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return articlesAPI.approve(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+      toast.success('Article approuvé avec succès!');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erreur lors de l\'approbation');
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
+      return articlesAPI.reject(id, reason);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+      toast.success('Article rejeté');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erreur lors du rejet');
+    },
+  });
+
+  const handleApprove = (id: string) => {
+    approveMutation.mutate(id);
+  };
+
+  const handleReject = (id: string, reason?: string) => {
+    rejectMutation.mutate({ id, reason });
+  };
+
+  // Manual refresh function
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+    queryClient.invalidateQueries({ 
+      queryKey: ['services', 'portfolio', 'articles', 'team', 'testimonials', 'products', 'users'] 
+    });
+    toast.success('Actualisation des données...');
+  };
+
+  // Fetch dashboard stats
+  const { data: servicesData } = useQuery({
+    queryKey: ['services'],
+    queryFn: servicesAPI.getAll,
+    enabled: !!user
+  });
+
+  const { data: portfolioData } = useQuery({
+    queryKey: ['portfolio'],
+    queryFn: realisationsAPI.getAll,
+    enabled: !!user
+  });
+
+  const { data: articlesData } = useQuery({
+    queryKey: ['articles'],
+    queryFn: () => articlesAPI.getAll(),
+    enabled: !!user
+  });
+
+  const { data: teamData } = useQuery({
+    queryKey: ['team'],
+    queryFn: teamAPI.getAll,
+    enabled: !!user
+  });
+
+  const { data: testimonialsData } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: testimonialsAPI.getAll,
+    enabled: !!user
+  });
+
+  const { data: productsData } = useQuery({
+    queryKey: ['products'],
+    queryFn: productsAPI.getAll,
+    enabled: !!user
+  });
+
+  const { data: usersData } = useQuery({
+    queryKey: ['users'],
+    queryFn: usersAPI.getAll,
+    enabled: !!user
+  });
+
+  // Compute stats based on API data
+  const stats: DashboardStats = React.useMemo(() => {
+    return {
+      services: Array.isArray(servicesData?.data) ? servicesData.data.length : 0,
+      portfolio: Array.isArray(portfolioData?.data) ? portfolioData.data.length : 0,
+      articles: Array.isArray(articlesData?.data) ? articlesData.data.length : 0,
+      team: Array.isArray(teamData?.data) ? teamData.data.length : 0,
+      testimonials: Array.isArray(testimonialsData?.data) ? testimonialsData.data.length : 0,
+      products: Array.isArray(productsData?.data) ? productsData.data.length : 0,
+      users: Array.isArray(usersData?.data?.users) ? usersData.data.users.length : 0,
+      pendingPosts: Array.isArray(articlesData?.data) 
+        ? articlesData.data.filter((article: any) => !article.published && article.status === 'pending') 
+        : [],
+      recentActivity: [
+        ...(Array.isArray(articlesData?.data) 
+          ? articlesData.data.slice(0, 3).map((article: any) => ({
+              type: 'article',
+              title: article.title,
+              date: new Date(article.createdAt).toLocaleDateString(),
+              icon: FileText
+            })) 
+          : []
+        ),
+        ...(Array.isArray(portfolioData?.data) 
+          ? portfolioData.data.slice(0, 2).map((project: any) => ({
+              type: 'portfolio',
+              title: project.title,
+              date: new Date(project.createdAt).toLocaleDateString(),
+              icon: Briefcase
+            })) 
+          : []
+        )
+      ]
+    };
+  }, [servicesData, portfolioData, articlesData, teamData, testimonialsData, productsData, usersData]);
+
+  // User authentication check
+  if (!user) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <div className={`p-8 rounded-xl shadow-lg transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <p>Chargement du tableau de bord...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has valid roles
+  const hasValidRole = user.roles && Array.isArray(user.roles) && user.roles.some(role =>
+    ['admin', 'owner', 'editor', 'moderator', 'manager'].includes(role.toLowerCase())
+  );
+
+  if (!hasValidRole) {
+    console.log('Dashboard - No valid roles found in loading check, redirecting to login');
+    return (
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <div className={`p-8 rounded-xl shadow-lg transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+          <div className="flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <p>Redirection vers la page de connexion...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Main dashboard UI
+  return (
+    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Tableau de bord</h1>
+          <Button onClick={handleRefresh} variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Actualiser
+          </Button>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Services</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.services}</div>
+              <p className="text-xs text-muted-foreground">Services actifs</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Portfolio</CardTitle>
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.portfolio}</div>
+              <p className="text-xs text-muted-foreground">Projets</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Articles</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.articles}</div>
+              <p className="text-xs text-muted-foreground">Articles publiés</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Utilisateurs</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.users}</div>
+              <p className="text-xs text-muted-foreground">Utilisateurs enregistrés</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Pending Posts */}
+        {stats.pendingPosts.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Articles en attente d'approbation</CardTitle>
+              <CardDescription>
+                {stats.pendingPosts.length} articles nécessitent votre attention
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {stats.pendingPosts.map((post: any) => (
+                  <div key={post._id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">{post.title}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Par {typeof post.author === 'object' ? post.author.name : post.author}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleReject(post._id, 'Contenu inapproprié')}
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Rejeter
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleApprove(post._id)}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Approuver
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Recent Activity */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <Card className="col-span-4">
+            <CardHeader>
+              <CardTitle>Activité récente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {stats.recentActivity.length > 0 ? (
+                  stats.recentActivity.map((activity, index) => {
+                    const Icon = activity.icon;
+                    return (
+                      <div key={index} className="flex items-center">
+                        <div className="mr-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium leading-none">{activity.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {activity.type === 'article' ? 'Article' : 'Projet'} • {activity.date}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-muted-foreground">Aucune activité récente</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats */}
+          <Card className="col-span-3">
+            <CardHeader>
+              <CardTitle>Statistiques rapides</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>Équipe</span>
+                  </div>
+                  <span className="font-medium">{stats.team} membres</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Star className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>Témoignages</span>
+                  </div>
+                  <span className="font-medium">{stats.testimonials} avis</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Package className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span>Produits</span>
+                  </div>
+                  <span className="font-medium">{stats.products} produits</span>
+                </div>
+              </div>
+              
+              <div className="mt-8">
+                <Button variant="outline" className="w-full">
+                  Voir toutes les statistiques
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

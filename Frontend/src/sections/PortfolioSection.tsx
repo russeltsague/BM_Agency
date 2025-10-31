@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { MotionDiv, MotionH2, MotionP } from '@/components/MotionComponents'
 import { ExternalLink, Eye } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/Button'
 import { realisationsAPI, type Realisation } from '@/lib/api'
+import { useTranslations } from 'next-intl'
 
 // Category emoji mapping
 const categoryEmojis: Record<string, string> = {
@@ -19,6 +21,8 @@ const categoryEmojis: Record<string, string> = {
 }
 
 export const PortfolioSection = () => {
+  const router = useRouter()
+  const t = useTranslations('PortfolioSection')
   const [realisations, setRealisations] = useState<Realisation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -70,26 +74,26 @@ export const PortfolioSection = () => {
           className="text-center mb-16"
         >
           <MotionH2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-            Nos Réalisations
+            {t('title')}
           </MotionH2>
           <MotionP className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Découvrez quelques-uns de nos projets les plus marquants et les résultats
-            obtenus pour nos clients.
+            {t('subtitle')}
           </MotionP>
         </MotionDiv>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <p className="text-gray-600 dark:text-slate-400">{t('loading')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load portfolio</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <p className="text-red-600 dark:text-red-400 mb-4">{t('error')}</p>
+            <Button onClick={() => window.location.reload()}>{t('retry')}</Button>
           </div>
         ) : !Array.isArray(realisations) || realisations.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-slate-400">No portfolio items available at the moment.</p>
+            <p className="text-gray-600 dark:text-slate-400">{t('noItems')}</p>
           </div>
         ) : (
           <MotionDiv
@@ -129,12 +133,12 @@ export const PortfolioSection = () => {
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Button size="sm" variant="secondary" className="mr-2">
                         <Eye className="w-4 h-4 mr-1" />
-                        Voir
+                        {t('view')}
                       </Button>
                       {realisation.link && (
                         <Button size="sm">
                           <ExternalLink className="w-4 h-4 mr-1" />
-                          Live
+                          {t('live')}
                         </Button>
                       )}
                     </div>
@@ -175,7 +179,7 @@ export const PortfolioSection = () => {
 
                   {/* CTA */}
                   <Button variant="outline" size="sm" className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                    Voir le projet
+                    {t('viewProject')}
                     <ExternalLink className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
@@ -192,10 +196,10 @@ export const PortfolioSection = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600 dark:text-slate-400 mb-6">
-            Vous souhaitez voir plus de projets ou discuter d&apos;une collaboration ?
+            {t('ctaText')}
           </p>
-          <Button size="lg">
-            Voir tous nos projets
+          <Button size="lg" onClick={() => router.push('/portfolio')}>
+            {t('ctaButton')}
           </Button>
         </MotionDiv>
       </div>

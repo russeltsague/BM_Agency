@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { servicesAPI, type Service } from '@/lib/api'
+import { useTranslations } from 'next-intl'
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -25,6 +26,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 export const ServicesSection = () => {
+  const t = useTranslations('ServicesSection')
   const [services, setServices] = useState<Service[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -78,26 +80,26 @@ export const ServicesSection = () => {
           className="text-center mb-16"
         >
           <MotionH2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-            Nos Services
+            {t('title')}
           </MotionH2>
           <MotionP className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Une gamme complète de services digitaux pour accompagner votre croissance
-            et maximiser votre impact sur le marché.
+            {t('subtitle')}
           </MotionP>
         </MotionDiv>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <p className="text-gray-600 dark:text-slate-400">{t('loading')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load services</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <p className="text-red-600 dark:text-red-400 mb-4">{t('error')}</p>
+            <Button onClick={() => window.location.reload()}>{t('retry')}</Button>
           </div>
         ) : services.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-slate-400">No services available at the moment.</p>
+            <p className="text-gray-600 dark:text-slate-400">{t('noServices')}</p>
           </div>
         ) : (
           <MotionDiv
@@ -140,7 +142,7 @@ export const ServicesSection = () => {
                     variant="outline"
                     className="w-full group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500"
                   >
-                    En savoir plus
+                    {t('learnMore')}
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </MotionDiv>
@@ -157,10 +159,10 @@ export const ServicesSection = () => {
           className="text-center mt-12"
         >
           <p className="text-gray-600 dark:text-slate-400 mb-6">
-            Besoin d&apos;une solution personnalisée ? Nos experts sont là pour vous accompagner.
+            {t('ctaText')}
           </p>
           <Button size="lg">
-            Demander un devis personnalisé
+            {t('ctaButton')}
           </Button>
         </MotionDiv>
       </div>

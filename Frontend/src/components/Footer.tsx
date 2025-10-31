@@ -1,29 +1,43 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { MotionDiv, MotionH4, MotionLi, MotionA } from '@/components/MotionComponents'
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react'
-import { Button } from './Button'
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
+import { MotionDiv, MotionH4, MotionLi, MotionA } from '@/components/MotionComponents';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Button } from './Button';
 
 export const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations('Footer');
+
+  // Helper function to ensure URLs have the current locale
+  const withLocale = (path: string) => {
+    // Don't add locale if it's already there or if it's an external URL
+    if (path.startsWith('http') || path.startsWith(`/${locale}`)) return path;
+    return `/${locale}${path}`;
+  };
 
   const footerLinks = {
     services: [
-      { href: '/services', label: 'Communication digitale' },
-      { href: '/services', label: 'Marketing digital' },
-      { href: '/services', label: 'Objets publicitaires' },
-      { href: '/services', label: 'Création de contenu' },
+      { href: withLocale('/services'), label: t('services.digital') },
+      { href: withLocale('/services'), label: t('services.marketing') },
+      { href: withLocale('/services'), label: t('services.advertising') },
+      { href: withLocale('/services'), label: t('services.content') },
     ],
     company: [
-      { href: '/agence', label: 'À propos' },
-      { href: '/equipe', label: 'Notre équipe' },
-      { href: '/contact', label: 'Contact' },
-      { href: '/recrutement', label: 'Recrutement' },
+      { href: withLocale('/agence'), label: t('company.about') },
+      { href: withLocale('/equipe'), label: t('company.team') },
+      { href: withLocale('/contact'), label: t('company.contact') },
+      { href: withLocale('/recrutement'), label: t('company.recruitment') },
     ],
     legal: [
-      { href: '/mentions-legales', label: 'Mentions légales' },
-      { href: '/politique-confidentialite', label: 'Politique de confidentialité' },
-      { href: '/conditions-generales', label: 'Conditions générales' },
+      { href: withLocale('/mentions-legales'), label: t('legal.terms') },
+      { href: withLocale('/politique-confidentialite'), label: t('legal.privacy') },
+      { href: withLocale('/conditions-generales'), label: t('legal.conditions') },
     ],
   }
 
@@ -56,22 +70,21 @@ export const Footer = () => {
                 />
               </div>
               <p className="text-gray-600 dark:text-slate-400 mb-6">
-                Votre partenaire de confiance pour la communication digitale 360° au Cameroun.
-                Créativité, stratégie et résultats au service de votre succès numérique.
+                {t('description')}
               </p>
               <div className="space-y-2">
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <MapPin className="w-4 h-4 mr-2" />
-                  11595 Yaoundé-Kondengui<br />
-                  Yaoundé, Cameroun
+                  {t('address.line1')}<br />
+                  {t('address.line2')}
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <Phone className="w-4 h-4 mr-2" />
-                  +237 675176974
+                  {t('phone')}
                 </div>
                 <div className="flex items-center text-gray-600 dark:text-slate-400">
                   <Mail className="w-4 h-4 mr-2" />
-                  contact@bm-agency.net
+                  {t('email')}
                 </div>
               </div>
             </MotionDiv>
@@ -86,7 +99,7 @@ export const Footer = () => {
               viewport={{ once: true }}
               className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100"
             >
-              Nos services
+              {t('sections.services')}
             </MotionH4>
             <ul className="space-y-2">
               {footerLinks.services.map((link, index) => (
@@ -117,7 +130,7 @@ export const Footer = () => {
               viewport={{ once: true }}
               className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100"
             >
-              Entreprise
+              {t('sections.company')}
             </MotionH4>
             <ul className="space-y-2">
               {footerLinks.company.map((link, index) => (
@@ -148,19 +161,19 @@ export const Footer = () => {
               viewport={{ once: true }}
               className="text-lg font-semibold mb-4 text-gray-900 dark:text-slate-100"
             >
-              Newsletter
+              {t('newsletter.title')}
             </MotionH4>
             <p className="text-gray-600 dark:text-slate-400 mb-4">
-              Restez informé de nos dernières actualités et tendances du digital.
+              {t('newsletter.description')}
             </p>
             <div className="flex flex-col space-y-2">
               <input
                 type="email"
-                placeholder="Votre email"
+                placeholder={t('newsletter.placeholder')}
                 className="px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               />
               <Button size="sm" className="w-full">
-                S&apos;abonner
+                {t('newsletter.button')}
               </Button>
             </div>
           </div>
@@ -176,7 +189,7 @@ export const Footer = () => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 dark:text-slate-400 text-sm">
-              © {currentYear}  BM Agency. Tous droits réservés.
+              © {currentYear} {t('copyright')}
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               {socialLinks.map((social, index) => (

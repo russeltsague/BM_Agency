@@ -9,16 +9,16 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, token, isLoading } = useAuth()
+  const { user, isLoading, isHydrated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isLoading && (!token || !user)) {
+    if (isHydrated && !isLoading && !user) {
       router.push('/admin/login')
     }
-  }, [user, token, isLoading, router])
+  }, [user, isLoading, isHydrated, router])
 
-  if (isLoading) {
+  if (isLoading || !isHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -26,7 +26,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  if (!token || !user) {
+  if (!user) {
     return null
   }
 

@@ -1,0 +1,441 @@
+{
+  "AgencyPage": {
+    "title": "À Propos de BM Agency",
+    "description": "Depuis 2021, nous accompagnons les entreprises dans leur transformation digitale avec passion, expertise et innovation. Notre mission : faire briller votre marque dans l'univers numérique.",
+    "hero": {
+      "titleHighlight": "BM Agency",
+      "description": "Depuis 2021, nous accompagnons les entreprises dans leur transformation digitale avec passion, expertise et innovation. Notre mission : faire briller votre marque dans l'univers numérique."
+    },
+    "story": {
+      "title": "Notre Histoire",
+      "paragraph1": "BM Agency est née de la passion de deux entrepreneurs visionnaires qui ont Depuis notre création en 2021, nous avons grandi en gardant toujours la même ambition : accompagner nos clients vers le succès digital avec des solutions innovantes et personnalisées.",
+      "paragraph2": "Aujourd'hui, avec une équipe de plus de 50 experts et 20 projets réussis, nous sommes devenus un partenaire de confiance pour les entreprises de toutes tailles."
+    },
+    "stats": {
+      "projects": "20",
+      "projectsLabel": "Projets réalisés",
+      "satisfaction": "98%",
+      "satisfactionLabel": "Clients satisfaits",
+      "experts": "50+",
+      "expertsLabel": "Experts digitaux",
+      "supportLabel": "Support client",
+      "years": "3",
+      "yearsLabel": "Années d'expérience"
+    },
+    "values": {
+      "title": "Nos Valeurs",
+      "subtitle": "Depuis plus de 3 ans, BM Agency accompagne les entreprises dans leur transformation digitale avec passion et expertise.",
+      "vision": {
+        "title": "Notre Vision",
+        "description": "Nous croyons que le digital est un levier de croissance essentiel pour toutes les entreprises. Notre mission est d'accompagner nos clients dans cette transformation avec des solutions innovantes et personnalisées."
+      }
+    },
+    "team": {
+      "title": "Notre Équipe",
+      "subtitle": "Rencontrez les experts passionnés qui font le succès de BM Agency."
+    },
+    "timeline": {
+      "title": "Notre Histoire",
+      "subtitle": "Découvrez les étapes clés de notre parcours et de notre croissance."
+    },
+    "milestones": {
+      "2018": "Création de BM Agency",
+      "2019": "Ouverture du bureau de Douala",
+      "2020": "Lancement de la division e-commerce",
+      "2021": "Plus de 100 clients satisfaits",
+      "2022": "Expansion équipe +50%",
+      "2023": "Lancement du projet 'Une entreprise, un site web'",
+      "2024": "Objectif 1000 projets réalisés"
+    },
+    "cta": {
+      "title": "Rejoignez l'aventure BM Agency",
+      "subtitle": "Vous souhaitez rejoindre notre équipe d'experts passionnés ? Découvrez nos offres d'emploi et postulez dès maintenant !",
+      "jobOffers": "Voir les offres d'emploi",
+      "spontaneous": "Envoyer une candidature spontanée"
+    }
+  },
+  "Navigation": {
+    "home": "Accueil",
+    "agency": "Agence",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contact",
+    "getQuote": "Demander un devis"
+  },
+  "Index": {
+    "heroTitle": "Solutions Numériques pour Votre Entreprise",
+    "heroSubtitle": "Nous aidons les entreprises à se développer avec des solutions numériques innovantes",
+    "ctaButton": "Commencer"
+  },
+  "PortfolioSection": {
+    "title": "Nos Réalisations",
+    "subtitle": "Découvrez quelques-uns de nos projets les plus marquants et les résultats obtenus pour nos clients.",
+    "loading": "Chargement du portfolio...",
+    "error": "Échec du chargement du portfolio. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "noItems": "Aucun projet disponible pour le moment.",
+    "view": "Voir",
+    "live": "Live",
+    "viewProject": "Voir le projet",
+    "ctaText": "Vous souhaitez voir plus de projets ou discuter d'une collaboration ?",
+    "ctaButton": "Voir tous nos projets"
+  },
+  "HeroSection": {
+    "whatsapp": "Discuter sur WhatsApp",
+    "title1": "Communication",
+    "title2": "Digitale 360°",
+    "description": "Depuis 2021, nous accompagnons les entreprises camerounaises dans leur transformation digitale avec passion, expertise et innovation. Notre mission : faire briller votre marque dans l'univers numérique africain.",
+    "cta": "Demander un devis",
+    "features": {
+      "expertise": {
+        "title": "Expertise locale",
+        "description": "Une équipe locale qui comprend votre marché"
+      },
+      "solutions": {
+        "title": "Solutions sur mesure",
+        "description": "Des stratégies adaptées à vos besoins spécifiques"
+      },
+      "results": {
+        "title": "Résultats mesurables",
+        "description": "Des performances optimisées pour votre entreprise"
+      },
+      "quality": {
+        "title": "Qualité garantie",
+        "description": "Des solutions robustes et évolutives"
+      },
+      "support": {
+        "title": "Support réactif",
+        "description": "Une équipe à votre écoute 24/7"
+      }
+    },
+    "trustedBy": "Reconnu par les entreprises de confiance",
+    "stats": {
+      "projects": "200+",
+      "projectsLabel": "Projets réalisés",
+      "satisfaction": "98%",
+      "satisfactionLabel": "Taux de satisfaction",
+      "experts": "50+",
+      "expertsLabel": "Experts digitaux",
+      "supportLabel": "Support client 24/7",
+      "experience": "3+"
+    }
+  },
+  "ContactPage": {
+    "hero": {
+      "title": "Contactez {highlight} BM Agency",
+      "subtitle": "Prêt à donner un coup d'accélérateur à votre présence digitale ? Nos experts vous accompagnent pour transformer vos idées en succès."
+    },
+    "contactInfo": {
+      "phone": {
+        "title": "Téléphone",
+        "detail": "+237 675 176 974",
+        "description": "Nos conseillers sont disponibles du lundi au vendredi de 8h à 17h"
+      },
+      "email": {
+        "title": "Email",
+        "detail": "contact@bm-agency.net",
+        "description": "Réponse garantie sous 24h pour les demandes de devis"
+      },
+      "address": {
+        "title": "Adresse",
+        "detail": "11595 Yaoundé-Kondengui",
+        "description": "Situé au cœur de Yaoundé pour mieux vous servir"
+      },
+      "hours": {
+        "title": "Horaires",
+        "detail": "Lundi à vendredi 08h-17h",
+        "description": "Accueil téléphonique et physique pendant les heures d'ouverture"
+      }
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "company": "Entreprise",
+      "service": "Service souhaité",
+      "message": "Message",
+      "placeholders": {
+        "firstName": "Votre prénom",
+        "lastName": "Votre nom",
+        "email": "votre.email@exemple.com",
+        "phone": "01 23 45 67 89",
+        "company": "Nom de votre entreprise",
+        "service": "Choisissez un service",
+        "message": "Décrivez votre projet ou votre demande..."
+      },
+      "services": {
+        "digital": "Communication digitale",
+        "marketing": "Marketing digital",
+        "design": "Design & Branding",
+        "strategy": "Stratégie digitale",
+        "objects": "Objets publicitaires",
+        "training": "Formation & Coaching",
+        "other": "Autre"
+      },
+      "privacy": "J'accepte que mes données soient traitées conformément à la {privacyLink}politique de confidentialité{/privacyLink}*",
+      "submitting": "Envoi en cours...",
+      "submit": "Envoyer le message"
+    },
+    "map": {
+      "title": "Carte interactive",
+      "address": "11595 Yaoundé-Kondengui, Cameroun"
+    },
+    "quickQuote": {
+      "title": "Besoin d'un devis rapide ?",
+      "description": "Obtenez une estimation gratuite en moins de 24h",
+      "button": "Devis express"
+    },
+    "testimonials": {
+      "title": "Ils nous font confiance",
+      "one": {
+        "name": "Jean-Paul Nguema",
+        "company": "Cameroun Télécom",
+        "content": "BM Agency a complètement transformé notre présence digitale. Leur expertise et leur professionnalisme sont exceptionnels."
+      },
+      "two": {
+        "name": "Fatima Mbarga",
+        "company": "Fashion Africa Group",
+        "content": "L'équipe de BM Agency comprend parfaitement les spécificités du marché camerounais. Résultats au-delà de nos attentes."
+      }
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "subtitle": "Trouvez rapidement les réponses à vos questions les plus courantes.",
+      "resultsTime": {
+        "question": "Combien de temps faut-il pour voir les résultats ?",
+        "answer": "Selon les services, les premiers résultats sont visibles entre 1 et 6 mois. Nous établissons un calendrier précis lors de notre première consultation."
+      },
+      "customSolutions": {
+        "question": "Proposez-vous des formules sur mesure ?",
+        "answer": "Absolument ! Chaque entreprise est unique, c'est pourquoi nous créons des solutions personnalisées adaptées à vos besoins et votre budget."
+      },
+      "pricing": {
+        "question": "Quels sont vos tarifs ?",
+        "answer": "Nos tarifs varient selon la complexité du projet. Nous proposons des devis gratuits et transparents après une première consultation."
+      },
+      "companySizes": {
+        "question": "Travaillez-vous avec des entreprises de toutes tailles ?",
+        "answer": "Oui, nous accompagnons aussi bien les startups que les grandes entreprises, avec des solutions adaptées à chaque structure."
+      }
+    },
+    "newsletter": {
+      "title": "Restez informé",
+      "subtitle": "Recevez nos dernières actualités, conseils et offres exclusives directement dans votre boîte mail.",
+      "placeholder": "votre.email@exemple.com",
+      "subscribing": "Inscription...",
+      "subscribe": "S'abonner"
+    },
+    "errors": {
+      "tryAgainLater": "Veuillez réessayer plus tard",
+      "sendError": "Erreur lors de l'envoi du message. Veuillez réessayer.",
+      "connectionError": "Erreur de connexion. Veuillez réessayer.",
+      "subscriptionError": "Erreur lors de l'inscription"
+    },
+    "success": {
+      "messageSent": "Message envoyé avec succès ! Nous vous répondrons sous 24h.",
+      "newsletterSubscribed": "Merci pour votre inscription à notre newsletter !"
+    }
+  },
+  "ServicesSection": {
+    "title": "Nos Services",
+    "subtitle": "Découvrez notre gamme complète de services pour propulser votre présence en ligne",
+    "loading": "Chargement des services...",
+    "error": "Échec du chargement des services. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "noServices": "Aucun service disponible pour le moment.",
+    "learnMore": "En savoir plus",
+    "ctaText": "Prêt à transformer votre présence numérique ?",
+    "ctaButton": "Discutons de votre projet"
+  },
+  "BlogSection": {
+    "title": "Notre Blog",
+    "subtitle": "Découvrez nos derniers articles et conseils pour booster votre présence en ligne",
+    "loading": "Chargement des articles...",
+    "error": "Échec du chargement des articles. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "noArticles": "Aucun article disponible pour le moment.",
+    "featuredBadge": "À la une",
+    "readArticle": "Lire l'article",
+    "read": "Lire",
+    "viewAllArticles": "Voir tous les articles"
+  },
+  "ContactSection": {
+    "title": "Contactez-nous",
+    "subtitle": "Discutons de votre projet et voyons comment nous pouvons vous aider à atteindre vos objectifs",
+    "contactInfo": {
+      "title": "Envoyez-nous un message",
+      "description": "Notre équipe est là pour répondre à toutes vos questions et vous accompagner dans votre projet.",
+      "phone": {
+        "title": "Téléphone",
+        "detail": "+237 6 75 17 69 74",
+        "description": "Disponible du lundi au vendredi de 9h à 18h"
+      },
+      "email": {
+        "title": "Email",
+        "detail": "contact@bm-agency.cm",
+        "description": "Réponse sous 24h ouvrés"
+      },
+      "address": {
+        "title": "Adresse",
+        "detail": "11595 Yaoundé-Kondengui, Cameroun",
+        "description": "Bureau ouvert sur rendez-vous"
+      },
+      "hours": {
+        "title": "Heures d'ouverture",
+        "detail": "Lun - Ven: 9h - 18h",
+        "description": "Fermé le week-end et les jours fériés"
+      }
+    },
+    "form": {
+      "title": "Parlons de votre projet",
+      "description": "Remplissez le formulaire ci-dessous et nous vous recontacterons sous 24h.",
+      "firstName": {
+        "label": "Prénom",
+        "placeholder": "Votre prénom"
+      },
+      "lastName": {
+        "label": "Nom",
+        "placeholder": "Votre nom de famille"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "votre@email.com"
+      },
+      "phone": {
+        "label": "Téléphone",
+        "placeholder": "+237 6 12 34 56 78"
+      },
+      "company": {
+        "label": "Entreprise",
+        "placeholder": "Le nom de votre entreprise"
+      },
+      "service": {
+        "label": "Service recherché",
+        "options": {
+          "choose": "Sélectionnez un service",
+          "digital": "Communication digitale",
+          "marketing": "Marketing digital",
+          "design": "Design graphique",
+          "strategy": "Stratégie digitale",
+          "objects": "Objets publicitaires",
+          "training": "Formation",
+          "other": "Autre"
+        }
+      },
+      "message": {
+        "label": "Votre message",
+        "placeholder": "Décrivez-nous votre projet ou posez-nous vos questions..."
+      },
+      "privacy": "J'accepte la {privacy} de BM Agency",
+      "privacyLink": "politique de confidentialité",
+      "submit": "Envoyer le message"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram"
+    }
+  },
+  "Footer": {
+    "description": "Votre partenaire de confiance pour la communication digitale 360° au Cameroun. Créativité, stratégie et résultats au service de votre succès numérique.",
+    "address": {
+      "line1": "11595 Yaoundé-Kondengui",
+      "line2": "Yaoundé, Cameroun"
+    },
+    "phone": "+237 675176974",
+    "email": "contact@bm-agency.net",
+    "sections": {
+      "services": "Nos services",
+      "company": "Entreprise"
+    },
+    "services": {
+      "digital": "Communication digitale",
+      "marketing": "Marketing digital",
+      "advertising": "Objets publicitaires",
+      "content": "Création de contenu"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Restez informé de nos actualités et offres spéciales.",
+      "placeholder": "Votre adresse email",
+      "button": "S'abonner"
+    },
+    "copyright": "BM Agency. Tous droits réservés.",
+    "company": {
+      "about": "À propos",
+      "team": "Notre équipe",
+      "contact": "Contact",
+      "recruitment": "Recrutement"
+    },
+    "legal": {
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
+      "conditions": "Conditions générales"
+    }
+  },
+  "PortfolioPage": {
+    "title": "Nos Réalisations",
+    "subtitle": "Découvrez nos projets récents et nos études de cas",
+    "all": "Tous",
+    "viewProject": "Voir le projet",
+    "viewMoreProjects": "Voir plus de projets",
+    "noProjects": "Aucun projet trouvé pour le moment.",
+    "loading": "Chargement des projets...",
+    "error": "Erreur lors du chargement des projets. Veuillez réessayer plus tard.",
+    "filters": {
+      "all": "Tous les projets",
+      "web": "Sites Web",
+      "mobile": "Applications Mobiles",
+      "design": "Design",
+      "ecommerce": "E-commerce"
+    },
+    "projectDetails": {
+      "client": "Client",
+      "date": "Date",
+      "technologies": "Technologies",
+      "visitWebsite": "Visiter le site",
+      "viewProject": "Voir le projet",
+      "description": "Description du projet",
+      "challenge": "Défi",
+      "solution": "Solution",
+      "results": "Résultats",
+      "testimonial": "Témoignage client"
+    }
+  },
+  "BlogPage": {
+    "title": "Notre Blog",
+    "subtitle": "Actualités, conseils et tendances du digital",
+    "readMore": "Lire la suite",
+    "publishedOn": "Publié le",
+    "by": "par",
+    "categories": {
+      "all": "Tous les articles",
+      "tips": "Conseils",
+      "news": "Actualités",
+      "tutorials": "Tutoriels",
+      "case-studies": "Études de cas"
+    },
+    "noPosts": "Aucun article trouvé pour le moment.",
+    "loading": "Chargement des articles...",
+    "error": "Erreur lors du chargement des articles. Veuillez réessayer plus tard.",
+    "relatedPosts": "Articles similaires",
+    "share": "Partager cet article",
+    "tags": "Étiquettes",
+    "search": {
+      "placeholder": "Rechercher des articles...",
+      "noResults": "Aucun article ne correspond à votre recherche."
+    },
+    "newsletter": {
+      "title": "Restez informé",
+      "subtitle": "Inscrivez-vous à notre newsletter pour recevoir nos derniers articles directement dans votre boîte mail.",
+      "placeholder": "Votre adresse email",
+      "subscribe": "S'abonner",
+      "success": "Merci pour votre inscription !",
+      "error": "Une erreur est survenue. Veuillez réessayer plus tard."
+    }
+  }
+}

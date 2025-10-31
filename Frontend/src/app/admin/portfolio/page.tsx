@@ -752,10 +752,10 @@ export default function AdminPortfolio() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
+        <DialogContent className="bg-slate-800 border-slate-700">
           <DialogHeader>
-            <DialogTitle>Delete Project</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Delete Project</DialogTitle>
+            <DialogDescription className="text-slate-300">
               Are you sure you want to delete &quot;{selectedPortfolio?.title}&quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -763,6 +763,7 @@ export default function AdminPortfolio() {
             <Button
               variant="outline"
               onClick={() => setIsDeleteModalOpen(false)}
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
             >
               Cancel
             </Button>
@@ -770,6 +771,7 @@ export default function AdminPortfolio() {
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
             >
               {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </Button>

@@ -1,24 +1,50 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { MotionDiv } from '@/components/MotionComponents'
-import { Phone, Mail, Menu, X, Settings } from 'lucide-react'
-import { Button } from './Button'
-import { ThemeToggle } from './ThemeToggle'
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname, useParams } from 'next/navigation';
+import { MotionDiv } from '@/components/MotionComponents';
+import { Phone, Mail, Menu, X, Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from './ThemeToggle';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useSafeTranslations } from '@/hooks/useSafeTranslations';
 
-export const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface NavItem {
+  href: string;
+  label: string;
+}
 
-  const navItems = [
-    { href: '/', label: 'Accueil' },
-    { href: '/agence', label: 'L\'Agence' },
-    { href: '/services', label: 'Services' },
-    { href: '/portfolio', label: 'Portfolio' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/contact', label: 'Contact' },
-  ]
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
+  const params = useParams();
+  
+  // Use the safe translations hook
+  const t = useSafeTranslations('Navigation');
+
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Safely get locale from params
+  const locale = params?.locale || 'fr';
+  
+  // Remove the locale from the pathname for active link checking
+  const path = pathname ? pathname.replace(/^\/(en|fr)/, '') || '/' : '/';
+
+  // Only render navigation items when on the client side
+  const navItems: NavItem[] = isClient ? [
+    { href: '/', label: t('home') },
+    { href: '/agence', label: t('agency') },
+    { href: '/services', label: t('services') },
+    { href: '/portfolio', label: t('portfolio') },
+    { href: '/blog', label: t('blog') },
+    { href: '/contact', label: t('contact') },
+  ] : [];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 dark:bg-slate-900/95 dark:border-slate-700 w-full overflow-hidden">
@@ -52,8 +78,12 @@ export const Navbar = () => {
                   transition={{ delay: index * 0.1 }}
                 >
                   <Link
-                    href={item.href}
-                    className="text-gray-700 hover:text-primary-600 dark:text-slate-300 dark:hover:text-blue-400 px-2 lg:px-3 py-2 text-sm font-medium transition-colors duration-200 whitespace-nowrap"
+                    href={`/${locale}${item.href === '/' ? '' : item.href}`}
+                    className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                      path === item.href 
+                        ? 'text-blue-600 dark:text-white font-semibold' 
+                        : 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white'
+                    }`}
                   >
                     {item.label}
                   </Link>
@@ -63,32 +93,38 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 min-w-0">
-            <ThemeToggle />
-            <Button variant="outline" size="sm" className="hidden lg:flex min-w-0">
-              <Phone className="w-4 h-4 mr-1 lg:mr-2 flex-shrink-0" />
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3 min-w-0">
+            <div className="flex items-center space-x-3 lg:space-x-4 mr-1">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
+            <div className="h-6 w-px bg-gray-300 dark:bg-slate-600 mx-1"></div>
+            <Button variant="outline" size="sm" className="hidden lg:flex min-w-0 px-3">
+              <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="hidden xl:inline truncate">+237 675176974</span>
               <span className="xl:hidden">Tel</span>
             </Button>
-            <Button size="sm" className="hidden lg:flex min-w-0">
-              <Mail className="w-4 h-4 mr-1 lg:mr-2 flex-shrink-0" />
-              <span className="hidden xl:inline truncate">Devis gratuit</span>
+            <Button size="sm" className="hidden lg:flex min-w-0 px-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+              <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="hidden xl:inline truncate">{t('getQuote')}</span>
               <span className="xl:hidden">Devis</span>
             </Button>
-            <Link href="/admin/dashboard">
-              <Button size="sm" variant="outline" className="min-w-0">
-                <Settings className="w-4 h-4 mr-1 lg:mr-2 flex-shrink-0" />
-                <span className="hidden lg:inline">Admin</span>
+            <Link href="/admin/login" className="hidden xl:block">
+              <Button size="sm" variant="outline" className="min-w-0 px-3">
+                <Settings className="w-4 h-4" />
+                <span className="ml-2">Admin</span>
               </Button>
             </Link>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-3 min-w-0 ml-auto flex-shrink-0">
+            <LanguageSwitcher />
             <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 min-w-0"
+              className="inline-flex items-center justify-center p-2.5 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 min-w-0"
+              aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -108,7 +144,7 @@ export const Navbar = () => {
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={`/${locale}${item.href === '/' ? '' : item.href}`}
                 className="text-gray-700 hover:text-primary-600 dark:text-slate-300 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 truncate"
                 onClick={() => setIsOpen(false)}
               >
@@ -123,9 +159,9 @@ export const Navbar = () => {
                 </Button>
                 <Button className="w-full justify-center min-w-0">
                   <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">Devis gratuit</span>
+                  <span className="truncate">{t('getQuote')}</span>
                 </Button>
-                <Link href="/admin/dashboard">
+                <Link href="/admin/login">
                   <Button variant="outline" className="w-full justify-center min-w-0">
                     <Settings className="w-4 h-4 mr-2 flex-shrink-0" />
                     <span className="truncate">Admin</span>
@@ -137,5 +173,7 @@ export const Navbar = () => {
         </MotionDiv>
       )}
     </nav>
-  )
-}
+  );
+};
+
+export default Navbar;

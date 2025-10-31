@@ -1,19 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { MotionDiv, MotionH2 } from '@/components/MotionComponents'
 import { Calendar, User, ArrowRight, Clock } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { articlesAPI, type Article } from '@/lib/api'
+import { useTranslations } from 'next-intl'
 
 export const BlogSection = () => {
+  const router = useRouter()
   const [articles, setArticles] = useState<Article[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const t = useTranslations('BlogSection')
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        setIsLoading(true)
         const response = await articlesAPI.getAll()
         const items = response?.data
         setArticles(Array.isArray(items) ? items.slice(0, 3) : [])
@@ -43,26 +46,26 @@ export const BlogSection = () => {
           className="text-center mb-16"
         >
           <MotionH2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-4">
-            Actualités & Blog
+            {t('title')}
           </MotionH2>
           <p className="text-xl text-gray-600 dark:text-slate-400 max-w-3xl mx-auto">
-            Restez informé des dernières tendances du digital et découvrez nos conseils
-            d&apos;experts pour développer votre présence en ligne.
+            {t('subtitle')}
           </p>
         </MotionDiv>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <p className="text-gray-600 dark:text-slate-400 ml-4">{t('loading')}</p>
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load articles</p>
-            <Button onClick={() => window.location.reload()}>Retry</Button>
+            <p className="text-red-600 dark:text-red-400 mb-4">{t('error')}</p>
+            <Button onClick={() => window.location.reload()}>{t('retry')}</Button>
           </div>
         ) : !Array.isArray(articles) || articles.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-slate-400">No articles available at the moment.</p>
+            <p className="text-gray-600 dark:text-slate-400">{t('noArticles')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -79,7 +82,7 @@ export const BlogSection = () => {
                   <div className="relative h-64 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-blue-900/30 dark:to-cyan-900/30">
                     <div className="absolute top-4 left-4">
                       <span className="bg-primary-600 dark:bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        Article à la une
+                        {t('featuredBadge')}
                       </span>
                     </div>
                   </div>
@@ -88,7 +91,7 @@ export const BlogSection = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-slate-400 mb-3">
                       <div className="flex items-center">
                         <User className="w-4 h-4 mr-1" />
-                        {articles[0].author}
+                        {typeof articles[0].author === 'object' && articles[0].author?.name ? articles[0].author.name : 'Unknown Author'}
                       </div>
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
@@ -110,7 +113,7 @@ export const BlogSection = () => {
                     </p>
 
                     <Button variant="outline" className="group border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                      Lire l&apos;article
+                      {t('readArticle')}
                       <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
@@ -156,10 +159,10 @@ export const BlogSection = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="text-xs text-gray-500 dark:text-slate-400">
-                        {article.author} • {formatDate(article.createdAt)}
+                        {typeof article.author === 'object' && article.author?.name ? article.author.name : 'Unknown Author'} • {formatDate(article.createdAt)}
                       </div>
                       <Button size="sm" variant="outline" className="border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-                        Lire
+                        {t('read')}
                       </Button>
                     </div>
                   </div>
@@ -176,8 +179,13 @@ export const BlogSection = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <Button size="lg" variant="outline" className="border-gray-300 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500">
-            Voir tous les articles
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="mt-8"
+            onClick={() => router.push('/blog')}
+          >
+            {t('viewAll')}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </MotionDiv>

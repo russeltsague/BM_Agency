@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { Author } from '@/types/article'
+import type { Article } from '@/lib/api'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -63,24 +65,15 @@ const blogSchema = z.object({
 
 type BlogForm = z.infer<typeof blogSchema>
 
-interface Blog {
-  _id: string
-  title: string
-  excerpt?: string
-  content: string
-  author: {
-    _id: string
-    name: string
-    email: string
-  } | string
-  category?: string
-  tags?: string[]
-  featured?: boolean
-  published?: boolean
-  thumbnail?: string
-  readTime?: string
-  createdAt: string
-  updatedAt: string
+interface Blog extends Omit<Article, 'stateHistory'> {
+  // Define stateHistory with the expected type
+  stateHistory?: Array<{
+    from: string;
+    to: string;
+    timestamp: string;
+    changedBy: string;
+    reason?: string;
+  }>;
 }
 
 export default function AdminBlog() {
@@ -208,8 +201,28 @@ export default function AdminBlog() {
     createMutation.mutate(data)
   }
 
-  const handleEdit = (blog: Blog) => {
-    setSelectedBlog(blog)
+  const handleEdit = (blog: Article) => {
+    // Convert Article to Blog by ensuring stateHistory has the correct type
+    const blogData: Blog = {
+      ...blog,
+      stateHistory: blog.stateHistory?.map(item => ({
+        from: item.from || '',
+        to: item.to || '',
+        timestamp: item.timestamp,
+        changedBy: item.changedBy,
+        reason: item.reason
+      })),
+      author: typeof blog.author === 'string' ? blog.author : {
+        name: blog.author?.name || '',
+        email: blog.author?.email || ''
+      },
+      published: blog.published || false,
+      featured: blog.featured || false,
+      tags: blog.tags || [],
+      category: blog.category || ''
+    };
+    
+    setSelectedBlog(blogData);
     setValue('title', blog.title)
     setValue('excerpt', blog.excerpt || '')
     setValue('content', blog.content)
@@ -232,9 +245,28 @@ export default function AdminBlog() {
     }
   }
 
-  const openDeleteModal = (blog: Blog) => {
-    setSelectedBlog(blog)
-    setIsDeleteModalOpen(true)
+  const openDeleteModal = (blog: Article) => {
+    // Convert Article to Blog type
+    const blogData: Blog = {
+      ...blog,
+      stateHistory: blog.stateHistory?.map(item => ({
+        from: item.from || '',
+        to: item.to || '',
+        timestamp: item.timestamp,
+        changedBy: item.changedBy,
+        reason: item.reason
+      })),
+      author: typeof blog.author === 'string' ? blog.author : {
+        name: blog.author?.name || '',
+        email: blog.author?.email || ''
+      },
+      published: blog.published || false,
+      featured: blog.featured || false,
+      tags: blog.tags || [],
+      category: blog.category || ''
+    };
+    setSelectedBlog(blogData);
+    setIsDeleteModalOpen(true);
   }
 
   // Reset form and close modals
