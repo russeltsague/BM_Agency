@@ -164,26 +164,34 @@ const Navbar = () => {
               <Link
                 key={item.href}
                 href={`/${locale}${item.href === '/' ? '' : item.href}`}
-                className="text-gray-700 hover:text-primary-600 dark:text-slate-300 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-50 dark:hover:bg-slate-700 truncate"
+                className="text-gray-700 hover:text-primary-600 dark:text-slate-200 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium rounded-md hover:bg-gray-50 dark:hover:bg-slate-700/70 transition-colors truncate"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             <div className="pt-4 pb-2 border-t border-gray-200 dark:border-slate-700">
-              <div className="flex flex-col space-y-2">
-                <Button variant="outline" className="w-full justify-center min-w-0">
-                  <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">+237 675176974</span>
+              <div className="flex flex-col space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-center min-w-0 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                >
+                  <Phone className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-300" />
+                  <span className="truncate font-medium">+237 675176974</span>
                 </Button>
-                <Button className="w-full justify-center min-w-0">
-                  <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">{t('getQuote')}</span>
+                <Button 
+                  className="w-full justify-center min-w-0 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white dark:from-blue-600/90 dark:to-cyan-600/90 dark:hover:from-blue-600 dark:hover:to-cyan-600 transition-all shadow-sm hover:shadow-md"
+                >
+                  <Mail className="w-4 h-4 mr-2 flex-shrink-0 text-white" />
+                  <span className="truncate font-medium">{t('getQuote')}</span>
                 </Button>
                 <Link href="/admin/login">
-                  <Button variant="outline" className="w-full justify-center min-w-0">
-                    <Settings className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">Admin</span>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center min-w-0 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <Settings className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-300" />
+                    <span className="truncate font-medium">Admin</span>
                   </Button>
                 </Link>
               </div>
