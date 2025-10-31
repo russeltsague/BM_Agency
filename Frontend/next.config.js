@@ -6,12 +6,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Increase static page generation timeout (in seconds)
   staticPageGenerationTimeout: 300,
-  // Ensure consistent React version
-  experimental: {
-    esmExternals: 'loose',
-    // Enable incremental static regeneration
-    isrMemoryCacheSize: 0,
-  },
+  
   // Handle file uploads
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -37,42 +32,37 @@ const nextConfig = {
 
     return config;
   },
+  
   // Optimize images
   images: {
     unoptimized: true,
-    // Add any necessary image domains here
     domains: ['localhost', 'via.placeholder.com'],
   },
+  
   // Enable SWC minifier for better performance
   swcMinify: true,
-  // i18n configuration for static export
+  
+  // Output standalone for better compatibility
   output: 'standalone',
-  // Configure page revalidation
+  
+  // Configure server components
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
-    // Enable incremental static regeneration
-    isrMemoryCacheSize: 0,
   },
+  
   // Disable TypeScript type checking during build for faster builds
   typescript: {
     ignoreBuildErrors: true, // Temporarily ignore TypeScript errors during build
   },
+  
   // Disable ESLint during build
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Configure API routes to be serverless
-  api: {
-    bodyParser: {
-      sizeLimit: '4mb',
-    },
-  },
-  // Configure static page generation
-  generateBuildId: async () => {
-    return 'build-' + Date.now();
-  },
+  
   // Disable source maps in production
   productionBrowserSourceMaps: false,
+  
   // Configure headers
   async headers() {
     return [
@@ -95,6 +85,17 @@ const nextConfig = {
       },
     ];
   },
+  
+  // Configure page extensions
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+  
+  // Configure build output
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
+  
+  // Disable static optimization for all pages
+  generateEtags: false,
 }
 
 // Apply next-intl plugin
