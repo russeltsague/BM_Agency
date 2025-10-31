@@ -2,15 +2,36 @@ import { NextResponse } from 'next/server';
 
 // List of paths that should use dynamic rendering
 const dynamicPaths = [
-  '/api/realisations',
+  // API routes
+  '/api/*',
+  
+  // Admin routes
   '/admin',
   '/admin/*',
+  
+  // Editor routes
   '/editor',
   '/editor/*',
+  
+  // Internationalization routes
   '/fr',
+  '/fr/*',
   '/en',
-  '/api/*' // Make all API routes dynamic
-];
+  '/en/*',
+  
+  // Homepage and root
+  '/',
+  
+  // Authentication routes
+  '/auth/*',
+  '/login',
+  '/register',
+  
+  // Any other dynamic content
+  '/*/edit',
+  '/*/create',
+  '/*/update',
+  '/*/delete'
 
 // This function checks if a route should use dynamic rendering
 function shouldUseDynamicRendering(pathname) {

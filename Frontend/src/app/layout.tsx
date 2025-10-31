@@ -5,6 +5,12 @@ import { Providers } from './providers';
 // Import metadata from a separate file
 export { metadata } from './metadata';
 
+// Force all pages to be dynamic
+export const dynamic = 'force-dynamic';
+
+// Disable static optimization
+export const revalidate = 0;
+
 export default function RootLayout({
   children,
 }: {

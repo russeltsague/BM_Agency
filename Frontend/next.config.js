@@ -7,6 +7,27 @@ const nextConfig = {
   // Disable static page generation timeout for Vercel
   staticPageGenerationTimeout: 0,
   
+  // Disable static optimization for all pages
+  output: 'standalone',
+  
+  // Disable static optimization for all pages
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+    // Disable static optimization
+    isrMemoryCacheSize: 0,
+    // Disable static pages
+    staticPageGeneration: {
+      maxConcurrentGenerations: 1,
+      concurrency: 1
+    },
+    // Disable static optimization
+    optimizeCss: false,
+    // Disable static optimization
+    optimizeFonts: false,
+    // Disable static optimization
+    optimizeImages: false,
+  },
+  
   // Handle file uploads
   webpack: (config, { isServer }) => {
     if (!isServer) {
