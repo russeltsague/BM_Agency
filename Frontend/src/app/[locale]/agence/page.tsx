@@ -146,10 +146,10 @@ export default function AgencyPage() {
               viewport={{ once: true }}
             >
               <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-6">
-                {t('vision.title')}
+                {t('values.vision.title')}
               </h3>
               <p className="text-gray-600 dark:text-slate-400 mb-6">
-                {t('vision.description')}
+                {t('values.vision.description')}
               </p>
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">

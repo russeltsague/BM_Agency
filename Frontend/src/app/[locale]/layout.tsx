@@ -26,8 +26,10 @@ export default function LocaleLayout({ children, params: { locale } }: LocaleLay
   const [messages, setMessages] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Validate locale
-  if (!['en', 'fr'].includes(locale)) {
+  // Validate locale and set default to 'fr' if not provided
+  if (!locale) {
+    locale = 'fr';
+  } else if (!['en', 'fr'].includes(locale)) {
     notFound();
   }
 

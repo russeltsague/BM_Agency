@@ -274,23 +274,13 @@ export const ContactSection = () => {
                     disabled={isSubmitting}
                   />
                   <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-slate-400">
-                    {(() => {
-                      const privacyText = t('form.privacy', {
-                        privacy: t('form.privacyLink')
-                      });
-                      const parts = privacyText.split('{privacy}');
-                      
-                      return parts.map((part, i) => (
-                        <React.Fragment key={i}>
-                          {part}
-                          {i < parts.length - 1 && (
-                            <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
-                              {t('form.privacyLink')}
-                            </a>
-                          )}
-                        </React.Fragment>
-                      ));
-                    })()}
+                    {t.rich('form.privacy', {
+                      privacyLink: (chunks) => (
+                        <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
+                          {chunks}
+                        </a>
+                      )
+                    })}
                   </label>
                 </div>
 

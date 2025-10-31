@@ -259,6 +259,7 @@
     "title": "Notre Blog",
     "subtitle": "Découvrez nos derniers articles et conseils pour booster votre présence en ligne",
     "loading": "Chargement des articles...",
+    "viewAll": "Voir tous les articles",
     "error": "Échec du chargement des articles. Veuillez réessayer.",
     "retry": "Réessayer",
     "noArticles": "Aucun article disponible pour le moment.",

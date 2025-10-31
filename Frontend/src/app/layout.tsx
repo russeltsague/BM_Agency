@@ -16,8 +16,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Default to French if no locale is specified
+  const defaultLocale = 'fr';
+  
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={defaultLocale} suppressHydrationWarning>
       <body className="min-h-screen bg-white dark:bg-slate-900">
         <Providers>
           {children}

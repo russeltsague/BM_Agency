@@ -175,7 +175,7 @@
         "training": "Training & Coaching",
         "other": "Other"
       },
-      "privacy": "I agree to my data being processed in accordance with the {privacyLink}privacy policy{/privacyLink}*",
+      "privacy": "I agree to my data being processed in accordance with the <privacyLink>privacy policy</privacyLink>*",
       "submitting": "Sending...",
       "submit": "Send message"
     },
@@ -254,6 +254,7 @@
     "title": "Our Blog",
     "subtitle": "Discover our latest articles and tips to boost your online presence",
     "loading": "Loading articles...",
+    "viewAll": "View all articles",
     "error": "Failed to load articles. Please try again.",
     "retry": "Retry",
     "noArticles": "No articles available at the moment.",
