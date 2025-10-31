@@ -109,7 +109,7 @@ const Navbar = () => {
               <span className="hidden xl:inline truncate">{t('getQuote')}</span>
               <span className="xl:hidden">Devis</span>
             </Button>
-            <Link href="/admin/login" className="hidden xl:block">
+            <Link href="/admin/login">
               <Button size="sm" variant="outline" className="min-w-0 px-3">
                 <Settings className="w-4 h-4" />
                 <span className="ml-2">Admin</span>
