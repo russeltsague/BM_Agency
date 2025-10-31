@@ -1,0 +1,73 @@
+{
+  "auth": {
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+    "invalid_credentials": "Incorrect email or password",
+    "email_already_exists": "Email already in use",
+    "user_created": "User created successfully",
+    "password_updated": "Password updated successfully",
+    "profile_updated": "Profile updated successfully",
+    "user_not_found": "User not found",
+    "user_deleted": "User deleted successfully",
+    "not_logged_in": "You are not logged in! Please log in to get access.",
+    "token_expired": "Invalid token or session expired. Please log in again.",
+    "user_no_longer_exists": "The user belonging to this token no longer exists.",
+    "password_changed_recently": "User recently changed password! Please log in again.",
+    "wrong_current_password": "Your current password is wrong.",
+    "cannot_delete_own_account": "You cannot delete your own account",
+    "admin_created": "Admin user created successfully",
+    "no_permission": "You do not have permission to perform this action",
+    "no_refresh_token": "No refresh token provided",
+    "invalid_refresh_token": "Invalid or expired refresh token"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email_invalid": "Please provide a valid email address",
+    "password_min_length": "Password must be at least 8 characters long",
+    "password_uppercase": "Password must contain at least one uppercase letter",
+    "password_lowercase": "Password must contain at least one lowercase letter",
+    "password_number": "Password must contain at least one number",
+    "password_special": "Password must contain at least one special character",
+    "name_min_length": "Name must be at least 2 characters",
+    "name_max_length": "Name cannot exceed 50 characters",
+    "validation_error": "Validation error"
+  },
+  "errors": {
+    "internal_server_error": "Internal server error",
+    "not_found": "Resource not found",
+    "bad_request": "Bad request",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden"
+  },
+  "articles": {
+    "created": "Article created successfully",
+    "updated": "Article updated successfully",
+    "deleted": "Article deleted successfully",
+    "not_found": "Article not found",
+    "published": "Article published successfully",
+    "unpublished": "Article unpublished successfully"
+  },
+  "services": {
+    "created": "Service created successfully",
+    "updated": "Service updated successfully",
+    "deleted": "Service deleted successfully",
+    "not_found": "Service not found"
+  },
+  "contact": {
+    "message_sent": "Message sent successfully",
+    "message_received": "Message received successfully"
+  },
+  "newsletter": {
+    "subscribed": "Successfully subscribed to newsletter",
+    "already_subscribed": "Email already subscribed",
+    "unsubscribed": "Successfully unsubscribed from newsletter"
+  },
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully",
+    "fetched": "Data fetched successfully"
+  }
+}

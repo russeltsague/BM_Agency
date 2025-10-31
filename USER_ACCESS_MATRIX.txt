@@ -1,0 +1,185 @@
+================================================================================
+                          BM AGENCY - USER ACCESS MATRIX
+================================================================================
+
+This document contains all user accounts, credentials, roles, and their
+respective system permissions for the BM Agency content management system.
+
+Generated: 2025-10-17
+Security Level: CONFIDENTIAL - Change all passwords in production!
+
+================================================================================
+USER CREDENTIALS & ROLES
+================================================================================
+
+| USERNAME/EMAIL           | PASSWORD    | ROLE     | NAME              | STATUS    |
+|--------------------------|-------------|----------|-------------------|-----------|
+| admin@example.com        | admin123    | admin    | Admin User        | Active    |
+| owner@bmagency.com       | owner123    | owner    | System Owner      | Active    |
+| editor@bmagency.com      | editor123   | editor   | Content Editor    | Active    |
+| author@bmagency.com      | author123   | author   | Content Author    | Active    |
+| marketing@bmagency.com   | marketing123| editor   | Marketing Manager | Active    |
+| writer@bmagency.com      | writer123   | author   | Junior Writer     | Active    |
+
+================================================================================
+ROLE-BASED PERMISSIONS MATRIX
+================================================================================
+
+OWNER ROLE (Full System Access)
+--------------------------------
+Email: owner@bmagency.com
+Permissions:
+✓ Manage Users (create, edit, delete, role changes)
+✓ Manage Roles (create custom roles, assign permissions)
+✓ Manage All Content (edit any content regardless of ownership)
+✓ Publish Content (immediate publishing without approval)
+✓ Approve Content (approve submissions from authors)
+✓ Delete Content (remove any content from system)
+✓ View Analytics (access all system analytics and reports)
+✓ Manage Settings (system configuration, integrations)
+
+--------------------------------------------------------------------------------
+
+ADMIN ROLE (Administrative Access)
+----------------------------------
+Email: admin@example.com
+Permissions:
+✓ Manage Users (create, edit, delete user accounts)
+✓ Manage Roles (modify user roles and permissions)
+✓ Manage All Content (edit any content in system)
+✓ Publish Content (publish content immediately)
+✓ Approve Content (approve author submissions)
+✓ Delete Content (remove content from system)
+✓ View Analytics (access analytics dashboard)
+✗ Manage Settings (system configuration - OWNER ONLY)
+
+--------------------------------------------------------------------------------
+
+EDITOR ROLE (Content Management)
+--------------------------------
+Email: editor@bmagency.com, marketing@bmagency.com
+Permissions:
+✓ Manage Own Content (create and edit personal content)
+✓ Publish Own Content (publish personal content immediately)
+✓ Edit Others Content (modify content created by authors)
+✓ View Analytics (access basic analytics)
+✗ Manage Users (user account management - ADMIN+ ONLY)
+✗ Delete Content (content removal - ADMIN+ ONLY)
+✗ Approve Content (submission approval - ADMIN+ ONLY)
+
+--------------------------------------------------------------------------------
+
+AUTHOR ROLE (Content Creation)
+------------------------------
+Email: author@bmagency.com, writer@bmagency.com
+Permissions:
+✓ Manage Own Content (create and edit personal content)
+✓ Submit for Approval (submit content for review)
+✗ Publish Content (direct publishing - EDITOR+ ONLY)
+✗ Edit Others Content (modify other users' content - EDITOR+ ONLY)
+✗ Manage Users (user management - ADMIN+ ONLY)
+✗ Delete Content (content removal - ADMIN+ ONLY)
+✗ View Analytics (analytics access - EDITOR+ ONLY)
+
+================================================================================
+SYSTEM ACCESS ENDPOINTS BY ROLE
+================================================================================
+
+OWNER & ADMIN ROLES:
+--------------------
+✓ /api/v1/auth/users (GET, POST, PATCH, DELETE) - User Management
+✓ /api/v1/auth/admin (POST) - Create Admin Users
+✓ /api/v1/auth/profile (PATCH) - Update Profile
+✓ /api/v1/services/* - Full CRUD Access
+✓ /api/v1/articles/* - Full CRUD Access
+✓ /api/v1/realisations/* - Full CRUD Access
+✓ /api/v1/testimonials/* - Full CRUD Access
+✓ /api/v1/products/* - Full CRUD Access
+✓ /api/v1/team/* - Full CRUD Access
+
+EDITOR ROLE:
+------------
+✓ /api/v1/auth/me (GET) - View Own Profile
+✓ /api/v1/auth/profile (PATCH) - Update Own Profile
+✓ /api/v1/services/* - CRUD Own Services
+✓ /api/v1/articles/* - CRUD Own Articles
+✓ /api/v1/realisations/* - CRUD Own Realisations
+✓ /api/v1/testimonials/* - CRUD Own Testimonials
+✓ /api/v1/products/* - CRUD Own Products
+✓ /api/v1/team/* - CRUD Own Team Members
+✗ /api/v1/auth/users (403 Forbidden)
+✗ /api/v1/auth/admin (403 Forbidden)
+
+AUTHOR ROLE:
+------------
+✓ /api/v1/auth/me (GET) - View Own Profile
+✓ /api/v1/auth/profile (PATCH) - Update Own Profile
+✓ /api/v1/articles/* - CRUD Own Articles (submit only)
+✓ /api/v1/realisations/* - CRUD Own Realisations (submit only)
+✗ /api/v1/services/* (403 Forbidden - unless owner)
+✗ /api/v1/testimonials/* (403 Forbidden - unless owner)
+✗ /api/v1/products/* (403 Forbidden - unless owner)
+✗ /api/v1/team/* (403 Forbidden - unless owner)
+✗ /api/v1/auth/users (403 Forbidden)
+
+================================================================================
+LOGIN TESTING CHECKLIST
+================================================================================
+
+□ 1. Test Owner Login (owner@bmagency.com / owner123)
+   □ Access all admin functions
+   □ Create/edit/delete users
+   □ Access all content endpoints
+
+□ 2. Test Admin Login (admin@example.com / admin123)
+   □ Access user management
+   □ Create/edit content
+   □ Access denied to settings
+
+□ 3. Test Editor Login (editor@bmagency.com / editor123)
+   □ Create/edit own content
+   □ Publish own content immediately
+   □ Edit others' content
+   □ Access denied to user management
+
+□ 4. Test Author Login (author@bmagency.com / author123)
+   □ Create content for approval
+   □ Submit content for review
+   □ Access denied to publishing
+   □ Access denied to user management
+
+================================================================================
+IMPORTANT SECURITY NOTES
+================================================================================
+
+⚠️  CRITICAL: Change all passwords immediately in production environment!
+
+⚠️  These are development credentials - never use in production systems.
+
+⚠️  Regularly audit user roles and remove unnecessary admin access.
+
+⚠️  Implement password policies (minimum length, complexity requirements).
+
+⚠️  Enable 2FA for admin accounts in production.
+
+================================================================================
+CONTACT & SUPPORT
+================================================================================
+
+For questions about user roles and permissions:
+- Review the User model in /Backend/src/models/User.ts
+- Check role middleware in /Backend/src/middleware/roleCheck.ts
+- Examine API routes in /Backend/src/routes/authRoutes.ts
+
+For technical support or issues:
+- Check application logs in /Backend/logs/
+- Verify database connectivity
+- Review authentication middleware in /Backend/src/middleware/auth.ts
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+
+
+ok let use simplify the administrators dashboard let the super admin be able to create accounts with only 2 roles either an editor or an admin the editor will only be able to write content on " and for the content and submit it to the admin for publishment 
+je sias pas ou 

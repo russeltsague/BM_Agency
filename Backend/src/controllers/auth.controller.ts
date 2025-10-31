@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { z } from 'zod';
 import { User } from '../models/User';
+import { promisify } from 'util';
+
+const verifyAsync = promisify(jwt.verify) as (token: string, secret: string) => Promise<any>;
 
 interface JwtPayload {
   id: string;
@@ -31,27 +34,41 @@ export const authController = {
     try {
       const { email, password } = loginSchema.parse(req.body);
       
-      // Find user by email
-      const user = await User.findOne({ email }).select('+password');
+      // Find user by email with proper type
+      const user = await User.findOne({ email }).select('+password').lean();
       
-      if (!user || !(await user.comparePassword(password))) {
+      if (!user || !('comparePassword' in user) || !(await user.comparePassword(password))) {
         return res.status(401).json({ status: 'error', message: 'Invalid credentials' });
       }
       
-      // Generate JWT token
-      const jwtOptions: SignOptions = { expiresIn: '7d' }; // Default to 7 days
-      if (process.env.JWT_EXPIRES_IN) {
-        const expiresIn = parseInt(process.env.JWT_EXPIRES_IN, 10);
-        if (!isNaN(expiresIn)) {
-          jwtOptions.expiresIn = expiresIn;
-        }
+      // Ensure user._id is a string
+      const userId = user._id?.toString();
+      if (!userId) {
+        throw new Error('User ID is missing');
       }
       
-      const token = jwt.sign(
-        { id: user._id },
+      // Generate access token (short-lived)
+      const accessToken = jwt.sign(
+        { id: userId },
         process.env.JWT_SECRET || 'your-secret-key',
-        jwtOptions
-      );
+        { expiresIn: '15m' }
+      ) as string;
+      
+      // Generate refresh token (long-lived)
+      const refreshToken = jwt.sign(
+        { id: userId },
+        process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret',
+        { expiresIn: '7d' }
+      ) as string;
+      
+      // Set refresh token in HTTP-only cookie
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/api/v1/auth/refresh-token'
+      });
       
       // Remove password from response
       const userWithoutPassword = user.toObject();
@@ -63,7 +80,7 @@ export const authController = {
         status: 'success',
         data: {
           user: userWithoutPassword,
-          token
+          token: accessToken
         }
       });
       
@@ -76,7 +93,6 @@ export const authController = {
         });
       }
       
-      console.error('Login error:', error);
       res.status(500).json({ status: 'error', message: 'Internal server error' });
     }
   },
@@ -132,8 +148,58 @@ export const authController = {
         });
       }
       
-      console.error('Registration error:', error);
       res.status(500).json({ status: 'error', message: 'Internal server error' });
+    }
+  },
+  
+  async refreshToken(req: Request, res: Response) {
+    try {
+      // Get the refresh token from cookies
+      const refreshToken = req.cookies?.refreshToken;
+      
+      if (!refreshToken) {
+        return res.status(401).json({ 
+          status: 'error', 
+          message: 'No refresh token provided' 
+        });
+      }
+
+      // Verify the refresh token
+      const decoded = await verifyAsync(
+        refreshToken, 
+        process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret'
+      );
+
+      // Find the user
+      const user = await User.findById(decoded.id);
+      
+      if (!user) {
+        return res.status(404).json({ 
+          status: 'error', 
+          message: 'User not found' 
+        });
+      }
+
+      // Generate a new access token
+      const accessToken = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: process.env.JWT_EXPIRES_IN || '15m' }
+      );
+
+      // Set the new access token in the response
+      res.json({
+        status: 'success',
+        data: {
+          token: accessToken
+        }
+      });
+      
+    } catch (error) {
+      res.status(401).json({ 
+        status: 'error', 
+        message: 'Invalid or expired refresh token' 
+      });
     }
   }
 };

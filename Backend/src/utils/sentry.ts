@@ -14,8 +14,6 @@ export const initSentry = () => {
       // Release Health
       environment: process.env.NODE_ENV || 'development',
     });
-
-    console.log('Sentry initialized for error tracking');
   }
 };
 
@@ -53,7 +51,6 @@ export const reportError = (error: Error, context?: any) => {
       Sentry.captureException(error);
     });
   } else {
-    console.error('Error:', error.message, context);
   }
 };
 
@@ -70,7 +67,6 @@ export const startTransaction = (name: string, description?: string) => {
 export const captureUserFeedback = (eventId: string, feedback: { message: string; email?: string; name?: string }) => {
   if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
     // Simplified feedback capture for testing
-    console.log('User feedback captured:', { eventId, ...feedback });
   }
 };
 

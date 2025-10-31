@@ -6,20 +6,32 @@ import { IUserPayload } from '../types/express';
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // 1) Get token from header
-    let token;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
-    ) {
+    let token: string | undefined;
+    // Authorization: Bearer <token>
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies?.token) {
-      token = req.cookies.token;
+    }
+    // x-access-token header
+    if (!token && typeof req.headers['x-access-token'] === 'string') {
+      token = req.headers['x-access-token'] as string;
+    }
+    // Cookie (requires cookie-parser; safe if absent)
+    if (!token && (req as any).cookies?.token) {
+      token = (req as any).cookies.token;
+    }
+    // Query param ?token=...
+    if (!token && typeof req.query.token === 'string') {
+      token = req.query.token as string;
+    }
+    // Body { token: "..." }
+    if (!token && typeof (req.body as any)?.token === 'string') {
+      token = (req.body as any).token;
     }
 
     if (!token) {
       return res.status(401).json({
         status: 'error',
-        message: 'You are not logged in! Please log in to get access.'
+        message: req.t?.('auth.not_logged_in') || 'You are not logged in! Please log in to get access.'
       });
     }
 
@@ -36,7 +48,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     if (!currentUser) {
       return res.status(401).json({
         status: 'error',
-        message: 'The user belonging to this token no longer exists.'
+        message: req.t?.('auth.user_no_longer_exists') || 'The user belonging to this token no longer exists.'
       });
     }
 
@@ -44,14 +56,14 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     if (currentUser.changedPasswordAfter(decoded.iat)) {
       return res.status(401).json({
         status: 'error',
-        message: 'User recently changed password! Please log in again.'
+        message: req.t?.('auth.password_changed_recently') || 'User recently changed password! Please log in again.'
       });
     }
 
     // GRANT ACCESS TO PROTECTED ROUTE
     req.user = {
       id: currentUser.id || currentUser._id?.toString() || '',
-      role: currentUser.role,
+      roles: currentUser.roles,
       name: currentUser.name,
       email: currentUser.email
     };
@@ -59,7 +71,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   } catch (err) {
     return res.status(401).json({
       status: 'error',
-      message: 'Invalid token or session expired. Please log in again.'
+      message: req.t?.('auth.token_expired') || 'Invalid token or session expired. Please log in again.'
     });
   }
 };
@@ -67,10 +79,10 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 // Role-based authorization
 export const restrictTo = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !req.user.roles || !roles.some(role => req.user!.roles.includes(role))) {
       return res.status(403).json({
         status: 'error',
-        message: 'You do not have permission to perform this action'
+        message: req.t?.('auth.no_permission') || 'You do not have permission to perform this action'
       });
     }
     next();

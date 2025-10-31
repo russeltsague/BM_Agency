@@ -8,6 +8,8 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import compression from 'compression';
+import http from 'http';
+import { Server } from 'socket.io';
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const csurf = require('csurf');
@@ -17,6 +19,7 @@ import { globalErrorHandler } from './middleware/errorHandler';
 import specs from './config/swagger';
 import logger from './utils/logger';
 import { initSentry, sentryErrorHandler } from './utils/sentry';
+import { i18nMiddleware } from './i18n';
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -26,6 +29,7 @@ initSentry();
 
 // Import routes
 import authRoutes from './routes/authRoutes';
+import userRoutes from './routes/userRoutes';
 import serviceRoutes from './routes/serviceRoutes';
 import realisationRoutes from './routes/realisationRoutes';
 import articleRoutes from './routes/articleRoutes';
@@ -36,6 +40,7 @@ import healthRoutes from './routes/healthRoutes';
 import contactRoutes from './routes/contactRoutes';
 import quoteRoutes from './routes/quoteRoutes';
 import newsletterRoutes from './routes/newsletterRoutes';
+import taskRoutes from './routes/taskRoutes';
 
 // Database connection
 const connectDB = async () => {
@@ -58,27 +63,52 @@ const connectDB = async () => {
 // Create Express application
 export const app = express();
 
+// Create HTTP server for Socket.io
+export const server = http.createServer(app);
+
+// ✅ Initialize Socket.io
+export const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000', 'http://localhost:3001'],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
+
+// Store connected users globally
+(global as any).onlineUsers = new Map<string, string>();
+
+io.on("connection", (socket: any) => {
+  logger.info(`Socket connected: ${socket.id}`);
+
+  socket.on("registerUser", (userId: string) => {
+    (global as any).onlineUsers.set(userId, socket.id);
+    logger.info(`User ${userId} registered with socket ${socket.id}`);
+  });
+
+  socket.on("disconnect", () => {
+    logger.info(`Socket disconnected: ${socket.id}`);
+    // Remove user from online users map
+    for (const [id, sid] of (global as any).onlineUsers.entries()) {
+      if (sid === socket.id) {
+        (global as any).onlineUsers.delete(id);
+        break;
+      }
+    }
+  });
+});
+
+// Make io accessible in routes/controllers
+app.set("io", io);
+
 // Middleware
 // CORS configuration for frontend
-const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000'];
+const allowedOrigins = process.env.FRONTEND_URL?.split(',') || ['http://localhost:3000', 'http://localhost:3001'];
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) {
-      console.log('Allowing request with no origin');
-      return callback(null, true);
-    }
-
-    // Check if the origin is in the allowed origins list
-    if (allowedOrigins.includes(origin)) {
-      console.log('Allowing origin:', origin);
-      return callback(null, true);
-    } else {
-      console.log('Blocked origin:', origin);
-      console.log('Allowed origins:', allowedOrigins);
-      return callback(new Error('Not allowed by CORS'), false);
-    }
+    // TEMPORARILY DISABLE CORS FOR DEVELOPMENT
+    return callback(null, true);
   },
   credentials: true,
   optionsSuccessStatus: 200
@@ -86,8 +116,22 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(compression()); // Compress responses
+
+// Optional cookie-parser: if not installed, use a no-op middleware
+let cookieParserMiddleware: any;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const cookieParser = require('cookie-parser');
+  cookieParserMiddleware = cookieParser();
+} catch (e) {
+  cookieParserMiddleware = (_req: Request, _res: Response, next: NextFunction) => next();
+}
+app.use(cookieParserMiddleware);
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// i18n middleware for multi-language support
+app.use(i18nMiddleware);
 
 // Logging in development
 if (process.env.NODE_ENV === 'development') {
@@ -119,13 +163,17 @@ app.use((req, res, next) => {
   return csrfProtection(req, res, next);
 });
 
-// Rate limiting
+// Rate limiting - More permissive for development
 const limiter = rateLimit({
-  max: 100,
+  max: 1000, // Increased for development
   windowMs: 15 * 60 * 1000, // 15 minutes
   message: 'Too many requests from this IP, please try again in 15 minutes!',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for authenticated requests in development
+    return process.env.NODE_ENV === 'development' && !!req.headers.authorization;
+  }
 });
 app.use('/api', limiter);
 
@@ -162,21 +210,23 @@ app.get('/api/v1/csrf-token', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/services', serviceRoutes);
-app.use('/api/v1/realisations', realisationRoutes);
 app.use('/api/v1/articles', articleRoutes);
+app.use('/api/v1/realisations', realisationRoutes);
 app.use('/api/v1/testimonials', testimonialRoutes);
-app.use('/api/v1/team', teamRoutes);
 app.use('/api/v1/products', productRoutes);
-app.use('/api/v1/contacts', contactRoutes);
+app.use('/api/v1/team', teamRoutes);
+app.use('/api/v1/contact', contactRoutes);
 app.use('/api/v1/quotes', quoteRoutes);
 app.use('/api/v1/newsletter', newsletterRoutes);
+app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1', healthRoutes); // Health check routes
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
-  
+
   app.get('*', (req, res) => {
     // Don't serve React app for API routes
     if (req.path.startsWith('/api/')) {
@@ -211,7 +261,7 @@ if (process.env.NODE_ENV !== 'test') {
     try {
       await connectDB();
       
-      const server = app.listen(PORT, () => {
+      server.listen(PORT, () => {
         logger.info(`Server is running on port ${PORT}`);
         logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 

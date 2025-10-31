@@ -109,7 +109,6 @@ export class BaseController<T extends Document> implements IBaseController {
   };
 
   protected handleError(res: Response, error: any, defaultMessage: string): void {
-    console.error(error);
     
     // Handle validation errors
     if (error.name === 'ValidationError') {

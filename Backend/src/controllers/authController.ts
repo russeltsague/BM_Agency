@@ -16,27 +16,48 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required')
 });
 
-// Generate JWT token
-const signToken = (id: string): string => {
+// Helpers to create tokens
+const signAccessToken = (id: string): string => {
   const secret = process.env.JWT_SECRET || 'your-secret-key';
-  
-  return jwt.sign(
-    { id },
-    secret,
-    { expiresIn: '90d' }
-  );
+  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
+  return jwt.sign({ id }, secret, { expiresIn });
 };
 
-// Create and send token
+const signRefreshToken = (id: string): string => {
+  const secret = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret';
+  const expiresIn = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
+  return jwt.sign({ id }, secret, { expiresIn });
+};
+
+// Create tokens, set HttpOnly cookies, and send response
 const createSendToken = (user: IUser & { _id: any }, statusCode: number, res: Response) => {
-  const token = signToken(user._id.toString());
+  const accessToken = signAccessToken(user._id.toString());
+  const refreshToken = signRefreshToken(user._id.toString());
+
+  const isProd = process.env.NODE_ENV === 'production';
+
+  // Set cookies
+  res.cookie('token', accessToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 15 * 60 * 1000 // 15 minutes
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/api/v1/auth/refresh-token'
+  });
   
   // Remove password from output
   user.password = undefined as any;
   
   res.status(statusCode).json({
     status: 'success',
-    token,
+    token: accessToken,
     data: {
       user
     }
@@ -74,7 +95,7 @@ export const authController = {
       if (existingUser) {
         return res.status(400).json({
           status: 'error',
-          message: 'Email already in use'
+          message: req.t?.('auth.email_already_exists') || 'Email already in use'
         });
       }
 
@@ -92,7 +113,7 @@ export const authController = {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
           status: 'error',
-          message: 'Validation error',
+          message: req.t?.('validation.validation_error') || 'Validation error',
           errors: error.issues.map(issue => ({
             message: issue.message,
             path: issue.path
@@ -100,10 +121,52 @@ export const authController = {
         });
       }
       
-      console.error('Registration error:', error);
       res.status(500).json({
         status: 'error',
-        message: 'Internal server error'
+        message: req.t?.('errors.internal_server_error') || 'Internal server error'
+      });
+    }
+  },
+
+  // Refresh access token using refresh token cookie
+  async refreshToken(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        return res.status(401).json({ 
+          status: 'error', 
+          message: req.t?.('auth.no_refresh_token') || 'No refresh token provided' 
+        });
+      }
+
+      const decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret'
+      ) as { id: string };
+
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(404).json({ 
+          status: 'error', 
+          message: req.t?.('auth.user_not_found') || 'User not found' 
+        });
+      }
+
+      const newAccessToken = signAccessToken(user._id.toString());
+
+      const isProd = process.env.NODE_ENV === 'production';
+      res.cookie('token', newAccessToken, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? 'none' : 'lax',
+        maxAge: 15 * 60 * 1000
+      });
+
+      return res.json({ status: 'success', data: { token: newAccessToken } });
+    } catch (error) {
+      return res.status(401).json({ 
+        status: 'error', 
+        message: req.t?.('auth.invalid_refresh_token') || 'Invalid or expired refresh token' 
       });
     }
   },
@@ -119,17 +182,17 @@ export const authController = {
       if (!user || !(await user.comparePassword(password))) {
         return res.status(401).json({
           status: 'error',
-          message: 'Incorrect email or password'
+          message: req.t?.('auth.invalid_credentials') || 'Incorrect email or password'
         });
       }
 
-      // 3) If everything ok, send token to client
+      // 3) If everything ok, set cookies and send token to client
       createSendToken(user, 200, res);
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
           status: 'error',
-          message: 'Validation error',
+          message: req.t?.('validation.validation_error') || 'Validation error',
           errors: error.issues.map(issue => ({
             message: issue.message,
             path: issue.path
@@ -137,10 +200,9 @@ export const authController = {
         });
       }
       
-      console.error('Login error:', error);
       res.status(500).json({
         status: 'error',
-        message: 'Internal server error'
+        message: req.t?.('errors.internal_server_error') || 'Internal server error'
       });
     }
   },
@@ -148,7 +210,7 @@ export const authController = {
   async getMe(req: Request, res: Response) {
     try {
       // The user is already attached to the request by the protect middleware
-      const user = await User.findById(req.user?._id);
+      const user = await User.findById(req.user?.id);
       
       if (!user) {
         return res.status(404).json({
@@ -164,7 +226,6 @@ export const authController = {
         }
       });
     } catch (error) {
-      console.error('Get me error:', error);
       res.status(500).json({
         status: 'error',
         message: 'Internal server error'
@@ -291,7 +352,6 @@ export const authController = {
         });
       }
 
-      console.error('Update profile error:', error);
       res.status(500).json({
         status: 'error',
         message: 'An error occurred while updating profile'
@@ -344,7 +404,6 @@ export const authController = {
         });
       }
 
-      console.error('Create admin error:', error);
       res.status(500).json({
         status: 'error',
         message: 'Internal server error'
@@ -381,7 +440,6 @@ export const authController = {
         message: 'User deleted successfully'
       });
     } catch (error) {
-      console.error('Delete user error:', error);
       res.status(500).json({
         status: 'error',
         message: 'An error occurred while deleting user'

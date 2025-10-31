@@ -1,0 +1,73 @@
+{
+  "auth": {
+    "login_success": "Connexion réussie",
+    "logout_success": "Déconnexion réussie",
+    "invalid_credentials": "Email ou mot de passe incorrect",
+    "email_already_exists": "Email déjà utilisé",
+    "user_created": "Utilisateur créé avec succès",
+    "password_updated": "Mot de passe mis à jour avec succès",
+    "profile_updated": "Profil mis à jour avec succès",
+    "user_not_found": "Utilisateur non trouvé",
+    "user_deleted": "Utilisateur supprimé avec succès",
+    "not_logged_in": "Vous n'êtes pas connecté! Veuillez vous connecter pour accéder.",
+    "token_expired": "Token invalide ou session expirée. Veuillez vous reconnecter.",
+    "user_no_longer_exists": "L'utilisateur appartenant à ce token n'existe plus.",
+    "password_changed_recently": "L'utilisateur a récemment changé son mot de passe! Veuillez vous reconnecter.",
+    "wrong_current_password": "Votre mot de passe actuel est incorrect.",
+    "cannot_delete_own_account": "Vous ne pouvez pas supprimer votre propre compte",
+    "admin_created": "Utilisateur administrateur créé avec succès",
+    "no_permission": "Vous n'avez pas la permission d'effectuer cette action",
+    "no_refresh_token": "Aucun token de rafraîchissement fourni",
+    "invalid_refresh_token": "Token de rafraîchissement invalide ou expiré"
+  },
+  "validation": {
+    "required": "Ce champ est requis",
+    "email_invalid": "Veuillez fournir une adresse email valide",
+    "password_min_length": "Le mot de passe doit contenir au moins 8 caractères",
+    "password_uppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+    "password_lowercase": "Le mot de passe doit contenir au moins une lettre minuscule",
+    "password_number": "Le mot de passe doit contenir au moins un chiffre",
+    "password_special": "Le mot de passe doit contenir au moins un caractère spécial",
+    "name_min_length": "Le nom doit contenir au moins 2 caractères",
+    "name_max_length": "Le nom ne peut pas dépasser 50 caractères",
+    "validation_error": "Erreur de validation"
+  },
+  "errors": {
+    "internal_server_error": "Erreur interne du serveur",
+    "not_found": "Ressource non trouvée",
+    "bad_request": "Mauvaise requête",
+    "unauthorized": "Non autorisé",
+    "forbidden": "Interdit"
+  },
+  "articles": {
+    "created": "Article créé avec succès",
+    "updated": "Article mis à jour avec succès",
+    "deleted": "Article supprimé avec succès",
+    "not_found": "Article non trouvé",
+    "published": "Article publié avec succès",
+    "unpublished": "Article dépublié avec succès"
+  },
+  "services": {
+    "created": "Service créé avec succès",
+    "updated": "Service mis à jour avec succès",
+    "deleted": "Service supprimé avec succès",
+    "not_found": "Service non trouvé"
+  },
+  "contact": {
+    "message_sent": "Message envoyé avec succès",
+    "message_received": "Message reçu avec succès"
+  },
+  "newsletter": {
+    "subscribed": "Abonnement à la newsletter réussi",
+    "already_subscribed": "Email déjà abonné",
+    "unsubscribed": "Désabonnement de la newsletter réussi"
+  },
+  "common": {
+    "success": "Succès",
+    "error": "Erreur",
+    "created": "Créé avec succès",
+    "updated": "Mis à jour avec succès",
+    "deleted": "Supprimé avec succès",
+    "fetched": "Données récupérées avec succès"
+  }
+}

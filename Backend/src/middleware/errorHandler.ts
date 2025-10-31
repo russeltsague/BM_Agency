@@ -87,7 +87,6 @@ const sendErrorDev = (err: any, req: Request, res: Response) => {
     });
   }
   // For non-API routes, send JSON as well since this is an API-only server
-  console.error('ERROR 💥', err);
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
@@ -106,7 +105,6 @@ const sendErrorProd = (err: any, req: Request, res: Response) => {
     }
     // Programming or other unknown error: don't leak error details
     // 1) Log error
-    console.error('ERROR 💥', err);
     // 2) Send generic message
     return res.status(500).json({
       status: 'error',
@@ -122,7 +120,6 @@ const sendErrorProd = (err: any, req: Request, res: Response) => {
   }
   // Programming or other unknown error: don't leak error details
   // 1) Log error
-  console.error('ERROR 💥', err);
   // 2) Send generic message
   return res.status(err.statusCode).json({
     status: 'error',

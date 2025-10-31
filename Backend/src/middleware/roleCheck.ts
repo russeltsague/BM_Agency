@@ -4,15 +4,15 @@ import { CustomRequest } from '../types/express';
 
 export const restrictTo = (...roles: string[]) => {
   return (req: CustomRequest, res: Response, next: NextFunction) => {
-    // Check if user is authenticated and has a role
-    if (!req.user || !req.user.role) {
+    // Check if user is authenticated and has roles
+    if (!req.user || !req.user.roles) {
       return next(
         new AppError('You are not logged in! Please log in to get access.', 401)
       );
     }
 
-    // Check if user's role is included in the allowed roles
-    if (!roles.includes(req.user.role)) {
+    // Check if user's roles include any of the allowed roles
+    if (!roles.some(role => req.user!.roles.includes(role))) {
       return next(
         new AppError('You do not have permission to perform this action', 403)
       );
@@ -39,15 +39,15 @@ export const isOwnerOrAdmin = (modelName: string) => {
         return next(new AppError('No document found with that ID', 404));
       }
 
-      // Check if user is authenticated and has a role
-      if (!req.user || !req.user.role) {
+      // Check if user is authenticated and has roles
+      if (!req.user || !req.user.roles) {
         return next(
           new AppError('You are not logged in! Please log in to get access.', 401)
         );
       }
 
       // If user is admin, allow access
-      if (req.user.role === 'admin') {
+      if (req.user.roles.includes('admin')) {
         return next();
       }
 

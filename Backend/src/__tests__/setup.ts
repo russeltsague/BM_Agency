@@ -15,7 +15,6 @@ beforeAll(async () => {
     
     await mongoose.connect(mongoUri);
   } catch (error) {
-    console.error('Failed to start MongoDB Memory Server:', error);
     throw error;
   }
 });
@@ -28,7 +27,6 @@ afterAll(async () => {
       await mongoServer.stop();
     }
   } catch (error) {
-    console.error('Error during cleanup:', error);
   }
 });
 

@@ -103,6 +103,9 @@ router.post(
   authController.login
 );
 
+// Refresh access token using HttpOnly refreshToken cookie
+router.post('/refresh-token', authController.refreshToken);
+
 // Protected routes (require authentication)
 router.use(protect);
 

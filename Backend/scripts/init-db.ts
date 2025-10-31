@@ -47,7 +47,8 @@ const initDB = async () => {
         name: 'Admin User',
         email: ADMIN_EMAIL,
         password: ADMIN_PASSWORD,
-        role: 'admin'
+        roles: ['admin'], // Fix: Use roles array with 'admin' instead of single role field
+        role: 'admin' // Keep both for backward compatibility
       });
 
       await admin.save();
