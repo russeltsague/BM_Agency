@@ -198,8 +198,17 @@ export const PortfolioSection = () => {
           <p className="text-gray-600 dark:text-slate-400 mb-6">
             {t('ctaText')}
           </p>
-          <Button size="lg" onClick={() => router.push('/portfolio')}>
+          <Button 
+            size="lg" 
+            onClick={() => {
+              // Get the current locale from the URL or default to 'fr'
+              const locale = window.location.pathname.split('/')[1] || 'fr';
+              router.push(`/${locale}/portfolio`);
+            }}
+            className="group"
+          >
             {t('ctaButton')}
+            <ExternalLink className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </MotionDiv>
       </div>

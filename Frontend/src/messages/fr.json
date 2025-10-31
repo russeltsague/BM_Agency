@@ -176,8 +176,13 @@
         "other": "Autre"
       },
       "privacy": "J'accepte que mes données soient traitées conformément à la {privacyLink}politique de confidentialité{/privacyLink}*",
+      "privacyRequired": "Vous devez accepter la politique de confidentialité",
+      "required": "Ce champ est obligatoire",
+      "invalidEmail": "Veuillez entrer une adresse email valide",
       "submitting": "Envoi en cours...",
-      "submit": "Envoyer le message"
+      "submit": "Envoyer le message",
+      "successMessage": "Votre message a bien été envoyé. Nous vous recontacterons bientôt !",
+      "errorMessage": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer plus tard."
     },
     "map": {
       "title": "Carte interactive",
@@ -275,7 +280,7 @@
       },
       "email": {
         "title": "Email",
-        "detail": "contact@bm-agency.cm",
+        "detail": "contact@bm-agency.net",
         "description": "Réponse sous 24h ouvrés"
       },
       "address": {

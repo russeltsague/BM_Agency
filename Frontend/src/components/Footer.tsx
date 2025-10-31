@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { MotionDiv, MotionH4, MotionLi, MotionA } from '@/components/MotionComponents';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Youtube } from 'lucide-react';
 import { Button } from './Button';
 
 export const Footer = () => {
@@ -43,9 +43,8 @@ export const Footer = () => {
 
   const socialLinks = [
     { href: 'https://www.facebook.com/share/1BVBZarSbm/?mibextid=wwXIfr', icon: Facebook, label: 'Facebook' },
-    { href: 'https://twitter.com/votreentreprise', icon: Twitter, label: 'Twitter' },
-    { href: 'https://instagram.com/votreentreprise', icon: Instagram, label: 'Instagram' },
     { href: 'https://www.linkedin.com/company/agency-bm/', icon: Linkedin, label: 'LinkedIn' },
+    { href: 'https://www.youtube.com/results?search_query=bm+agency&sp=mAEA', icon: Youtube, label: 'YouTube' },
   ]
 
   return (

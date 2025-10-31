@@ -182,11 +182,15 @@ export const BlogSection = () => {
           <Button 
             variant="outline" 
             size="lg" 
-            className="mt-8"
-            onClick={() => router.push('/blog')}
+            className="mt-8 group"
+            onClick={() => {
+              // Get the current locale from the URL or default to 'fr'
+              const locale = window.location.pathname.split('/')[1] || 'fr';
+              router.push(`/${locale}/blog`);
+            }}
           >
             {t('viewAll')}
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </MotionDiv>
       </div>

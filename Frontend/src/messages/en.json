@@ -275,7 +275,7 @@
       },
       "email": {
         "title": "Email",
-        "detail": "contact@bm-agency.cm",
+        "detail": "contact@bm-agency.net",
         "description": "Response within 24 business hours"
       },
       "address": {
@@ -290,8 +290,7 @@
       }
     },
     "form": {
-      "title": "Let's talk about your project",
-      "description": "Fill out the form below and we'll get back to you within 24 hours.",
+      "title": "Send us a message",
       "firstName": {
         "label": "First Name",
         "placeholder": "Your first name"
@@ -302,36 +301,42 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "your@email.com"
+        "placeholder": "your.email@example.com"
       },
       "phone": {
         "label": "Phone",
-        "placeholder": "+237 6 12 34 56 78"
+        "placeholder": "+1 234 567 890"
       },
       "company": {
         "label": "Company",
         "placeholder": "Your company name"
       },
       "service": {
-        "label": "Service needed",
+        "label": "Service",
         "options": {
           "choose": "Select a service",
           "digital": "Digital Communication",
           "marketing": "Digital Marketing",
-          "design": "Graphic Design",
+          "design": "Design & Branding",
           "strategy": "Digital Strategy",
           "objects": "Promotional Items",
-          "training": "Training",
+          "training": "Training & Coaching",
           "other": "Other"
         }
       },
       "message": {
         "label": "Message",
-        "placeholder": "Describe your project or request..."
+        "placeholder": "How can we help you?"
       },
-      "privacy": "I accept BM Agency's {privacy}",
-      "privacyLink": "privacy policy",
-      "submit": "Send message"
+      "privacy": "I agree to the {privacy}Privacy Policy{/privacy} and {terms}Terms of Service{/terms}.",
+      "privacyLink": "Privacy Policy",
+      "privacyRequired": "You must accept the privacy policy",
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "submitting": "Sending...",
+      "submit": "Send Message",
+      "successMessage": "Your message has been sent successfully. We'll get back to you soon!",
+      "errorMessage": "There was an error sending your message. Please try again later."
     },
     "social": {
       "facebook": "Facebook",

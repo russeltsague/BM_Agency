@@ -161,8 +161,20 @@ export const ServicesSection = () => {
           <p className="text-gray-600 dark:text-slate-400 mb-6">
             {t('ctaText')}
           </p>
-          <Button size="lg">
+          <Button 
+            size="lg"
+            onClick={() => {
+              // Replace with your WhatsApp business number in international format (without + or 00)
+              const phoneNumber = '237675176974';
+              // Pre-filled message (URL encoded)
+              const message = encodeURIComponent("Bonjour, je souhaite discuter de mon projet avec l'équipe BM Agency.");
+              // Open WhatsApp with the pre-filled message
+              window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+            }}
+            className="group"
+          >
             {t('ctaButton')}
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </MotionDiv>
       </div>

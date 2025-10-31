@@ -1,79 +1,46 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { MotionDiv } from '@/components/MotionComponents'
-import { Phone, Mail, MapPin, Clock, Send, Loader2, CheckCircle } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/Button'
 import { useTranslations } from 'next-intl'
-import { useForm, SubmitHandler } from 'react-hook-form'
 
-type FormData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  company: string;
-  service: string;
-  message: string;
-  privacy: boolean;
-};
+interface FormData {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  company: string
+  service: string
+  message: string
+  privacy: boolean
+}
 
 export const ContactSection = () => {
   const t = useTranslations('ContactSection')
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{ success: boolean; message: string } | null>(null);
+  const router = useRouter()
   
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>();
-
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSubmitStatus({
-          success: true,
-          message: t('form.successMessage')
-        });
-        reset();
-      } else {
-        throw new Error(result.message || 'Failed to send message');
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setSubmitStatus({
-        success: false,
-        message: error instanceof Error ? error.message : t('form.errorMessage')
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Reset status after 5 seconds
-  React.useEffect(() => {
-    if (submitStatus) {
-      const timer = setTimeout(() => {
-        setSubmitStatus(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [submitStatus]);
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    company: '',
+    service: '',
+    message: '',
+    privacy: false
+  })
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<{ 
+    type: 'success' | 'error' | null
+    message: string | null 
+  }>({ 
+    type: null, 
+    message: null 
+  })
   
   const contactInfo = [
     {
@@ -102,11 +69,59 @@ export const ContactSection = () => {
     }
   ]
 
-  const handleWhatsAppClick = () => {
-    const phoneNumber = '237675176974';
-    const message = encodeURIComponent("Bonjour, je souhaite obtenir un devis express pour mes besoins en communication digitale.");
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus({ type: null, message: null })
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: 'success',
+          message: t('form.submitSuccess')
+        })
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          company: '',
+          service: '',
+          message: '',
+          privacy: false
+        })
+      } else {
+        throw new Error(data.message || 'Failed to send message')
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      setSubmitStatus({
+        type: 'error',
+        message: t('form.submitError')
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <section className="py-20 bg-white dark:bg-slate-900">
@@ -140,7 +155,7 @@ export const ContactSection = () => {
                 {t('contactInfo.title')}
               </h3>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
@@ -149,12 +164,12 @@ export const ContactSection = () => {
                     <input
                       type="text"
                       id="firstName"
-                      className={`w-full px-4 py-3 border ${
-                        errors.firstName ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
-                      } rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100`}
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                       placeholder={t('form.firstName.placeholder')}
-                      {...register('firstName', { required: t('form.required') })}
-                      disabled={isSubmitting}
                     />
                   </div>
 
@@ -165,12 +180,12 @@ export const ContactSection = () => {
                     <input
                       type="text"
                       id="lastName"
-                      className={`w-full px-4 py-3 border ${
-                        errors.lastName ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
-                      } rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100`}
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                       placeholder={t('form.lastName.placeholder')}
-                      {...register('lastName', { required: t('form.required') })}
-                      disabled={isSubmitting}
                     />
                   </div>
                 </div>
@@ -182,18 +197,12 @@ export const ContactSection = () => {
                   <input
                     type="email"
                     id="email"
-                    className={`w-full px-4 py-3 border ${
-                      errors.email ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
-                    } rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100`}
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     placeholder={t('form.email.placeholder')}
-                    {...register('email', { 
-                      required: t('form.required'),
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: t('form.invalidEmail')
-                      }
-                    })}
-                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -204,10 +213,11 @@ export const ContactSection = () => {
                   <input
                     type="tel"
                     id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     placeholder={t('form.phone.placeholder')}
-                    {...register('phone')}
-                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -218,10 +228,11 @@ export const ContactSection = () => {
                   <input
                     type="text"
                     id="company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     placeholder={t('form.company.placeholder')}
-                    {...register('company')}
-                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -231,9 +242,10 @@ export const ContactSection = () => {
                   </label>
                   <select
                     id="service"
+                    name="service"
+                    value={formData.service}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
-                    {...register('service')}
-                    disabled={isSubmitting}
                   >
                     <option value="">{t('form.service.options.choose')}</option>
                     <option value="digital">{t('form.service.options.digital')}</option>
@@ -252,26 +264,25 @@ export const ContactSection = () => {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     rows={5}
-                    className={`w-full px-4 py-3 border ${
-                      errors.message ? 'border-red-500' : 'border-gray-300 dark:border-slate-600'
-                    } rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100`}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-blue-400 focus:border-primary-500 dark:focus:border-blue-400 transition-colors resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
                     placeholder={t('form.message.placeholder')}
-                    {...register('message', { required: t('form.required') })}
-                    disabled={isSubmitting}
                   />
-                  {errors.message && (
-                    <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
-                  )}
                 </div>
 
                 <div className="flex items-start">
                   <input
                     type="checkbox"
                     id="privacy"
-                    className={`mt-1 mr-3 ${errors.privacy ? 'border-red-500' : ''}`}
-                    {...register('privacy', { required: t('form.privacyRequired') })}
-                    disabled={isSubmitting}
+                    name="privacy"
+                    checked={formData.privacy}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 mr-3"
                   />
                   <label htmlFor="privacy" className="text-sm text-gray-600 dark:text-slate-400">
                     {(() => {
@@ -284,7 +295,12 @@ export const ContactSection = () => {
                         <React.Fragment key={i}>
                           {part}
                           {i < parts.length - 1 && (
-                            <a href="/politique-confidentialite" className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300">
+                            <a 
+                              href="/politique-confidentialite" 
+                              className="text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               {t('form.privacyLink')}
                             </a>
                           )}
@@ -294,6 +310,23 @@ export const ContactSection = () => {
                   </label>
                 </div>
 
+                {submitStatus.message && (
+                  <div className={`p-4 rounded-lg ${
+                    submitStatus.type === 'success' 
+                      ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
+                      : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                  }`}>
+                    <div className="flex items-center">
+                      {submitStatus.type === 'success' ? (
+                        <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+                      )}
+                      <span>{submitStatus.message}</span>
+                    </div>
+                  </div>
+                )}
+
                 <Button 
                   type="submit" 
                   size="lg" 
@@ -302,7 +335,7 @@ export const ContactSection = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <Loader2 className="mr-2 w-5 h-5 animate-spin" />
                       {t('form.submitting')}
                     </>
                   ) : (
@@ -312,25 +345,6 @@ export const ContactSection = () => {
                     </>
                   )}
                 </Button>
-                
-                {submitStatus && (
-                  <div className={`mt-4 p-4 rounded-lg ${
-                    submitStatus.success 
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}>
-                    <div className="flex items-center">
-                      {submitStatus.success ? (
-                        <CheckCircle className="h-5 w-5 mr-2" />
-                      ) : (
-                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      )}
-                      <span>{submitStatus.message}</span>
-                    </div>
-                  </div>
-                )}
               </form>
             </div>
           </MotionDiv>
@@ -357,7 +371,6 @@ export const ContactSection = () => {
                     <info.icon className="w-6 h-6 text-primary-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <span className="sr-only">{t('social.facebook')}</span>
                     <h4 className="font-semibold text-gray-900 dark:text-slate-100">{info.title}</h4>
                   </div>
                 </div>
@@ -392,7 +405,7 @@ export const ContactSection = () => {
                 variant="secondary" 
                 size="sm" 
                 className="w-full"
-                onClick={handleWhatsAppClick}
+                onClick={() => router.push('/contact?quick-quote=true')}
               >
                 Devis express
               </Button>
